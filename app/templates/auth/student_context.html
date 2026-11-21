@@ -131,18 +131,22 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="next" value="{{ next_target or '' }}">
 
-          <div class="form-field">
+          <div class="form-field university-picker" id="university-picker">
             <label for="university-filter">搜索学校</label>
-            <div class="input-shell context-input-shell">
-              <span class="input-icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
-              </span>
-              <input id="university-filter" type="text" placeholder="输入“四川”可筛选学校"
-                     aria-controls="university_id" autocomplete="off">
+            <div class="university-combobox">
+              <div class="input-shell context-input-shell">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+                </span>
+                <input id="university-filter" type="search" placeholder="输入校名或城市关键字"
+                       role="combobox" aria-autocomplete="list" aria-expanded="false"
+                       aria-controls="university-results" aria-describedby="university-search-hint university-error"
+                       autocomplete="off">
+              </div>
+              <div id="university-results" class="university-results" role="listbox" aria-label="学校搜索结果" hidden></div>
             </div>
 
-            <label class="context-select-label" for="university_id">选择学校</label>
-            <select id="university_id" name="university_id" required>
+            <select id="university_id" name="university_id" class="university-native" tabindex="-1" aria-hidden="true">
               <option value="" selected disabled>请选择学校</option>
               {% for uni in universities %}
                 <option value="{{ uni.id }}" data-name="{{ uni.name }} {{ uni.city }}"
@@ -151,6 +155,8 @@
                 </option>
               {% endfor %}
             </select>
+            <p class="field-hint" id="university-search-hint">输入单字或连续关键字，实时匹配校名与城市。</p>
+            <p class="field-error" id="university-error" hidden>请从搜索结果中选择学校。</p>
           </div>
 
           <div class="form-field">
@@ -199,10 +205,82 @@
       const filterInput = document.getElementById("university-filter");
       const universitySelect = document.getElementById("university_id");
       const campusSelect = document.getElementById("campus_id");
+      const universityPicker = document.getElementById("university-picker");
+      const universityResults = document.getElementById("university-results");
+      const universityError = document.getElementById("university-error");
       const submit = document.getElementById("context-submit");
       const summary = document.getElementById("selection-summary");
       const stepSchool = document.querySelector('[data-step="school"]');
       const stepCampus = document.querySelector('[data-step="campus"]');
+      const schoolOptions = Array.from(universitySelect.options).filter((option) => option.value);
+      let activeIndex = -1;
+
+      universityPicker.classList.add("is-enhanced");
+      universitySelect.removeAttribute("required");
+
+      function optionLabel(option) {
+        return option.textContent.trim();
+      }
+
+      function closeResults() {
+        universityResults.hidden = true;
+        filterInput.setAttribute("aria-expanded", "false");
+        filterInput.removeAttribute("aria-activedescendant");
+        activeIndex = -1;
+      }
+
+      function setActiveResult(index) {
+        const buttons = Array.from(universityResults.querySelectorAll(".university-option"));
+        if (!buttons.length) return;
+        activeIndex = (index + buttons.length) % buttons.length;
+        buttons.forEach((button, buttonIndex) => {
+          button.classList.toggle("is-active", buttonIndex === activeIndex);
+        });
+        filterInput.setAttribute("aria-activedescendant", buttons[activeIndex].id);
+        buttons[activeIndex].scrollIntoView({ block: "nearest" });
+      }
+
+      function chooseUniversity(option) {
+        universitySelect.value = option.value;
+        filterInput.value = optionLabel(option);
+        universityError.hidden = true;
+        closeResults();
+        refreshCampuses();
+        campusSelect.focus();
+      }
+
+      function renderResults() {
+        const keyword = filterInput.value.trim().toLowerCase();
+        if (!keyword) {
+          closeResults();
+          return;
+        }
+        const matches = schoolOptions.filter((option) =>
+          (option.dataset.name || "").toLowerCase().includes(keyword)
+        );
+        universityResults.replaceChildren();
+        activeIndex = -1;
+        if (!matches.length) {
+          const empty = document.createElement("p");
+          empty.className = "university-empty";
+          empty.textContent = "没有匹配的学校，请换个关键字。";
+          universityResults.append(empty);
+        } else {
+          matches.slice(0, 30).forEach((option, index) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.id = `university-option-${index}`;
+            button.className = "university-option";
+            button.setAttribute("role", "option");
+            button.dataset.value = option.value;
+            button.textContent = optionLabel(option);
+            button.addEventListener("click", () => chooseUniversity(option));
+            universityResults.append(button);
+          });
+        }
+        universityResults.hidden = false;
+        filterInput.setAttribute("aria-expanded", "true");
+      }
 
       function selectedUniversityName() {
         return universitySelect.selectedIndex > 0 ? universitySelect.selectedOptions[0].textContent.trim() : "";
@@ -252,16 +330,51 @@
       }
 
       filterInput.addEventListener("input", () => {
-        const keyword = filterInput.value.trim().toLowerCase();
-        universitySelect.querySelectorAll("option[data-name]").forEach((option) => {
-          const visible = !keyword || option.dataset.name.toLowerCase().includes(keyword);
-          option.hidden = !visible;
-          option.disabled = !visible;
-        });
+        const selected = universitySelect.selectedOptions[0];
+        if (selected && filterInput.value.trim() !== optionLabel(selected)) {
+          universitySelect.value = "";
+          refreshCampuses();
+        }
+        universityError.hidden = true;
+        renderResults();
+      });
+
+      filterInput.addEventListener("focus", () => {
+        if (filterInput.value.trim() && !universitySelect.value) renderResults();
+      });
+
+      filterInput.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          if (universityResults.hidden) renderResults();
+          const offset = event.key === "ArrowDown" ? 1 : -1;
+          setActiveResult(activeIndex + offset);
+        } else if (event.key === "Enter" && activeIndex >= 0) {
+          event.preventDefault();
+          universityResults.querySelectorAll(".university-option")[activeIndex]?.click();
+        } else if (event.key === "Escape") {
+          closeResults();
+        }
+      });
+
+      document.addEventListener("pointerdown", (event) => {
+        if (!universityPicker.contains(event.target)) closeResults();
+      });
+
+      document.getElementById("student-context-form").addEventListener("submit", (event) => {
+        if (!universitySelect.value) {
+          event.preventDefault();
+          universityError.hidden = false;
+          filterInput.focus();
+        }
       });
 
       universitySelect.addEventListener("change", refreshCampuses);
       campusSelect.addEventListener("change", updateSummary);
+      const initiallySelected = universitySelect.selectedOptions[0];
+      if (initiallySelected && initiallySelected.value) {
+        filterInput.value = optionLabel(initiallySelected);
+      }
       refreshCampuses();
       updateSummary();
     })();

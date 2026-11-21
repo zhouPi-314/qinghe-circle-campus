@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-21T12:09:05.620Z",
+  "checked_at": "2026-11-21T12:25:18.265Z",
   "passed": true,
   "checks": [
     {
@@ -161,12 +161,74 @@
       "details": null
     },
     {
+      "name": "school search placeholder is generic",
+      "passed": true,
+      "details": {
+        "placeholder": "输入校名或城市关键字"
+      }
+    },
+    {
+      "name": "school search returns single-character results",
+      "passed": true,
+      "details": {
+        "visible": true,
+        "texts": [
+          "四川大学（成都市 · 本科）",
+          "四川师范大学（成都市 · 本科）"
+        ]
+      }
+    },
+    {
+      "name": "single-character results match keyword",
+      "passed": true,
+      "details": {
+        "visible": true,
+        "texts": [
+          "四川大学（成都市 · 本科）",
+          "四川师范大学（成都市 · 本科）"
+        ]
+      }
+    },
+    {
+      "name": "school search returns multi-character results",
+      "passed": true,
+      "details": {
+        "visible": true,
+        "texts": [
+          "四川大学（成都市 · 本科）",
+          "四川师范大学（成都市 · 本科）"
+        ]
+      }
+    },
+    {
+      "name": "multi-character results match keyword",
+      "passed": true,
+      "details": {
+        "visible": true,
+        "texts": [
+          "四川大学（成都市 · 本科）",
+          "四川师范大学（成都市 · 本科）"
+        ]
+      }
+    },
+    {
+      "name": "school search selection updates form",
+      "passed": true,
+      "details": {
+        "campusDisabled": false,
+        "submitDisabled": false,
+        "summary": "四川大学（成都市 · 本科） · 四川大学",
+        "selectedUniversity": "1"
+      }
+    },
+    {
       "name": "student context applies campus selection",
       "passed": true,
       "details": {
         "campusDisabled": false,
         "submitDisabled": false,
-        "summary": "青禾示范大学（成都市 · 本科） · 青禾示范大学"
+        "summary": "四川大学（成都市 · 本科） · 四川大学",
+        "selectedUniversity": "1"
       }
     },
     {
@@ -175,7 +237,8 @@
       "details": {
         "campusDisabled": false,
         "submitDisabled": false,
-        "summary": "青禾示范大学（成都市 · 本科） · 青禾示范大学"
+        "summary": "四川大学（成都市 · 本科） · 四川大学",
+        "selectedUniversity": "1"
       }
     },
     {

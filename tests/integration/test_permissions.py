@@ -207,6 +207,9 @@ class TestStudentContextEnforced:
         assert 'class="campus-visual"' in context_html
         assert 'id="selection-summary"' in context_html
         assert 'id="university-filter"' in context_html
+        assert 'id="university-results"' in context_html
+        assert 'placeholder="输入校名或城市关键字"' in context_html
+        assert "输入“四川”" not in context_html
 
     def test_student_without_campus_cannot_login(self, client):
         """未选校区时直接 POST 登录被重定向回学校校区选择。"""
