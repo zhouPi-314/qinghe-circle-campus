@@ -20,6 +20,7 @@
 | `6.3-development/g5-university-admin-and-registration-sms-design.md` | G5 校级管理员与阿里云注册短信设计提案 | Codex |
 | `6.3-development/g5-university-admin-and-registration-sms-plan.md` | G5 分工、TDD 任务和开发流程扩展计划 | Codex |
 | `6.3-development/cloudflare-free-firewall.md` | Cloudflare Free 接入前提、项目改造和上线验证 | Codex |
+| `6.3-development/evidence/g5-release-evidence.md` | G5 校级管理员、短信认证和运维安全验收证据 | Codex |
 
 ## 唯一规则入口
 

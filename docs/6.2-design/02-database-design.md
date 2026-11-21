@@ -26,14 +26,14 @@
 
 ## 2. 表规模核算
 
-概念模型最终得到 27 张表：
+概念模型最初得到 27 张表；G5 增加 4 张注册验证与运维安全表，当前共 31 张：
 
 | 分组 | 表数 | 表 |
 |---|---:|---|
-| 组织与账号 | 8 | `universities`、`campuses`、`users`、`stations`、`station_manager_assignments`、`student_import_batches`、`student_registry_records`、`login_verification_codes` |
+| 组织与账号 | 9 | `universities`、`campuses`、`users`、`stations`、`station_manager_assignments`、`student_import_batches`、`student_registry_records`、`login_verification_codes`、`registration_verification_requests` |
 | 物品与发布 | 3 | `item_categories`、`items`、`item_images` |
 | 申请与履约 | 6 | `circulation_requests`、`borrow_details`、`sale_details`、`recycle_details`、`handover_records`、`status_history` |
-| 治理与通知 | 4 | `notifications`、`disputes`、`dispute_messages`、`audit_logs` |
+| 治理与通知 | 7 | `notifications`、`disputes`、`dispute_messages`、`audit_logs`、`security_events`、`security_blocks`、`application_events` |
 | 公益首版 | 6 | `charity_projects`、`charity_project_needs`、`charity_donations`、`charity_donation_items`、`charity_receipts`、`charity_receipt_items` |
 
 数量是建模结果，不是设计目标。没有为达到某个数字而增设空表。
@@ -78,7 +78,7 @@
 - 只有在校学生可以进入学校—校区选择并自主注册。
 - 公益管理员和校级管理员账号由平台管理员导入，不显示注册入口。
 - 平台管理员首版只预置 1 个账号，不设账号总数上限。
-- 校级管理员首版仅预留账号和登录入口，不开放校级管理功能。
+- 校级管理员按本校范围管理组织、账号名单、审核、争议和审计。
 
 ### 4.2 活动申请唯一
 

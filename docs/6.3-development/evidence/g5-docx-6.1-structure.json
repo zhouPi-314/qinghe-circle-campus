@@ -1,0 +1,22 @@
+{
+  "documents": [
+    {
+      "file": "提交物\\6.1\\01-AI生成的原始需求文档.docx",
+      "counts": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "findings": []
+    },
+    {
+      "file": "提交物\\6.1\\02-删减决策表.docx",
+      "counts": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "findings": []
+    }
+  ]
+}

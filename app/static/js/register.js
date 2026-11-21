@@ -40,7 +40,7 @@
     const tick = () => {
       const remaining = Math.max(0, Math.ceil(Number(epochSeconds) - Date.now() / 1000));
       sendButton.disabled = remaining > 0;
-      sendButton.textContent = remaining > 0 ? `${remaining} 秒后重试` : "重新获取验证码";
+      sendButton.textContent = remaining > 0 ? `${remaining} 秒后重试` : "获取验证码";
       if (remaining === 0) window.clearInterval(countdownTimer);
     };
     tick();

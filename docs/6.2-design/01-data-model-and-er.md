@@ -11,7 +11,7 @@
 
 ## 1. 建模方法
 
-本文档从需求规格说明书中提取名词，区分实体与属性，再依据“一个 X 对应几个 Y”确定关系。最终得到 27 张表。
+本文档从需求规格说明书中提取名词，区分实体与属性，再依据“一个 X 对应几个 Y”确定关系。原模型 27 张表；G5 增加注册验证 1 张和运维安全 3 张，当前共 31 张。
 
 实体的判定标准：
 
@@ -136,6 +136,10 @@ erDiagram
 | 25 | `charity_donation_items` | 捐赠物资明细 | `donation_id`、`project_id`、`project_need_id`、`quantity`、`accepted_quantity`、`image_object_key` | 明细必须属于同一项目与需求项 |
 | 26 | `charity_receipts` | 公益回执抬头 | `project_id`、`station_id`、`recipient_org`、`received_at`、`public_note`、`status` | 发布后本校用户可查看 |
 | 27 | `charity_receipt_items` | 回执物资明细 | `receipt_id`、`donation_item_id`、`item_name`、`quantity` | 回执物资可追溯到已接收捐赠明细 |
+| 28 | `registration_verification_requests` | 注册验证挑战 | `registry_record_id`、`phone_hash`、`provider`、`out_id`、`status`、`expires_at` | 一记录一活动挑战；不存验证码明文 |
+| 29 | `security_events` | 安全事件 | `category`、`severity`、`subject_hash`、`status`、`detail` | 攻击分类与处置状态 |
+| 30 | `security_blocks` | IP 临时封禁 | `subject_hash`、`category`、`starts_at`、`ends_at`、`status` | 活动封禁主体唯一，可人工解除 |
+| 31 | `application_events` | 应用错误与日志 | `level`、`event_code`、`request_id`、`route`、`status_code` | 只存脱敏摘要与结构 |
 
 ## 8. 关系口径
 
@@ -168,3 +172,4 @@ erDiagram
 | 版本 | 日期 | 变更 |
 |---|---|---|
 | 1.0 | 2026-11-19 | 建立 27 张表的概念模型、ER 图和实体关系核对 |
+| 1.1 | 2026-11-22 | G5 增加注册验证与运维安全 4 张表，当前 31 张 |

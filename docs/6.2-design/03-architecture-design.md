@@ -12,7 +12,7 @@
 
 系统采用单体的分层服务端渲染架构。浏览器访问 Flask 路由，路由只处理请求和模板，业务权限、状态转换和事务由 service 模块执行，SQLAlchemy 访问 PostgreSQL，图片通过独立存储适配器写入 Cloudflare R2。
 
-首版不拆分前后端，不提供 REST API，不引入消息队列、微服务和第二套状态来源。该结构适合单人课程项目，也满足后续扩展校级管理员和更多流转模式的接口边界。
+首版不拆分前后端，不提供 REST API，不引入消息队列、微服务和第二套状态来源。G5 在同一分层内增加校级管理员、阿里云短信认证 Provider 和平台运维安全中心。
 
 ## 2. 分层架构
 
@@ -41,7 +41,7 @@ flowchart TB
 
 | 模块 | 主要使用角色 | 主要业务 | 维护表 |
 |---|---|---|---|
-| 身份与准入 | 所有角色 | 身份选择、学校校区选择、注册、两种登录、资料、模拟验证码 | `users`、`universities`、`campuses`、`student_import_batches`、`student_registry_records`、`login_verification_codes` |
+| 身份与准入 | 所有角色 | 身份选择、学校校区选择、注册、图形码、PNVS/Mock 短信认证、两种登录、资料 | `users`、`universities`、`campuses`、`student_import_batches`、`student_registry_records`、`registration_verification_requests`、`login_verification_codes` |
 | 校园组织 | 平台管理员、公益管理员 | 高校、校区、站点和公益管理员站点授权 | `universities`、`campuses`、`stations`、`station_manager_assignments` |
 | 物品与媒体 | 在校学生、平台管理员 | 发布、分类、图片、浏览、编辑、下架 | `item_categories`、`items`、`item_images` |
 | 流转申请 | 在校学生、公益管理员 | 借用、出售、赠送、回收的申请和模式规则 | `circulation_requests`、`borrow_details`、`sale_details`、`recycle_details` |
@@ -58,7 +58,7 @@ flowchart TB
 - 主要角色：所有角色。
 - 业务起点与终点：选择登录身份开始，建立有效登录会话后结束；账号停用时退出。
 - 公开接口：选择身份、学生学校校区选择、注册、密码登录、验证码登录、载入当前用户、修改资料、导入学生名单、导入管理账号。
-- 核心规则：只有学生可自主注册；名单匹配；学生账号必须属于所选学校；公益管理员与校级管理员账号由平台管理员导入；平台管理员首版只预置 1 个，不设总数上限；验证码 60 秒有效。
+- 核心规则：只有学生可自主注册；名单匹配；学生账号必须属于所选学校；短信码 60 秒重发、300 秒有效；生产禁止 Mock。
 - 上游：身份选择页、学校校区页、登录/注册表单、平台管理员名单导入。
 - 下游：其他所有模块只接收已认证的 `CurrentUser`。
 - 验收：冒领注册、错学校访问、错角色访问、管理员自主注册和重复学号均失败。
@@ -73,7 +73,7 @@ flowchart TB
 - 下游：物品发布、回收申请、公益捐赠和统计。
 - 验收：停用校区不能发布新物品；不能把站点授权给其他学校账号。
 
-说明：校级管理员是首版预留登录身份，不调用校园组织管理接口；其管理功能进入后续版本时再按 `university_id` 扩展。
+说明：G5 起校级管理员按 `university_id` 使用本校概览、组织、账号名单、审核、争议与审计接口，不能跨校。
 
 ### 4.3 物品与媒体
 
@@ -208,6 +208,8 @@ flowchart LR
 | Web | Flask 开发服务器 | Vercel Python Function |
 | 数据库 | 本地 PostgreSQL 18 | Neon PostgreSQL |
 | 图片 | 本地 fake storage 或临时目录 | Cloudflare R2 |
+| 短信认证 | Mock Provider | 阿里云 PNVS 短信认证 |
+| 边缘防护 | Flask 应用层频控 | 应用层 + 可选 Cloudflare Free WAF |
 | 页面 | Jinja2 | 同一套 Jinja2 模板 |
 
 环境变量、密钥和 R2 凭据只从环境读取，不写入代码或文档。

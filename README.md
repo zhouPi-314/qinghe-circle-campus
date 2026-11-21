@@ -12,7 +12,7 @@ A Campus Circular Sharing Platform
 [![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00)](https://www.sqlalchemy.org/)
-[![Tests](https://img.shields.io/badge/tests-195%20passed-2EA44F)](docs/6.3-development/evidence/ui-consistency-redesign.md)
+[![Tests](https://img.shields.io/badge/tests-286%20passed-2EA44F)](docs/6.3-development/evidence/g5-release-evidence.md)
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghe-circle-campus.vercel.app)
 
@@ -44,12 +44,12 @@ A Campus Circular Sharing Platform
 
 | 模块 | 能力 |
 |---|---|
-| 身份与准入 | 学生名单核验注册、学生/公益管理员/平台管理员/校级管理员登录、学校与校区隔离 |
+| 身份与准入 | 学生名单核验、图形验证码、阿里云短信认证、四类身份登录、学校与校区隔离 |
 | 物品与媒体 | 发布、搜索、筛选、详情、图片、上下架与内容审核 |
 | 流转与交接 | 借用、出售模拟支付、赠送、回收、一次性交接码、归还与逾期 |
 | 公益与回执 | 实物需求、捐赠、站点核验、募集进度、脱敏回执公示 |
-| 管理与治理 | 高校/校区/站点、管理员账号、名单导入、争议、审计和强制下架 |
-| 工程与部署 | PostgreSQL 数据模型、权限测试、R2 存储、Vercel + Neon 公网复刻 |
+| 管理与治理 | 平台全局管理、校级管理员本校组织/账号/名单/审核/争议、运维安全中心 |
+| 工程与部署 | PostgreSQL 数据模型、权限测试、R2、阿里云 PNVS、Vercel + Neon 公网复刻 |
 
 下表是现场演示建议时长权重，用于避免把时间平均分给每个页面；它不是代码行数、业务重要性或真实使用量的比例。
 
@@ -74,9 +74,13 @@ A Campus Circular Sharing Platform
 
 | 学生身份核验注册 | 平台管理员与名单导入 |
 |---|---|
-| ![学生注册](docs/6.2-design/assets/ui-register.png) | ![平台管理员名单导入](docs/6.2-design/assets/ui-admin-import.png) |
+| ![学生注册与双重验证码](docs/6.3-development/evidence/g5-register.png) | ![平台管理员名单导入](docs/6.2-design/assets/ui-admin-import.png) |
 
-明确不包含真实支付、短信、邮件验证码、实名认证、公开募捐、公益资金、物流、地图、实时聊天和推荐算法。
+| 校级管理员本校概览 | 平台管理员运维与安全 |
+|---|---|
+| ![校级管理员本校概览](docs/6.3-development/evidence/g5-school-admin.png) | ![平台管理员运维与安全](docs/6.3-development/evidence/g5-operations.png) |
+
+明确不包含真实支付、邮件验证码、实名认证、公开募捐、公益资金、物流、地图、实时聊天和推荐算法。真实手机验证码使用阿里云短信认证服务。
 
 ## 平台管理员账号
 
@@ -118,8 +122,16 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 | `R2_BUCKET_NAME` | 图片上传时需要 | R2 Bucket 名称 |
 | `R2_ENDPOINT` | 图片上传时需要 | `https://<ACCOUNT_ID>.r2.cloudflarestorage.com` |
 | `R2_PUBLIC_BASE_URL` | 图片上传时需要 | R2 公共读取域名 |
+| `SMS_PROVIDER` | 是 | 本地可用 `mock`，Production 必须为 `aliyun_pnvs` |
+| `ALIBABA_CLOUD_ACCESS_KEY_ID` | 阿里云短信时需要 | 专用 RAM AccessKey ID |
+| `ALIBABA_CLOUD_ACCESS_KEY_SECRET` | 阿里云短信时需要 | 专用 RAM AccessKey Secret |
+| `ALIYUN_PNVS_SIGN_NAME` | 阿里云短信时需要 | 系统赠送签名名称 |
+| `ALIYUN_PNVS_TEMPLATE_CODE` | 阿里云短信时需要 | 登录/注册验证码模板 Code |
+| `ALIYUN_PNVS_REGION_ID` | 可选 | 默认 `cn-hangzhou` |
+| `TRUST_CLOUDFLARE_IP_HEADER` | Cloudflare 代理时需要 | 默认 `false` |
+| `CLOUDFLARE_ORIGIN_SECRET` | 上项为 true 时必填 | Cloudflare 注入的源站共享密钥 |
 
-上述配置本项目未真实值提交到 Git、Issue、PR、日志或截图中。真实学生姓名、学号、手机号、名单 CSV 和公益受助对象信息同样也禁止提交。
+上述配置真实值不得提交到 Git、Issue、PR、日志或截图中。真实学生姓名、学号、手机号、名单 CSV、短信测试号和公益受助对象信息同样禁止提交。
 
 ### 3. 初始化数据库与管理员
 
@@ -146,7 +158,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 
 1. `/health` 返回应用和数据库正常。
 2. 平台管理员可登录并看到平台概览。
-3. 导入虚构学生名单，学生可完成注册和登录。
+3. 导入虚构学生名单，学生通过图形验证码和短信验证码完成注册登录；本地无云凭据时使用页面显示的 Mock 码。
 4. 发布一件物品并完成一次借用或赠送闭环。
 5. 未配置 R2 时，图片入口应给出明确提示，不影响文字业务。
 
@@ -168,36 +180,44 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 | 四类状态机 | 验证同一物品只允许一个进行中业务 | 是 |
 | 交接码与争议 | 验证取消、过期、逾期、归还和管理员处理 | 是 |
 | 公益核验与回执 | 验证进度不超募和公开内容脱敏 | 是 |
+| 短信认证 | Mock 自动测试 + 阿里云 PNVS 真实 smoke | 是，真实短信可选 |
+| 运维安全中心 | 运行状况、错误、攻击分类和临时封禁处置 | 是 |
 | Cloudflare R2 | 物品与公益图片上传、读取和删除 | 否，图片增强 |
 | Vercel + Neon | 公网应用入口与托管 PostgreSQL | 否，部署增强 |
 
-真实短信、邮件验证码、支付结算和公开募捐不在当前实现范围内。需要时应在独立分支重新评估隐私、费用、模板审核和合规边界。
+邮件验证码、支付结算和公开募捐不在当前实现范围内。真实短信使用阿里云号码认证短信认证；Cloudflare WAF 只在自有域名代理后启用。
 
 ## 演示顺序
 
 1. 平台管理员登录并创建公益管理员、分配回收站点。
-2. 导入虚构学生名单，学生完成注册。
+2. 导入虚构学生名单，演示图形验证码、短信验证码、60 秒重发和新账号登录。
 3. 学生发布四类物品，另一名学生发起申请。
 4. 展示申请接受、交接码、完成、归还、回收验收和争议。
 5. 平台管理员创建公益项目，学生提交实物捐赠与图片。
 6. 站点管理员核验捐赠并发布脱敏回执。
-7. 演示高校隔离、越权 403、跨校对象 404、CSRF 和错误页。
+7. 校级管理员演示本校组织、账号、审核和争议，不能访问其他学校。
+8. 平台管理员演示运维安全中心、IP 临时封禁和错误日志。
+9. 演示高校隔离、越权 403、跨校对象 404、CSRF 和错误页。
 
 ## 部署
 
 生产推荐 Vercel + Neon PostgreSQL + Cloudflare R2：
 
-1. 把上述 8 个非空环境变量配置到平台 Secret 管理。
+1. 把数据库、R2 和阿里云短信相关环境变量配置到平台 Secret 管理；Production 禁止 `SMS_PROVIDER=mock`。
 2. 在 Neon 创建数据库，执行 `sql/schema.sql` 或 `tools/init_database.py`。
 3. 在公网环境运行 `tools/create_platform_admin.py` 创建独立管理员，禁止使用公开示例密码。
 4. Vercel 使用仓库根目录的 Flask 入口 `main.py`。
 5. 部署后验证 `/health`、登录、数据库读写、R2 上传与公网读取。
+6. 先执行添加式数据库迁移，再部署新应用版本；阿里云短信先使用受控测试手机 smoke。
+7. Cloudflare WAF 需要自有域名、代理 DNS、Full (strict) 和源站共享 Header，不能直接套在 `vercel.app`。
 
 更完整的基础设施说明见 `docs/0-pre-development/07-Vercel-Neon-R2接入指南.md`。
 
 ## 安全与隐私
 
 - 手机号以 HMAC 哈希和末四位保存，不保存可回显的完整手机号。
+- 阿里云短信验证码不进入数据库；应用只保存挑战状态、HMAC 标识和 Provider 流水信息。
+- 同一 IP 10 分钟内第 9 次注册短信请求会触发 15 分钟临时阻断和分类安全事件。
 - 密码仅保存慢哈希，生产 Cookie 启用 `Secure`、`HttpOnly`、`SameSite=Lax`。
 - 公开文本拒绝手机号、身份证号和邮箱；图片中的弱结构化隐私由管理员人工核验。
 - 发现安全漏洞或泄露的凭据时，请勿公开提交 Issue，按 `SECURITY.md` 私下报告。
@@ -227,7 +247,8 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 
 ## 已知限制
 
-- 首版无真实支付、短信、邮件、实名认证和公开募捐。
+- 首版无真实支付、邮件验证码、实名认证和公开募捐。
+- 图形验证码是课程级自托管方案，不等同于商业 OCR 抗性验证码。
 - 无管理员自助改密页面，密码重置需要受控运维操作。
 - 并发验证以线程级测试为主，未做生产级压测。
 - 高校校区部分记录仍标记为 `temporary`，正式运营前需逐校核验。

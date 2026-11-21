@@ -14,8 +14,8 @@
     <div class="stat"><span class="stat-num">{{ counts.projects }}</span><span class="stat-label">公益项目</span></div>
   </div>
   <ul>
-    <li><a href="{{ url_for('admin.organizations') }}">组织管理（高校/校区/站点/授权）</a></li>
-    <li><a href="{{ url_for('admin.users') }}">账号管理（管理员账号导入）</a></li>
+    <li><a href="{{ url_for('admin.organizations') }}">{{ '组织管理（高校/校区/站点/授权）' if g.current_user.is_platform_admin else '组织管理（本校校区/站点/授权）' }}</a></li>
+    <li><a href="{{ url_for('admin.users') }}">{{ '账号管理（管理员账号导入）' if g.current_user.is_platform_admin else '账号管理（本校公益管理员）' }}</a></li>
     <li><a href="{{ url_for('admin.student_imports') }}">学生名单导入</a></li>
     <li><a href="{{ url_for('admin.moderation') }}">内容审核</a></li>
     <li><a href="{{ url_for('admin.disputes') }}">争议处理</a></li>
