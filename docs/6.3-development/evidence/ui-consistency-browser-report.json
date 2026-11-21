@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-21T11:29:32.065Z",
+  "checked_at": "2026-11-21T11:57:53.596Z",
   "passed": true,
   "checks": [
     {
@@ -173,6 +173,42 @@
     },
     {
       "name": "student context mobile has no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "register mobile has no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "register compact desktop fits one viewport",
+      "passed": true,
+      "details": {
+        "documentHeight": 768,
+        "viewport": 768
+      }
+    },
+    {
+      "name": "register uses split identity layout",
+      "passed": true,
+      "details": {
+        "documentHeight": 933,
+        "viewport": 933,
+        "visual": true
+      }
+    },
+    {
+      "name": "register desktop has no vertical scrollbar",
+      "passed": true,
+      "details": {
+        "documentHeight": 933,
+        "viewport": 933,
+        "visual": true
+      }
+    },
+    {
+      "name": "register theme toggles dark",
       "passed": true,
       "details": null
     },

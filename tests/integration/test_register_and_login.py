@@ -146,6 +146,10 @@ class TestRegister:
 
         page = client.get("/auth/register").get_data(as_text=True)
         assert "测试大学" in page  # 学校信息由上下文带入
+        assert 'class="login-shell register-shell"' in page
+        assert 'class="identity-visual"' in page
+        assert 'id="student_no"' in page
+        assert 'id="password_confirm"' in page
 
         resp = client.post(
             "/auth/register",

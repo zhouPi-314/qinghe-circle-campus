@@ -314,6 +314,7 @@ def register():
     return render_template(
         "auth/register.html",
         university=university,
+        campus_display=_student_context_display(),
         field_errors=field_errors,
         form=request.form if request.method == "POST" else {},
         next_target=target,

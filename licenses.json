@@ -15,9 +15,11 @@
         "app/static/js/login.js",
         "app/static/js/theme.js",
         "app/static/css/student-context.css",
+        "app/static/css/register-auth.css",
         "app/templates/base.html",
         "app/templates/home.html",
-        "app/templates/auth/student_context.html"
+        "app/templates/auth/student_context.html",
+        "app/templates/auth/register.html"
       ],
       "author": "zhouPi-314 / Codex",
       "license": "MIT",

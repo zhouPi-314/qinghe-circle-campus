@@ -3,7 +3,7 @@
 | 项目 | 内容 |
 |---|---|
 | 日期 | 2026-11-21 |
-| 决策 | D-044、D-045、D-046、D-047、D-048 |
+| 决策 | D-044、D-045、D-046、D-047、D-048、D-049 |
 | 浏览器 | Microsoft Edge 157.0.4341.60 |
 | 范围 | 登录、身份切换、浅深主题、首页与工作区页面 |
 | 结论 | 通过；全量回归 195 passed，Ruff 通过，Edge 控制台 0 error |
@@ -15,6 +15,8 @@
 - D-046 将官方入口改为未选身份直接提示，并把身份切换改为单选项原地更新。
 - D-047 将身份单选实时同步到服务端会话，学生校区与注册入口会等待同步后再跳转。
 - D-048 仅重做学校与校区选择页，新增校园坐标网络双栏布局和原创路径动画。
+- D-049 将注册页改为身份核验双栏动画，并移除校区页左侧步骤式文案。
+- 注册页左侧不显示具体学校、校区或测试校名，真实范围只保留在右侧业务表单。
 - 新增浅色/深色主题切换；主题写入 `localStorage`，并在 React 之外的无框架 Jinja 页面刷新后保持。
 - 登录页先按视口预置主题，避免刷新时先显示错误配色。
 - 登录页右上角新增“切换身份”面板；选择后沿用既有身份、学校校区、登录与 `next` 回跳流程。
@@ -30,7 +32,7 @@
 
 ```text
 .\.venv\Scripts\python.exe -m pytest
-195 passed in 137.39s
+195 passed in 137.59s
 
 .\.venv\Scripts\python.exe -m ruff check app tests
 All checks passed!
@@ -45,7 +47,7 @@ Edge 自动检查覆盖：
 - 1440、768、390 px 无横向溢出；移动端可交互控件达到 44 px 目标。
 - 首页、物品发现、发布表单、物品详情、资料、申请、通知、公益项目、全部平台管理页、站点工作台、回收验收、捐赠核验、回执登记和公益项目创建页均正常渲染。
 - 表单字段具备可见标签；测试账号均为临时数据库中的虚构数据。
-- 本轮 Edge 检查共 73 项，全部通过，控制台 error 与 warning 均为 0。
+- 本轮 Edge 检查共 78 项，全部通过，控制台 error 与 warning 均为 0。
 
 完整机器结果见 [ui-consistency-browser-report.json](ui-consistency-browser-report.json)。
 
@@ -59,6 +61,10 @@ Edge 自动检查覆盖：
 - [学校与校区选择页深色](ui-consistency-student-context-dark-1867x933.png)
 - [学校与校区选择页 1366×768](ui-consistency-student-context-1366x768.png)
 - [学校与校区选择页手机](ui-consistency-student-context-390x844.png)
+- [学生注册页 1867×933](ui-consistency-register-1867x933.png)
+- [学生注册页深色](ui-consistency-register-dark-1867x933.png)
+- [学生注册页 1366×768](ui-consistency-register-1366x768.png)
+- [学生注册页手机](ui-consistency-register-390x844.png)
 - [首页浅色 1440×1000](ui-consistency-home-light-1440x1000.png)
 - [首页深色 1867×933](ui-consistency-home-dark-1867x933.png)
 - [首页手机 390×844](ui-consistency-home-light-390x844.png)
