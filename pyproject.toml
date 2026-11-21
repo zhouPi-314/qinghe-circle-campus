@@ -9,6 +9,8 @@ dependencies = [
     "sqlalchemy==2.0.44",
     "psycopg[binary]==3.2.12",
     "boto3==1.40.62",
+    "alibabacloud_dypnsapi20170525==2.0.0",
+    "pillow==13.0.0",
 ]
 
 [tool.ruff]
