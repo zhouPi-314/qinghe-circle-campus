@@ -15,6 +15,7 @@
   const contextLabel = document.getElementById("context-label");
   const contextValue = document.getElementById("context-value");
   const contextAction = document.getElementById("context-action");
+  const registrationNotice = document.getElementById("registration-guard-notice");
   const accountLabel = document.getElementById("account-label");
   const footnoteText = document.getElementById("footnote-text");
   const footnoteLink = document.getElementById("footnote-link");
@@ -27,7 +28,8 @@
     !remember ||
     !submit ||
     !selectedRole ||
-    !roleConfigNode
+    !roleConfigNode ||
+    !registrationNotice
   ) {
     return;
   }
@@ -127,6 +129,8 @@
     }
 
     footnoteText.textContent = config.footnote;
+    registrationNotice.hidden = true;
+    footnoteLink.dataset.registrationReady = config.registration_ready ? "1" : "0";
     if (config.footnote_url) {
       footnoteLink.href = config.footnote_url;
       footnoteLink.textContent = config.footnote_link_label;
@@ -169,17 +173,30 @@
     }
   });
 
-  [contextAction, footnoteLink].forEach((link) => {
-    link.addEventListener("click", async (event) => {
-      event.preventDefault();
-      const target = link.href;
-      if (await roleSync) window.location.assign(target);
-    });
+  contextAction.addEventListener("click", async (event) => {
+    event.preventDefault();
+    const target = contextAction.href;
+    if (await roleSync) window.location.assign(target);
+  });
+
+  footnoteLink.addEventListener("click", async (event) => {
+    event.preventDefault();
+    if (currentRole === "student" && footnoteLink.dataset.registrationReady !== "1") {
+      registrationNotice.hidden = false;
+      contextAction.focus();
+      return;
+    }
+    const target = footnoteLink.href;
+    if (await roleSync) window.location.assign(target);
   });
 
   if (!currentRole) {
     setControlledState(false);
   } else {
+    const currentConfig = identityConfig[currentRole];
+    if (currentConfig) {
+      footnoteLink.dataset.registrationReady = currentConfig.registration_ready ? "1" : "0";
+    }
     restoreIdentifier(currentRole);
   }
 

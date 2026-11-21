@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-21T11:57:53.596Z",
+  "checked_at": "2026-11-21T12:09:05.620Z",
   "passed": true,
   "checks": [
     {
@@ -112,6 +112,21 @@
     },
     {
       "name": "student identity updates in place",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student register without campus is blocked",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student register guard explains missing campus",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student register guard uses actionable copy",
       "passed": true,
       "details": null
     },

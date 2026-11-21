@@ -63,7 +63,7 @@ _IDENTITY_COPY = {
 }
 
 
-def _identity_config(campus_display: str | None = None) -> dict[str, dict[str, str | None]]:
+def _identity_config(campus_display: str | None = None) -> dict[str, dict[str, object]]:
     """登录页身份切换的展示文案；不包含账号或权限判断。"""
     config: dict[str, dict[str, str | None]] = {}
     for role, label in _IDENTITY_ROLES.items():
@@ -76,6 +76,7 @@ def _identity_config(campus_display: str | None = None) -> dict[str, dict[str, s
             **copy,
             "context_action_url": url_for("auth.student_context") if role == "student" else None,
             "context_action_label": "重新选择学校与校区" if campus_display else "先选择学校与校区",
+            "registration_ready": role == "student" and bool(campus_display),
             "footnote_url": url_for(footnote_endpoint) if footnote_endpoint else None,
         }
     return config

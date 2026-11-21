@@ -185,6 +185,10 @@
           </span>
         </div>
 
+        <p id="registration-guard-notice" class="login-alert registration-guard-notice" role="alert" hidden>
+          请先选择学校和校区
+        </p>
+
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
             <div class="login-alerts" role="status">

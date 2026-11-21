@@ -582,6 +582,10 @@ html[data-theme="dark"] .theme-icon-sun { display: block; }
   margin: -6px 0 14px;
   padding: 9px 12px;
 }
+.registration-guard-notice {
+  margin: 0 0 12px;
+  padding: 9px 12px;
+}
 
 .context-card {
   display: flex;

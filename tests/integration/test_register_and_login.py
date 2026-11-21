@@ -109,6 +109,7 @@ class TestIdentityFlow:
         assert 'id="identity-picker"' in html
         assert 'name="role" value="platform_admin"' in html
         assert "不需要再次确认" in html
+        assert 'id="registration-guard-notice"' in html
         assert "data-theme-toggle" in html
 
     def test_login_page_prompts_when_identity_is_not_selected(self, client):
