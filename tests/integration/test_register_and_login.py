@@ -59,6 +59,47 @@ def submit_login(client, page_html: str, identifier: str, password: str, follow:
     )
 
 
+def complete_registration(
+    client,
+    monkeypatch,
+    *,
+    student_no: str,
+    phone: str,
+    password: str = "abcd1234",
+):
+    monkeypatch.setattr(
+        "app.services.auth_service.verify_captcha",
+        lambda _session, answer: answer == "TEST",
+    )
+    page = client.get("/auth/register").get_data(as_text=True)
+    sms = client.post(
+        "/auth/register/sms-code",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "student_no": student_no,
+            "phone": phone,
+            "captcha": "TEST",
+        },
+        headers={"Accept": "application/json"},
+    )
+    assert sms.status_code == 202
+    page = client.get("/auth/register").get_data(as_text=True)
+    token = re.search(r'name="verification_request_id" value="([^"]+)"', page).group(1)
+    return client.post(
+        "/auth/register",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "verification_request_id": token,
+            "student_no": student_no,
+            "phone": phone,
+            "password": password,
+            "password_confirm": password,
+            "sms_code": "123456",
+        },
+        follow_redirects=True,
+    )
+
+
 @pytest.fixture
 def school(app):
     """构造一所单校区测试高校，并预置一条未注册的名单记录。"""
@@ -141,7 +182,7 @@ class TestIdentityFlow:
 
 
 class TestRegister:
-    def test_register_success_and_login(self, client, app, school):
+    def test_register_success_and_login(self, client, app, school, monkeypatch):
         choose_student_identity(client)
         choose_campus(client, school["university_id"], school["campus_id"])
 
@@ -152,16 +193,11 @@ class TestRegister:
         assert 'id="student_no"' in page
         assert 'id="password_confirm"' in page
 
-        resp = client.post(
-            "/auth/register",
-            data={
-                "csrf_token": get_csrf_token(page),
-                "student_no": "2024001",
-                "phone": "13880001234",
-                "password": "abcd1234",
-                "password_confirm": "abcd1234",
-            },
-            follow_redirects=True,
+        resp = complete_registration(
+            client,
+            monkeypatch,
+            student_no="2024001",
+            phone="13880001234",
         )
         html = resp.get_data(as_text=True)
         assert "注册成功" in html
@@ -181,41 +217,49 @@ class TestRegister:
         assert "张测试" in html  # 昵称来自名单姓名
         assert "学生" in html  # 角色标签
 
-    def test_register_student_no_not_in_roster(self, client, school):
+    def test_register_student_no_not_in_roster(self, client, school, monkeypatch):
         choose_student_identity(client)
         choose_campus(client, school["university_id"], school["campus_id"])
+        monkeypatch.setattr(
+            "app.services.auth_service.verify_captcha",
+            lambda _session, answer: answer == "TEST",
+        )
         page = client.get("/auth/register").get_data(as_text=True)
         resp = client.post(
-            "/auth/register",
+            "/auth/register/sms-code",
             data={
                 "csrf_token": get_csrf_token(page),
                 "student_no": "9999999",
                 "phone": "13880001234",
-                "password": "abcd1234",
-                "password_confirm": "abcd1234",
+                "captcha": "TEST",
             },
+            headers={"Accept": "application/json"},
         )
-        html = resp.get_data(as_text=True)
-        assert "学号不在本校名单中" in html
+        assert resp.get_json()["message"] == "如果名单信息匹配，验证码将发送到预留手机号。"
+        assert "学号不在本校名单中" not in resp.get_json()["message"]
 
-    def test_register_phone_mismatch(self, client, school):
+    def test_register_phone_mismatch(self, client, school, monkeypatch):
         choose_student_identity(client)
         choose_campus(client, school["university_id"], school["campus_id"])
+        monkeypatch.setattr(
+            "app.services.auth_service.verify_captcha",
+            lambda _session, answer: answer == "TEST",
+        )
         page = client.get("/auth/register").get_data(as_text=True)
         resp = client.post(
-            "/auth/register",
+            "/auth/register/sms-code",
             data={
                 "csrf_token": get_csrf_token(page),
                 "student_no": "2024001",
                 "phone": "13900000000",
-                "password": "abcd1234",
-                "password_confirm": "abcd1234",
+                "captcha": "TEST",
             },
+            headers={"Accept": "application/json"},
         )
-        html = resp.get_data(as_text=True)
-        assert "手机号与名单记录不符" in html
+        assert resp.get_json()["message"] == "如果名单信息匹配，验证码将发送到预留手机号。"
+        assert "手机号与名单记录不符" not in resp.get_json()["message"]
 
-    def test_register_duplicate_rejected(self, client, app, school):
+    def test_register_duplicate_rejected(self, client, app, school, monkeypatch):
         # 名单记录已注册
         with app.app_context():
             from app import db
@@ -243,57 +287,219 @@ class TestRegister:
             db_add(user)
             record.registered_user_id = user.id
             db.session.commit()
+            assert record.registered_user_id == user.id
+
+        with app.app_context():
+            from app.models.university import StudentRegistryRecord
+
+            persisted = db.session.get(StudentRegistryRecord, school["record_id"])
+            assert persisted.registered_user_id is not None
 
         choose_student_identity(client)
         choose_campus(client, school["university_id"], school["campus_id"])
+        monkeypatch.setattr(
+            "app.services.auth_service.verify_captcha",
+            lambda _session, answer: answer == "TEST",
+        )
         page = client.get("/auth/register").get_data(as_text=True)
         resp = client.post(
-            "/auth/register",
+            "/auth/register/sms-code",
             data={
                 "csrf_token": get_csrf_token(page),
                 "student_no": "2024001",
                 "phone": "13880001234",
-                "password": "abcd1234",
-                "password_confirm": "abcd1234",
+                "captcha": "TEST",
             },
+            headers={"Accept": "application/json"},
         )
-        html = resp.get_data(as_text=True)
-        assert "已注册过账号" in html
-        assert "登录" in html  # 引导登录
+        assert resp.get_json()["message"] == "如果名单信息匹配，验证码将发送到预留手机号。"
+        assert "mock_code" not in resp.get_json()
+        with app.app_context():
+            from app.models.verification import RegistrationVerificationRequest
 
-    def test_register_password_format_rejected(self, client, school):
+            assert db.session.query(RegistrationVerificationRequest).one().status == "ignored"
+
+    def test_register_password_format_rejected(self, client, school, monkeypatch):
         choose_student_identity(client)
         choose_campus(client, school["university_id"], school["campus_id"])
+        monkeypatch.setattr(
+            "app.services.auth_service.verify_captcha",
+            lambda _session, answer: answer == "TEST",
+        )
         page = client.get("/auth/register").get_data(as_text=True)
+        sms = client.post(
+            "/auth/register/sms-code",
+            data={
+                "csrf_token": get_csrf_token(page),
+                "student_no": "2024001",
+                "phone": "13880001234",
+                "captcha": "TEST",
+            },
+            headers={"Accept": "application/json"},
+        )
+        assert sms.status_code == 202
+        page = client.get("/auth/register").get_data(as_text=True)
+        token = re.search(r'name="verification_request_id" value="([^"]+)"', page).group(1)
         resp = client.post(
             "/auth/register",
             data={
                 "csrf_token": get_csrf_token(page),
+                "verification_request_id": token,
                 "student_no": "2024001",
                 "phone": "13880001234",
                 "password": "short",
                 "password_confirm": "short",
+                "sms_code": "123456",
             },
         )
         html = resp.get_data(as_text=True)
         assert "密码长度至少 8 位" in html
 
 
-class TestLogin:
-    def test_login_by_phone(self, client, app, school):
-        # 先注册
+class TestRegisterVerificationHttp:
+    def _start_registration(self, client, school, monkeypatch):
+        monkeypatch.setattr(
+            "app.services.auth_service.verify_captcha",
+            lambda _session, answer: answer == "TEST",
+        )
         choose_student_identity(client)
         choose_campus(client, school["university_id"], school["campus_id"])
         page = client.get("/auth/register").get_data(as_text=True)
-        client.post(
+        return page, get_csrf_token(page)
+
+    def test_captcha_image_has_no_store(self, client, school, monkeypatch):
+        self._start_registration(client, school, monkeypatch)
+
+        response = client.get("/auth/register/captcha.png")
+
+        assert response.status_code == 200
+        assert response.mimetype == "image/png"
+        assert response.headers["Cache-Control"] == "no-store"
+        assert response.data.startswith(b"\x89PNG\r\n\x1a\n")
+
+    def test_sms_code_endpoint_is_generic_and_returns_mock_code(
+        self, client, school, monkeypatch
+    ):
+        _page, token = self._start_registration(client, school, monkeypatch)
+
+        response = client.post(
+            "/auth/register/sms-code",
+            data={
+                "csrf_token": token,
+                "student_no": "2024001",
+                "phone": "13880001234",
+                "captcha": "TEST",
+            },
+            headers={"Accept": "application/json"},
+        )
+
+        assert response.status_code == 202
+        body = response.get_json()
+        assert body["message"] == "如果名单信息匹配，验证码将发送到预留手机号。"
+        assert body["mock_code"] == "123456"
+        assert body["resend_after"] > 0
+        assert "13880001234" not in response.get_data(as_text=True)
+
+    def test_sms_code_mismatch_does_not_reveal_roster(self, client, school, monkeypatch):
+        _page, token = self._start_registration(client, school, monkeypatch)
+
+        response = client.post(
+            "/auth/register/sms-code",
+            data={
+                "csrf_token": token,
+                "student_no": "9999999",
+                "phone": "13880001234",
+                "captcha": "TEST",
+            },
+            headers={"Accept": "application/json"},
+        )
+
+        assert response.status_code == 202
+        assert response.get_json()["message"] == "如果名单信息匹配，验证码将发送到预留手机号。"
+        assert "名单" not in response.get_data(as_text=True)
+        assert "学号" not in response.get_data(as_text=True)
+
+    def test_full_verified_registration(self, client, school, monkeypatch):
+        _page, token = self._start_registration(client, school, monkeypatch)
+        sms = client.post(
+            "/auth/register/sms-code",
+            data={
+                "csrf_token": token,
+                "student_no": "2024001",
+                "phone": "13880001234",
+                "captcha": "TEST",
+            },
+            headers={"Accept": "application/json"},
+        )
+        assert sms.status_code == 202
+
+        page = client.get("/auth/register").get_data(as_text=True)
+        assert 'id="mock-sms-code"' in page
+        assert "123456" in page
+        assert 'name="verification_request_id"' in page
+        assert 'id="sms_code"' in page
+
+        response = client.post(
             "/auth/register",
             data={
                 "csrf_token": get_csrf_token(page),
+                "verification_request_id": re.search(
+                    r'name="verification_request_id" value="([^"]+)"', page
+                ).group(1),
                 "student_no": "2024001",
                 "phone": "13880001234",
                 "password": "abcd1234",
                 "password_confirm": "abcd1234",
+                "sms_code": "123456",
             },
+            follow_redirects=True,
+        )
+
+        assert response.status_code == 200
+        assert "注册成功" in response.get_data(as_text=True)
+
+    def test_wrong_sms_code_creates_no_account(self, client, school, monkeypatch):
+        _page, token = self._start_registration(client, school, monkeypatch)
+        client.post(
+            "/auth/register/sms-code",
+            data={
+                "csrf_token": token,
+                "student_no": "2024001",
+                "phone": "13880001234",
+                "captcha": "TEST",
+            },
+            headers={"Accept": "application/json"},
+        )
+        page = client.get("/auth/register").get_data(as_text=True)
+        response = client.post(
+            "/auth/register",
+            data={
+                "csrf_token": get_csrf_token(page),
+                "verification_request_id": re.search(
+                    r'name="verification_request_id" value="([^"]+)"', page
+                ).group(1),
+                "student_no": "2024001",
+                "phone": "13880001234",
+                "password": "abcd1234",
+                "password_confirm": "abcd1234",
+                "sms_code": "000000",
+            },
+        )
+
+        assert response.status_code == 400
+        assert "短信验证码不正确" in response.get_data(as_text=True)
+
+
+class TestLogin:
+    def test_login_by_phone(self, client, app, school, monkeypatch):
+        # 先注册
+        choose_student_identity(client)
+        choose_campus(client, school["university_id"], school["campus_id"])
+        complete_registration(
+            client,
+            monkeypatch,
+            student_no="2024001",
+            phone="13880001234",
         )
         # 手机号登录
         page = client.get("/auth/login").get_data(as_text=True)

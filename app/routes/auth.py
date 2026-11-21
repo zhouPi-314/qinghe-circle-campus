@@ -10,13 +10,29 @@ next 参数贯穿 身份选择 → 学校校区选择 → 登录 → 登录后�
 
 from __future__ import annotations
 
-from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
+import secrets
+import time
+
+from flask import (
+    Blueprint,
+    current_app,
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for,
+)
 
 from app.core import auth as session_auth
+from app.core.captcha import issue_captcha
 from app.core.errors import InputError
+from app.core.sms import SmsProviderError
 from app.services import auth_service
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
+_REGISTRATION_FORM_TOKEN = "auth.registration_form_token"
 
 _IDENTITY_ROLES = {
     "student": "在校学生",
@@ -100,6 +116,25 @@ def _redirect_with_next(endpoint: str, target: str | None, **kwargs):
     if target:
         return redirect(url_for(endpoint, next=target, **kwargs))
     return redirect(url_for(endpoint, **kwargs))
+
+
+def _wants_json() -> bool:
+    return request.accept_mimetypes.best == "application/json"
+
+
+def _registration_challenge_context() -> dict:
+    return {
+        "registration_verification_id": session.get(
+            auth_service.SESSION_REGISTRATION_VERIFICATION_ID
+        ),
+        "registration_verification_token": session.get(_REGISTRATION_FORM_TOKEN),
+        "registration_resend_after": session.get(
+            auth_service.SESSION_REGISTRATION_RESEND_AFTER, 0
+        ),
+        "registration_mock_code": session.get(
+            auth_service.SESSION_REGISTRATION_MOCK_CODE
+        ),
+    }
 
 
 @bp.route("/identity", methods=["GET", "POST"])
@@ -286,8 +321,23 @@ def register():
             "phone": request.form.get("phone", ""),
             "password": request.form.get("password", ""),
             "password_confirm": request.form.get("password_confirm", ""),
+            "verification_request_id": request.form.get("verification_request_id", ""),
+            "sms_code": request.form.get("sms_code", ""),
         }
         try:
+            session_verification_id = session.get(
+                auth_service.SESSION_REGISTRATION_VERIFICATION_ID
+            )
+            session_form_token = session.get(_REGISTRATION_FORM_TOKEN)
+            if (
+                not session_verification_id
+                or not session_form_token
+                or form["verification_request_id"] != session_form_token
+            ):
+                raise InputError(
+                    "请先获取并输入短信验证码。",
+                    field_errors={"sms_code": "请先获取并输入短信验证码。"},
+                )
             if form["password"] != form["password_confirm"]:
                 raise InputError(
                     "两次输入的密码不一致。",
@@ -299,8 +349,11 @@ def register():
                 student_no=form["student_no"],
                 phone=form["phone"],
                 password=form["password"],
+                verification_request_id=int(session_verification_id),
+                sms_code=form["sms_code"],
             )
             session_auth.set_student_context(university_id, user.campus_id)
+            session.pop(_REGISTRATION_FORM_TOKEN, None)
             from flask import flash
 
             flash("注册成功，请使用学号或手机号登录。", "success")
@@ -312,14 +365,91 @@ def register():
 
                 flash(err.message, "error")
 
-    return render_template(
+    response = render_template(
         "auth/register.html",
         university=university,
         campus_display=_student_context_display(),
         field_errors=field_errors,
         form=request.form if request.method == "POST" else {},
         next_target=target,
+        **_registration_challenge_context(),
     )
+    return (response, 400) if request.method == "POST" and field_errors else response
+
+
+@bp.get("/register/captcha.png")
+def register_captcha():
+    """Issue a one-time registration captcha image."""
+    if session_auth.get_identity_role() != "student":
+        return "", 403
+    image = issue_captcha(session)
+    response = current_app.response_class(image, mimetype="image/png")
+    response.headers["Cache-Control"] = "no-store"
+    return response
+
+
+@bp.post("/register/sms-code")
+def register_sms_code():
+    """Request a registration SMS code without exposing roster membership."""
+    if session_auth.get_identity_role() != "student":
+        if _wants_json():
+            return jsonify({"message": "请重新选择学生身份。"}), 403
+        return _redirect_with_next("auth.identity", _target_from_request())
+
+    university_id = session.get(session_auth.SESSION_UNIVERSITY_ID)
+    campus_id = session.get(session_auth.SESSION_CAMPUS_ID)
+    if university_id is None or campus_id is None:
+        if _wants_json():
+            return jsonify({"message": "请先选择学校与校区。"}), 400
+        return _redirect_with_next("auth.student_context", _target_from_request())
+
+    try:
+        result = auth_service.request_registration_code(
+            university_id=university_id,
+            campus_id=campus_id,
+            student_no=request.form.get("student_no", ""),
+            phone=request.form.get("phone", ""),
+            captcha_answer=request.form.get("captcha", ""),
+            request_ip=request.remote_addr,
+        )
+    except InputError as err:
+        if _wants_json():
+            return jsonify(
+                {"message": err.message, "field_errors": err.field_errors}
+            ), 400
+        for message in err.field_errors.values():
+            flash(message, "error")
+        if not err.field_errors:
+            flash(err.message, "error")
+        return _redirect_with_next("auth.register", _target_from_request())
+    except SmsProviderError as err:
+        if _wants_json():
+            return jsonify({"message": str(err)}), 503
+        flash(str(err), "error")
+        return _redirect_with_next("auth.register", _target_from_request())
+
+    form_token = secrets.token_urlsafe(18)
+    session[_REGISTRATION_FORM_TOKEN] = form_token
+    if _wants_json():
+        payload = {
+            "message": result["message"],
+            "verification_token": form_token,
+            "resend_after": float(
+                session.get(
+                    auth_service.SESSION_REGISTRATION_RESEND_AFTER,
+                    time.time() + auth_service.REGISTRATION_CODE_COOLDOWN_SECONDS,
+                )
+            ),
+        }
+        mock_code = session.get(auth_service.SESSION_REGISTRATION_MOCK_CODE)
+        if mock_code and not getattr(
+            current_app.config.get("APP_CONFIG"), "vercel_env", None
+        ) == "production":
+            payload["mock_code"] = mock_code
+        return jsonify(payload), 202
+
+    flash(result["message"], "success")
+    return _redirect_with_next("auth.register", _target_from_request())
 
 
 @bp.post("/logout")

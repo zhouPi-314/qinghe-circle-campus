@@ -148,6 +148,7 @@ def request_registration_code(
             StudentRegistryRecord.status == "active",
         )
         .with_for_update()
+        .execution_options(populate_existing=True)
     ).first()
     if (
         record is None

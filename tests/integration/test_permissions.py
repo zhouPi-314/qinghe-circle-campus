@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from datetime import UTC, datetime
 
 import pytest
@@ -14,6 +15,14 @@ from tests.integration.test_register_and_login import (
 )
 
 pytestmark = pytest.mark.integration
+
+
+@pytest.fixture(autouse=True)
+def allow_registration_captcha(monkeypatch):
+    monkeypatch.setattr(
+        "app.services.auth_service.verify_captcha",
+        lambda _session, answer: answer == "TEST",
+    )
 
 
 @pytest.fixture
@@ -41,14 +50,32 @@ def login_student(client, school, student_no="2024010", password="stu-pass1"):
     choose_student_identity(client)
     choose_campus(client, school["university_id"], school["campus_id"])
     page = client.get("/auth/register").get_data(as_text=True)
+    token = get_csrf_token(page)
+    sms = client.post(
+        "/auth/register/sms-code",
+        data={
+            "csrf_token": token,
+            "student_no": student_no,
+            "phone": "13650001111",
+            "captcha": "TEST",
+        },
+        headers={"Accept": "application/json"},
+    )
+    assert sms.status_code == 202
+    page = client.get("/auth/register").get_data(as_text=True)
+    verification_token = re.search(
+        r'name="verification_request_id" value="([^"]+)"', page
+    ).group(1)
     client.post(
         "/auth/register",
         data={
             "csrf_token": get_csrf_token(page),
+            "verification_request_id": verification_token,
             "student_no": student_no,
             "phone": "13650001111",
             "password": password,
             "password_confirm": password,
+            "sms_code": "123456",
         },
         follow_redirects=True,
     )
@@ -337,13 +364,29 @@ class TestNextTargetChain:
         # 5) 先完成注册（名单记录由 school 夹具预置），注册后仍携带 next
         page = client.get("/auth/register").get_data(as_text=True)
         client.post(
-            "/auth/register",
+            "/auth/register/sms-code",
             data={
                 "csrf_token": get_csrf_token(page),
                 "student_no": "2024010",
                 "phone": "13650001111",
+                "captcha": "TEST",
+            },
+            headers={"Accept": "application/json"},
+        )
+        page = client.get("/auth/register").get_data(as_text=True)
+        verification_token = re.search(
+            r'name="verification_request_id" value="([^"]+)"', page
+        ).group(1)
+        client.post(
+            "/auth/register",
+            data={
+                "csrf_token": get_csrf_token(page),
+                "verification_request_id": verification_token,
+                "student_no": "2024010",
+                "phone": "13650001111",
                 "password": "stu-pass1",
                 "password_confirm": "stu-pass1",
+                "sms_code": "123456",
             },
             follow_redirects=False,
         )

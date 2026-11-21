@@ -244,6 +244,56 @@
 .register-form-card .field-hint { margin-top: 4px; font-size: 11px; }
 .register-form-card .submit-button { margin-top: 3px; }
 
+.captcha-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.captcha-row img {
+  width: 120px;
+  height: 40px;
+  border: 1px solid var(--c-divider);
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--c-surface-soft);
+}
+
+.captcha-row .btn {
+  white-space: nowrap;
+}
+
+.field-status {
+  margin: 8px 0 10px;
+  padding: 9px 11px;
+  border-radius: 10px;
+  color: var(--c-success);
+  background: color-mix(in srgb, var(--c-success) 8%, var(--c-surface));
+  font-size: 11px;
+}
+
+.field-status.is-error {
+  color: var(--c-danger, #b42318);
+  background: color-mix(in srgb, var(--c-danger, #b42318) 8%, var(--c-surface));
+}
+
+@media (max-width: 520px) {
+  .captcha-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .captcha-row img {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .captcha-row #captcha-refresh {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
 @keyframes identity-route-flow {
   to { stroke-dashoffset: -51; }
 }

@@ -138,9 +138,13 @@
           </span>
         </div>
 
-        <form method="post" action="{{ url_for('auth.register') }}">
+        <form method="post" action="{{ url_for('auth.register') }}" id="register-form"
+              data-sms-url="{{ url_for('auth.register_sms_code') }}"
+              data-captcha-url="{{ url_for('auth.register_captcha') }}"
+              data-resend-after="{{ registration_resend_after or 0 }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="next" value="{{ next_target or '' }}">
+          <input type="hidden" name="verification_request_id" value="{{ registration_verification_token or '' }}">
 
           <div class="form-field {% if field_errors.student_no %}has-error{% endif %}">
             <label for="student_no">学号</label>
@@ -167,6 +171,49 @@
             <p class="field-hint" id="phone-hint">必须与学校导入名单中的手机号一致。</p>
             {% if field_errors.phone %}<p class="field-error" id="err-phone">{{ field_errors.phone }}</p>{% endif %}
           </div>
+
+          <div class="form-field {% if field_errors.captcha %}has-error{% endif %}">
+            <label for="captcha">图形验证码</label>
+            <div class="captcha-row">
+              <div class="input-shell">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"></path><path d="m7 15 3-3 2 2 3-4 2 2"></path></svg>
+                </span>
+                <input id="captcha" name="captcha" type="text" maxlength="4"
+                       {% if not registration_verification_id %}required{% endif %}
+                       autocomplete="off" autocapitalize="characters" spellcheck="false"
+                       aria-describedby="{{ 'err-captcha' if field_errors.captcha else '' }}">
+              </div>
+              <img id="captcha-image" src="{{ url_for('auth.register_captcha') }}"
+                   alt="图形验证码，看不清可刷新" width="120" height="40">
+              <button id="captcha-refresh" type="button" class="btn btn-ghost btn-compact">换一张</button>
+            </div>
+            {% if field_errors.captcha %}<p class="field-error" id="err-captcha">{{ field_errors.captcha }}</p>{% endif %}
+          </div>
+
+          <div class="form-field {% if field_errors.sms_code %}has-error{% endif %}">
+            <label for="sms_code">短信验证码</label>
+            <div class="captcha-row">
+              <div class="input-shell">
+                <span class="input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><rect x="4" y="6" width="16" height="12" rx="2"></rect><path d="m5 8 7 5 7-5"></path></svg>
+                </span>
+                <input id="sms_code" name="sms_code" type="text" inputmode="numeric"
+                       pattern="[0-9]{6}" maxlength="6" required autocomplete="one-time-code"
+                       value="{{ form.get('sms_code', '') }}"
+                       aria-describedby="sms-code-hint{{ ' err-sms-code' if field_errors.sms_code else '' }}">
+              </div>
+              <button id="send-sms-code" type="submit" formaction="{{ url_for('auth.register_sms_code') }}"
+                      class="btn btn-primary btn-compact">获取验证码</button>
+            </div>
+            <p class="field-hint" id="sms-code-hint">验证码 5 分钟内有效，同一账号 60 秒后可重新获取。</p>
+            {% if field_errors.sms_code %}<p class="field-error" id="err-sms-code">{{ field_errors.sms_code }}</p>{% endif %}
+          </div>
+
+          <p id="sms-request-status" class="field-status" role="status" aria-live="polite" hidden></p>
+          {% if registration_mock_code %}
+            <p class="field-hint" id="mock-sms-code">本地模拟验证码：<strong>{{ registration_mock_code }}</strong></p>
+          {% endif %}
 
           <div class="form-field {% if field_errors.password %}has-error{% endif %}">
             <label for="password">设置密码</label>
@@ -211,5 +258,6 @@
     </section>
   </main>
   <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+  <script src="{{ url_for('static', filename='js/register.js') }}" defer></script>
 </body>
 </html>
