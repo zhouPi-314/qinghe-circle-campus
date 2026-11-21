@@ -33,3 +33,4 @@ from app.models.university import (  # noqa: F401
     University,
 )
 from app.models.user import User  # noqa: F401
+from app.models.verification import RegistrationVerificationRequest  # noqa: F401

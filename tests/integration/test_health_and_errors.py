@@ -35,6 +35,7 @@ class TestSchemaInit:
             "station_manager_assignments",
             "student_import_batches",
             "student_registry_records",
+            "registration_verification_requests",
             "login_verification_codes",
             "item_categories",
             "items",
@@ -56,7 +57,7 @@ class TestSchemaInit:
             "charity_receipts",
             "charity_receipt_items",
         }
-        assert len(expected) == 27
+        assert len(expected) == 28
         missing = expected - tables
         assert missing == set(), f"缺少表：{missing}"
 

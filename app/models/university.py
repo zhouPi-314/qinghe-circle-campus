@@ -178,6 +178,7 @@ class StudentRegistryRecord(db.Model):
         ),
         UniqueConstraint("university_id", "student_no", name="uq_registry_university_student_no"),
         UniqueConstraint("university_id", "phone_hash", name="uq_registry_university_phone_hash"),
+        UniqueConstraint("id", "university_id", name="uq_registry_id_university_id"),
         CheckConstraint("phone_hash ~ '^[0-9a-f]{64}$'", name="ck_registry_phone_hash"),
         CheckConstraint("phone_last4 ~ '^[0-9]{4}$'", name="ck_registry_phone_last4"),
     )
