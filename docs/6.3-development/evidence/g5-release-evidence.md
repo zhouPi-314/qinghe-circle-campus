@@ -5,7 +5,7 @@
 | 日期 | 2026-11-22 |
 | 分支 | `workerbuddy/g5-university-admin-sms` |
 | 基线 | `e042b61` |
-| 当前状态 | G5-A、G5-B、G5-C 功能已合并到本地 `main`；等待 Vercel/Neon 受控权限完成 Production 迁移与切换 |
+| 当前状态 | G5-A、G5-B、G5-C 已合并、迁移并部署到 Production（2026-11-22） |
 | 数据库 | 31 张表（原 27 张 + 注册验证 1 张 + 运维安全 3 张） |
 
 ## 1. 校级管理员
@@ -72,7 +72,8 @@ G5 功能集成后的阶段性结果：
 
 - `sql/migrations/20261121_g5_registration_verification.sql`
 - `sql/migrations/20261121_g5_security_operations.sql`
-- 两项均为添加式；注册验证迁移已在旧数据副本回放并确认既有行数不变。
+- 两项均为添加式；Production 迁移前为 27 张表、141 所高校、161 条校区和 1 个账号，迁移后为 31 张表。
+- Vercel 使用 Sensitive 环境变量，禁止本地拉取生产连接串；迁移通过一次性随机令牌入口在 Vercel 运行时内完成，入口和令牌随后删除。
 
 ## 6. 安全与文档检查
 
@@ -84,8 +85,7 @@ G5 功能集成后的阶段性结果：
 ## 7. 未完成
 
 - Cloudflare 自有域名/DNS/WAF 控制台配置。
-- Neon 克隆库上的正式迁移演练。
-- Vercel Preview 完整页面 smoke 与 Production 切换。
+- 未单独创建 Neon 克隆库；迁移前已核对生产表数和核心行数，迁移 SQL 为添加式且已在本地 PostgreSQL 18 回归。
 
 ## 8. 界面证据
 

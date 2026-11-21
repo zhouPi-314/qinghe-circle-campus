@@ -5,7 +5,7 @@
 ## 当前阶段
 
 - 项目名称：青禾流转（Qinghe Circle Campus）
-- 当前状态：G4 已批准发布（D-042）。G5-A/B/C 已完成代码合并、286 项回归、依赖审计和 Word 同步；等待 Vercel/Neon 受控权限执行 Production 迁移与切换。Cloudflare WAF 暂缓（D-055）；WorkerBuddy 保持停止
+- 当前状态：G4 已批准发布（D-042）。G5-A/B/C 已完成合并、286 项回归、依赖审计、31 表 Production 迁移、Vercel 部署和公网 smoke；Cloudflare WAF 暂缓（D-055），WorkerBuddy 保持停止
 - G1 通过前不得进入 G2 业务编码；各门禁停止点见 `docs/00-governance/collaboration-and-quality-gates.md`
 
 ## 强制阅读顺序
