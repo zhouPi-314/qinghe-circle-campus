@@ -16,7 +16,7 @@ A Campus Circular Sharing Platform
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghe-circle-campus.vercel.app)
 
-[**在线体验**](https://qinghe-circle-campus.vercel.app) ·
+[**官方网站**](https://qinghe-circle-campus.vercel.app) ·
 [**项目文档**](docs/README.md) ·
 [**版本更新**](https://github.com/zhouPi-314/qinghe-circle-campus/releases) ·
 [**参与贡献**](CONTRIBUTING.md)
