@@ -4,6 +4,8 @@
 |---|---|
 | 日期 | 2026-11-22 |
 | Production | `https://qinghe-circle-campus.vercel.app` |
+| Git 提交 | `4a976c7` |
+| Vercel Deployment | `dpl_CCyXt7is5SqvTbXMzQxVb4qxN7AM` |
 | 应用状态 | G5-A/B/C 已部署 |
 | 数据库 | PostgreSQL 18.6，31 张表 |
 | Cloudflare | R2 可用；WAF、Bot Fight Mode 和 Rate Limiting 按 D-055 暂缓 |
