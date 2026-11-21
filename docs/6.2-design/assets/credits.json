@@ -1,0 +1,459 @@
+{
+  "checked_at": "2026-11-20",
+  "policy": "Only assets currently used by the 6.2 prototype are credited here. All downloaded photos and videos are stored locally. Pexels permits free use and modification under its license, but does not guarantee model, property or location releases; every human scene is therefore labelled as a scene illustration, not evidence of a completed Qinghe Circle activity.",
+  "assets": [
+    {
+      "file": "photos/asian-students-laptops.jpg",
+      "title": "Young women sitting on steps and using laptops",
+      "creator": "Kaboompics.com",
+      "source_page": "https://www.pexels.com/photo/young-women-sitting-on-steps-and-using-laptops-8554478/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in the prototype.",
+      "release_note": "Pexels does not guarantee model or property releases; use as an illustrative campus scene.",
+      "used_in": [
+        "身份选择页背景",
+        "学生登录/注册页背景",
+        "发现页第二次被选择图文区",
+        "校园拾光册方向"
+      ]
+    },
+    {
+      "file": "photos/young-woman-books-street.jpg",
+      "title": "Young woman holding books in a traditional street",
+      "creator": "rongkum Li",
+      "source_page": "https://www.pexels.com/photo/young-woman-holding-books-in-a-traditional-street-40591646/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in the prototype.",
+      "release_note": "Pexels does not guarantee model or property releases; the location is not presented as a project site.",
+      "used_in": [
+        "公益项目善意图集"
+      ]
+    },
+    {
+      "file": "photos/china-rural-classroom-jiangxi.jpg",
+      "title": "Students listening to a teacher in rural Jiangxi, China",
+      "creator": "Greece-China News",
+      "source_page": "https://www.pexels.com/photo/students-listening-to-a-teacher-11682274/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1400 px wide; cropped by object-fit in the prototype.",
+      "release_note": "Identifiable minors appear in the source scene. Pexels does not guarantee model releases; use only as a design illustration and replace before public fundraising promotion.",
+      "used_in": [
+        "校园拾光册方向"
+      ]
+    },
+    {
+      "file": "photos/china-huaian-library-student.jpg",
+      "title": "Student at a modern library in Huaian, China",
+      "creator": "Usman AbdulrasheedGambo",
+      "source_page": "https://www.pexels.com/photo/student-at-modern-huaian-library-interior-29335859/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; portrait scene cropped by object-fit.",
+      "release_note": "Pexels does not guarantee model or property releases; use as a scene illustration only.",
+      "used_in": [
+        "发现页第二次被选择主图"
+      ]
+    },
+    {
+      "file": "photos/item-books-textbook-stack.jpg",
+      "title": "Stack of books on a yellow background",
+      "creator": "Gilmer Diaz Estela",
+      "source_page": "https://www.pexels.com/photo/close-up-shot-of-stack-of-books-5535288/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in item cards.",
+      "used_in": [
+        "高等数学教材物品卡"
+      ]
+    },
+    {
+      "file": "photos/item-desk-lamp-yellow.jpg",
+      "title": "Modern yellow desk lamp in a minimalist workspace",
+      "creator": "Alpha En",
+      "source_page": "https://www.pexels.com/photo/modern-yellow-desk-lamp-in-minimalist-workspace-28461166/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in item cards and detail gallery.",
+      "used_in": [
+        "宿舍护眼台灯物品卡",
+        "物品详情主图"
+      ]
+    },
+    {
+      "file": "photos/item-badminton-racket.jpg",
+      "title": "Blue and white badminton racket with shuttlecock",
+      "creator": "Pew Nguyen",
+      "source_page": "https://www.pexels.com/photo/blue-and-white-badminton-racket-8286363/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in item cards.",
+      "release_note": "Visible racket branding remains third-party property; use only as a prototype item photo.",
+      "used_in": [
+        "入门级羽毛球拍物品卡"
+      ]
+    },
+    {
+      "file": "photos/item-portable-speaker.jpg",
+      "title": "Hands operating a portable wireless speaker",
+      "creator": "cottonbro studio",
+      "source_page": "https://www.pexels.com/photo/person-turning-on-a-black-portable-speaker-6332446/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in item cards.",
+      "release_note": "Pexels does not guarantee model releases; no identity is implied.",
+      "used_in": [
+        "便携蓝牙音箱物品卡"
+      ]
+    },
+    {
+      "file": "photos/item-vintage-books.jpg",
+      "title": "Piles of vintage books",
+      "creator": "Nothing Ahead",
+      "source_page": "https://www.pexels.com/photo/piles-of-books-5009160/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in item cards and editorial tiles.",
+      "used_in": [
+        "考研英语真题册物品卡",
+        "校园拾光册方向"
+      ]
+    },
+    {
+      "file": "photos/item-storage-boxes.jpg",
+      "title": "Three stacked storage boxes",
+      "creator": "Castorly Stock",
+      "source_page": "https://www.pexels.com/photo/three-boxes-3912293/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "modifications": "Downloaded at 1200 px wide; cropped by object-fit in item cards.",
+      "used_in": [
+        "折叠收纳箱物品卡"
+      ]
+    },
+    {
+      "file": "photos/books-stacked-user-provided.jpg",
+      "title": "Books stacked across a wooden floor",
+      "creator": "User-provided reference image",
+      "source_page": null,
+      "license": "Rights not documented; retained as attributed course-record material without an additional project license",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Converted from the user-provided PNG to a 1023 px wide JPEG for the local prototype.",
+      "release_note": "Source not documented. Retained only as course-record material; no photographer, redistributor or project re-license rights are asserted.",
+      "used_in": [
+        "发现页第二次被选择图文区",
+        "校园拾光册方向"
+      ]
+    },
+    {
+      "file": "photos/china-public-good/cvf-doctor-volunteer.jpg",
+      "title": "“当代雷锋”庄仕华：医者仁同胞亲",
+      "creator": "中国志愿服务联合会",
+      "source_page": "https://www.cvf.org.cn/",
+      "license": "官方公益宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally without content alteration; cropped by object-fit in the prototype.",
+      "release_note": "该图片用于说明医疗志愿服务，不代表青禾流转组织或参与了图中的活动；第三方权利仍归原机构，再次分发应核对原来源许可。",
+      "used_in": [
+        "公益项目善意图集",
+        "公益影像带医疗志愿服务"
+      ]
+    },
+    {
+      "file": "photos/china-public-good/cvf-village-guard.jpg",
+      "title": "一束光，守护村寨的平安",
+      "creator": "中国志愿服务联合会",
+      "source_page": "https://www.cvf.org.cn/",
+      "license": "官方公益宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally without content alteration; cropped by object-fit in the prototype.",
+      "release_note": "该图片用于说明志愿服务场景，不代表青禾流转组织或参与了图中的活动；第三方权利仍归原机构，再次分发应核对原来源许可。",
+      "used_in": [
+        "公益项目善意图集"
+      ]
+    },
+    {
+      "file": "photos/china-public-good/cvf-tiananmen-volunteer.jpg",
+      "title": "把天安门的故事，讲给世界",
+      "creator": "中国志愿服务联合会",
+      "source_page": "https://www.cvf.org.cn/",
+      "license": "官方公益宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally without content alteration; cropped by object-fit in the prototype.",
+      "release_note": "该图片用于说明公共引导志愿服务，不代表青禾流转组织或参与了图中的活动；第三方权利仍归原机构，再次分发应核对原来源许可。",
+      "used_in": [
+        "公益项目善意图集",
+        "腾讯基金会宣传视频海报"
+      ]
+    },
+    {
+      "file": "photos/china-public-good/cvf-hongyan-guide.webp",
+      "title": "歌乐山脚下，红岩精神代代讲",
+      "creator": "中国志愿服务联合会",
+      "source_page": "https://www.cvf.org.cn/",
+      "license": "官方公益宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally without content alteration; cropped by object-fit in the prototype.",
+      "release_note": "该图片用于说明文化志愿讲解，不代表青禾流转组织或参与了图中的活动；第三方权利仍归原机构，再次分发应核对原来源许可。",
+      "used_in": [
+        "公益影像带文化志愿服务"
+      ]
+    },
+    {
+      "file": "video/qinqing-hope-promo.mp4",
+      "poster_file": "video/qinqing-hope-poster.png",
+      "title": "亲青公益首页公益宣传视频",
+      "creator": "中国青少年发展基金会 / 亲青公益",
+      "source_page": "https://www.qinqing.cydf.org.cn/",
+      "license": "官方公益宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally and configured for click-to-play loop playback; no scene content changed.",
+      "release_note": "宣传片只说明官方公益议题，不代表青禾流转已开展片中的活动；第三方权利仍归原机构，再次分发应核对原来源许可。",
+      "used_in": [
+        "公益项目主视觉视频"
+      ]
+    },
+    {
+      "file": "video/tencent-foundation-promo.mp4",
+      "poster_file": "photos/china-public-good/cvf-tiananmen-volunteer.jpg",
+      "title": "腾讯基金会首页品牌宣传视频",
+      "creator": "腾讯基金会",
+      "source_page": "https://www.tencentfoundation.org/",
+      "license": "官方公益宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally and configured for click-to-play playback; no scene content changed.",
+      "release_note": "宣传片只说明官方公益议题，不代表青禾流转已开展片中的活动；第三方权利仍归原机构，再次分发应核对原来源许可。",
+      "used_in": [
+        "公益影像带品牌宣传视频"
+      ]
+    },
+    {
+      "file": "photos/schools/scu-wangjiang-north-gate.jpg",
+      "title": "四川大学望江校区北大门",
+      "creator": "四川大学",
+      "source_page": "https://www.scu.edu.cn/whcd/yxzy/xyfj.htm",
+      "license": "学校官网公开宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally; cropped by object-fit and animated by a restrained pan and scale.",
+      "release_note": "用于学校场景识别，不代表青禾流转与学校存在合作或项目成果。",
+      "used_in": [
+        "发现页四川大学校园动画"
+      ]
+    },
+    {
+      "file": "photos/schools/swjtu-campus.jpg",
+      "title": "西南交通大学校园实景",
+      "creator": "西南交通大学",
+      "source_page": "https://www.swjtu.edu.cn/info/1782/143852.htm",
+      "license": "学校官网公开宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally; cropped by object-fit and animated by a restrained pan and scale.",
+      "release_note": "用于学校场景识别，不代表青禾流转与学校存在合作或项目成果。",
+      "used_in": [
+        "发现页西南交通大学校园动画"
+      ]
+    },
+    {
+      "file": "photos/schools/uestc-campus.jpg",
+      "title": "电子科技大学校园学习场景",
+      "creator": "电子科技大学",
+      "source_page": "https://www.uestc.edu.cn/",
+      "license": "学校官网公开宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally; cropped by object-fit and animated by a restrained pan and scale.",
+      "release_note": "用于学校场景识别，不代表青禾流转与学校存在合作或项目成果。",
+      "used_in": [
+        "发现页电子科技大学校园动画"
+      ]
+    },
+    {
+      "file": "photos/schools/swufe-campus.jpg",
+      "title": "西南财经大学校园实景",
+      "creator": "西南财经大学",
+      "source_page": "https://www.swufe.edu.cn/xxgk/xyfg.htm",
+      "license": "学校官网公开宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally; cropped by object-fit and animated by a restrained pan and scale.",
+      "release_note": "用于学校场景识别，不代表青禾流转与学校存在合作或项目成果。",
+      "used_in": [
+        "发现页西南财经大学校园动画"
+      ]
+    },
+    {
+      "file": "photos/schools/sicau-campus.jpg",
+      "title": "四川农业大学校园实景",
+      "creator": "四川农业大学",
+      "source_page": "https://www.sicau.edu.cn/xywh/xyfg.htm",
+      "license": "学校官网公开宣传素材；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Stored locally; cropped by object-fit and animated by a restrained pan and scale.",
+      "release_note": "用于学校场景识别，不代表青禾流转与学校存在合作或项目成果。",
+      "used_in": [
+        "发现页四川农业大学校园动画"
+      ]
+    },
+    {
+      "file": "badges/scu-full-badge.png",
+      "title": "四川大学校徽按钮",
+      "creator": "四川大学",
+      "source_page": "https://www.scu.edu.cn/",
+      "license": "学校官网标识；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Cropped to the emblem and centered on a white circular playback control.",
+      "release_note": "仅用于当前学校的场景说明和媒体控制，不构成合作、授权或背书。",
+      "used_in": [
+        "四川大学校园动画播放按钮"
+      ]
+    },
+    {
+      "file": "badges/swjtu-full-badge.png",
+      "title": "西南交通大学校徽按钮",
+      "creator": "西南交通大学",
+      "source_page": "https://www.swjtu.edu.cn/",
+      "license": "学校官网标识；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Cropped to the emblem and centered on a white circular playback control.",
+      "release_note": "仅用于当前学校的场景说明和媒体控制，不构成合作、授权或背书。",
+      "used_in": [
+        "西南交通大学校园动画播放按钮"
+      ]
+    },
+    {
+      "file": "badges/uestc-full-badge.png",
+      "title": "电子科技大学校徽按钮",
+      "creator": "电子科技大学",
+      "source_page": "https://www.uestc.edu.cn/",
+      "license": "学校官网标识；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Cropped to the emblem and centered on a white circular playback control.",
+      "release_note": "仅用于当前学校的场景说明和媒体控制，不构成合作、授权或背书。",
+      "used_in": [
+        "电子科技大学校园动画播放按钮"
+      ]
+    },
+    {
+      "file": "badges/swufe-full-badge.png",
+      "title": "西南财经大学校徽按钮",
+      "creator": "西南财经大学",
+      "source_page": "https://www.swufe.edu.cn/",
+      "license": "学校官网标识；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Cropped to the emblem and centered on a white circular playback control.",
+      "release_note": "仅用于当前学校的场景说明和媒体控制，不构成合作、授权或背书。",
+      "used_in": [
+        "西南财经大学校园动画播放按钮"
+      ]
+    },
+    {
+      "file": "badges/sicau-full-badge.png",
+      "title": "四川农业大学校徽按钮",
+      "creator": "四川农业大学",
+      "source_page": "https://www.sicau.edu.cn/",
+      "license": "学校官网标识；版权归原机构，课程演示使用",
+      "license_url": null,
+      "downloaded_on": "2026-11-20",
+      "modifications": "Cropped to the emblem and centered on a white circular playback control.",
+      "release_note": "仅用于当前学校的场景说明和媒体控制，不构成合作、授权或背书。",
+      "used_in": [
+        "四川农业大学校园动画播放按钮"
+      ]
+    },
+    {
+      "file": "video/china-campus-moment.mp4",
+      "poster_file": "video/china-campus-moment-poster.jpg",
+      "title": "Busy day at a Chinese urban campus",
+      "creator": "LayG Traveller",
+      "source_page": "https://www.pexels.com/video/busy-day-at-chinese-urban-campus-36132240/",
+      "license": "Pexels License",
+      "license_url": "https://www.pexels.com/license/",
+      "downloaded_on": "2026-11-20",
+      "duration": "8 seconds",
+      "modifications": "Stored locally and set to muted loop playback with a visible pause control; no content was added to the footage.",
+      "release_note": "Pexels does not guarantee model or property releases; the clip is an illustrative campus scene, not evidence of an activity run by Qinghe Circle.",
+      "used_in": [
+        "发现页主视觉视频"
+      ]
+    }
+  ],
+  "remote_identities": [
+    {
+      "name": "联合国环境规划署（UNEP）",
+      "official_page": "https://www.unep.org/zh-hans",
+      "display": "Text-only reference; no UN or UNEP logo is loaded or stored.",
+      "purpose": "Environmental topic reference only; no affiliation or endorsement is implied."
+    },
+    {
+      "name": "中国乡村发展基金会",
+      "official_page": "https://www.cfrd.org.cn/",
+      "logo_url": "https://static.cfpa.org.cn/Images/index_logo.png",
+      "display": "Remote hotlink for nominative identification only.",
+      "purpose": "No affiliation or endorsement is implied; 归属权利在原机构。"
+    },
+    {
+      "name": "中国青少年发展基金会 / 希望工程",
+      "official_page": "https://www.cydf.org.cn/",
+      "logo_urls": [
+        "https://www.cydf.org.cn/_nuxt/logo_banner22.DsyWrKGG.png",
+        "https://www.cydf.org.cn/_nuxt/logo_banner11.HuBOqU-i.png"
+      ],
+      "display": "Remote hotlinks for nominative identification only.",
+      "purpose": "No affiliation or endorsement is implied; 归属权利在原机构。"
+    },
+    {
+      "name": "微博微公益",
+      "official_page": "https://gongyi.weibo.com/",
+      "logo_url": "https://gongyi.weibo.com/favicon.ico",
+      "display": "Remote hotlink for nominative identification only.",
+      "purpose": "No affiliation or endorsement is implied; 归属权利在原机构。"
+    },
+    {
+      "name": "合一绿学院（绿资酷）",
+      "official_page": "https://heyi.lvziku.cn/",
+      "logo_url": "https://heyi.lvziku.cn/Public/Home/img/logo.png",
+      "display": "Remote hotlink for nominative identification only.",
+      "purpose": "No affiliation or endorsement is implied; 归属权利在原机构。"
+    },
+    {
+      "name": "中国绿化基金会",
+      "official_page": "https://www.cgf.org.cn/",
+      "logo_url": "https://www.cgf.org.cn/cgforgcn/picture/logo.png",
+      "display": "Remote hotlink for nominative identification only.",
+      "purpose": "No affiliation or endorsement is implied; 归属权利在原机构。"
+    },
+    {
+      "name": "中国志愿服务联合会",
+      "official_page": "https://www.cvf.org.cn/",
+      "logo_url": "https://www.cvf.org.cn/images/zylogo.png",
+      "display": "Remote hotlink for nominative identification only.",
+      "purpose": "No affiliation or endorsement is implied; 归属权利在原机构。"
+    }
+  ]
+}

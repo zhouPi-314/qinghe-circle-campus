@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}青禾流转{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('main.index') }}">
+      <span class="brand-name">青禾流转</span>
+      <span class="brand-sub">校园物品共享流转与绿色回收平台</span>
+    </a>
+    <nav class="site-nav">
+      {% if g.current_user %}
+        <a class="nav-link" href="{{ url_for('items.discover') }}">物品发现</a>
+        <a class="nav-link" href="{{ url_for('circulation.my_requests') }}">我的申请</a>
+        <a class="nav-link" href="{{ url_for('circulation.notifications') }}">通知</a>
+        <a class="nav-link" href="{{ url_for('me.profile') }}">资料</a>
+        <a class="nav-link" href="{{ url_for('items.new_item') }}">发布物品</a>
+        {% if g.current_user.role == 'station_manager' %}
+          <a class="nav-link" href="{{ url_for('circulation.station_workbench') }}">站点工作台</a>
+          <a class="nav-link" href="{{ url_for('charity.new_project') }}">创建公益项目</a>
+        {% endif %}
+        <a class="nav-link" href="{{ url_for('charity.project_list') }}">公益项目</a>
+        {% if g.current_user.is_platform_admin %}
+          <a class="nav-link" href="{{ url_for('admin.overview') }}">平台概览</a>
+        {% endif %}
+        <span class="role-tag role-{{ g.current_user.role }}">{{ g.current_user.role_label }}</span>
+        <span class="nav-user">{{ g.current_user.nickname }}</span>
+        <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn btn-ghost">退出登录</button>
+        </form>
+      {% else %}
+        <a class="btn btn-ghost" href="{{ url_for('auth.identity') }}">登录 / 注册</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  <main class="page">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-list" role="status">
+          {% for category, message in messages %}
+            <p class="flash flash-{{ category }}">{{ message }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>让每一件好物，都遇见下一位需要的人</p>
+  </footer>
+</body>
+</html>

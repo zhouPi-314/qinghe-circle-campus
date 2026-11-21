@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block title %}流转详情 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="detail-head">
+    <h1>流转详情：{{ req.item.title }}</h1>
+    <span class="status-chip status-{{ req.status }}">{{ {'pending':'待处理','accepted':'已接受','payment_pending':'待模拟支付','handover_pending':'待交接','in_progress':'借用中','return_pending':'待归还确认','inspection_pending':'待回收验收','completed':'已完成','rejected':'已拒绝','cancelled':'已取消','disputed':'争议中'}.get(req.status, req.status) }}</span>
+  </div>
+  <p class="page-lead">
+    模式：{{ {'borrow':'共享借还','sale':'二手交易','give':'免费赠送','recycle':'绿色回收'}.get(req.mode, req.mode) }} ·
+    申请人：{{ req.requester.nickname }} ·
+    所有者：{{ req.owner.nickname }} ·
+    申请时间：{{ req.created_at | local_dt }}
+  </p>
+  {% if req.request_note %}<p>申请留言：{{ req.request_note }}</p>{% endif %}
+  {% if details %}
+    <p>借用期：<strong>{{ details.start_date }} 至 {{ details.due_date }}</strong>
+      {% if overdue %}<span class="overdue-tag">已逾期</span>{% endif %}
+    </p>
+    {% if details.return_note %}<p>归还说明：{{ details.return_note }}（{{ details.return_submitted_at | local_dt }}）</p>{% endif %}
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>当前可执行操作</h2>
+
+  {% if is_owner and req.status == 'pending' %}
+    <p class="page-lead">接受前会校验相同物品借期不重叠（BR-022）。</p>
+    <form method="post" action="{{ url_for('circulation.decide', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" name="decision" value="accept" class="btn btn-primary">接受申请</button>
+    </form>
+    <form method="post" action="{{ url_for('circulation.decide', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" name="decision" value="reject" class="btn btn-danger">拒绝申请</button>
+    </form>
+
+  {% elif ((req.mode == 'recycle' and is_requester) or (req.mode != 'recycle' and is_owner)) and req.status == 'handover_pending' %}
+    <p class="page-lead">把生成的 6 位交接码当面告知借用人；重新生成后旧码立即失效（BR-017）。</p>
+    <form method="post" action="{{ url_for('circulation.issue_code', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" class="btn btn-primary">
+        {{ '重新生成交接码' if record and record.status == 'active' else '生成交接码' }}
+      </button>
+    </form>
+    {% if record and record.status == 'active' %}
+      <p class="field-hint">当前码版本：第 {{ record.code_version }} 版，{{ record.expires_at | local_dt }} 前有效。</p>
+    {% endif %}
+
+  {% elif (is_requester and req.mode != 'recycle' or is_owner and req.mode == 'recycle') and req.status == 'handover_pending' %}
+    <p class="page-lead">请输入交付方当面出示的 6 位交接码完成交接。</p>
+    <form method="post" action="{{ url_for('circulation.confirm_handover', request_id=req.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-field">
+        <label for="code">交接码</label>
+        <input id="code" name="code" type="text" inputmode="numeric" maxlength="6" required>
+      </div>
+      <button type="submit" class="btn btn-primary">确认取件</button>
+    </form>
+
+  {% elif is_requester and req.status == 'in_progress' %}
+    {% if overdue %}<p class="flash flash-error">该物品已超过预计归还日期，请尽快归还（逾期仍允许归还）。</p>{% endif %}
+    <p class="page-lead">填写归还说明并提交，等待出借人确认（BR-023）。</p>
+    <form method="post" action="{{ url_for('circulation.submit_return', request_id=req.id) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-field">
+        <label for="return_note">归还说明</label>
+        <textarea id="return_note" name="return_note" rows="3" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary">提交归还</button>
+    </form>
+
+  {% elif is_owner and req.status == 'return_pending' %}
+    <p class="page-lead">确认物品状态正常则完成借用；发现损坏或不符可转入争议（BR-023）。</p>
+    <form method="post" action="{{ url_for('circulation.confirm_return', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" name="condition_ok" value="ok" class="btn btn-primary">确认归还完成</button>
+    </form>
+    <form method="post" action="{{ url_for('circulation.confirm_return', request_id=req.id) }}" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="condition_ok" value="bad">
+      <input type="text" name="note" placeholder="说明损坏或不符情况">
+      <button type="submit" class="btn btn-danger">转入争议</button>
+    </form>
+
+  {% elif is_requester and req.status == 'payment_pending' %}
+    <p class="page-lead">模拟支付：成功后进入待交接；失败或取消将解除物品占用（BR-026）。教学模拟，不产生真实扣款。</p>
+    <form method="post" action="{{ url_for('circulation.simulate_payment', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" name="outcome" value="success" class="btn btn-primary">模拟支付成功</button>
+    </form>
+    <form method="post" action="{{ url_for('circulation.simulate_payment', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" name="outcome" value="fail" class="btn btn-danger">模拟支付失败</button>
+    </form>
+    <form method="post" action="{{ url_for('circulation.simulate_payment', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" name="outcome" value="cancel" class="btn btn-ghost">取消支付</button>
+    </form>
+
+  {% elif is_owner and req.status == 'inspection_pending' %}
+    <p class="page-lead">验收物品是否符合回收条件；不符合须记录原因（BR-031）。</p>
+    <form method="post" action="{{ url_for('circulation.inspect_recycle', request_id=req.id) }}" class="inline-actions">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <button type="submit" name="result" value="accept" class="btn btn-primary">验收通过</button>
+    </form>
+    <form method="post" action="{{ url_for('circulation.inspect_recycle', request_id=req.id) }}" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="result" value="reject">
+      <input type="text" name="note" placeholder="不符合原因" required>
+      <button type="submit" class="btn btn-danger">验收不符合</button>
+    </form>
+
+  {% elif req.status == 'disputed' %}
+    <p class="page-lead">争议处理中，等待平台管理员记录结论（BR-042）。历史记录不会被删除。</p>
+    {% if dispute_messages %}
+      <ul class="timeline">
+        {% for message in dispute_messages %}
+          <li>{{ message.created_at | local_dt }} — {{ message.body }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+  {% elif req.status in ('completed', 'rejected', 'cancelled') and not dispute and req.status == 'completed' %}
+    {% if is_requester or is_owner %}
+      <p class="page-lead">本次流转已结束。如对结果有异议，可发起争议（BR-041）。</p>
+      <form method="post" action="{{ url_for('circulation.open_dispute', request_id=req.id) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-field">
+          <label for="reason">争议原因</label>
+          <textarea id="reason" name="reason" rows="3" required></textarea>
+        </div>
+        <button type="submit" class="btn btn-danger">发起争议</button>
+      </form>
+    {% endif %}
+  {% endif %}
+
+  {% if req.status in ('pending', 'accepted', 'handover_pending') and (is_requester or is_owner) %}
+    <hr>
+    <p class="page-lead">交接前可取消并需填写原因；取消后物品恢复可申请（FR-H02）。</p>
+    <form method="post" action="{{ url_for('circulation.cancel', request_id=req.id) }}" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="text" name="reason" placeholder="取消原因" required>
+      <button type="submit" class="btn btn-danger">取消申请</button>
+    </form>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>状态历史</h2>
+  {% if history %}
+    <ul class="timeline">
+      {% for row in history %}
+        <li>
+          <span class="timeline-time">{{ row.created_at | local_dt }}</span>
+          {% if row.from_status %}{{ {'pending':'待处理','accepted':'已接受','payment_pending':'待模拟支付','handover_pending':'待交接','in_progress':'借用中','return_pending':'待归还确认','inspection_pending':'待回收验收','completed':'已完成','rejected':'已拒绝','cancelled':'已取消','disputed':'争议中','active':'可申请','reserved':'已被申请','off_shelf':'已下架','on_hold':'异常冻结'}.get(row.from_status, row.from_status) }}
+            → {% endif %}{{ {'pending':'待处理','accepted':'已接受','payment_pending':'待模拟支付','handover_pending':'待交接','in_progress':'借用中','return_pending':'待归还确认','inspection_pending':'待回收验收','completed':'已完成','rejected':'已拒绝','cancelled':'已取消','disputed':'争议中','active':'可申请','reserved':'已被申请','off_shelf':'已下架','on_hold':'异常冻结'}.get(row.to_status, row.to_status) }}
+          — {{ row.reason }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="page-lead">暂无历史记录。</p>
+  {% endif %}
+</section>
+{% endblock %}

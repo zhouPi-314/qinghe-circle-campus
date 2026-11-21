@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}公益回执 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ receipt.title }}</h1>
+  <p class="page-lead">每一份善意，都能看见去向。</p>
+  <p>项目：{{ receipt.project.title }} · 接收组织：{{ receipt.recipient_org }} · 接收时间：{{ receipt.received_at | local_dt }}</p>
+  <p>{{ receipt.public_note }}</p>
+</section>
+<section class="card">
+  <h2>物资去向</h2>
+  <ul class="request-list">
+    {% for item in items %}
+      <li>{{ item.item_name }} · 数量 {{ item.quantity }}{% if item.note %} · {{ item.note }}{% endif %}</li>
+    {% endfor %}
+  </ul>
+  <p class="page-lead">回执不含受助对象的可识别个人信息（BR-039）。</p>
+</section>
+{% endblock %}

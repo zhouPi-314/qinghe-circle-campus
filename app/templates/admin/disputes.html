@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}争议处理 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>争议处理</h1>
+  <p class="page-lead">查看状态历史与双方说明，记录结论并关闭业务（FR-H05、BR-042）。</p>
+  {% if disputes %}
+    {% for dispute in disputes %}
+      <div class="item-card" style="margin-bottom:14px;">
+        <div class="item-card-title">申请 #{{ dispute.circulation_request_id }} · 发起人 {{ dispute.opened_by_user_id }}</div>
+        <p>{{ dispute.reason }}</p>
+        <form method="post" action="{{ url_for('admin.resolve_dispute', dispute_id=dispute.id) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="text" name="resolution" placeholder="处理结论" required>
+          <button type="submit" class="btn btn-primary">处理并关闭</button>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="page-lead">暂无待处理争议。</p>
+  {% endif %}
+</section>
+{% endblock %}

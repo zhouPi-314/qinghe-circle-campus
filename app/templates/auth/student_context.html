@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}选择学校与校区 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card auth-card">
+  <h1>选择学校与校区</h1>
+  <p class="page-lead">学生账号必须属于所选学校。单校区高校的校区显示学校全称。</p>
+
+  <form method="post" action="{{ url_for('auth.student_context') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ next_target or '' }}">
+    <div class="form-field">
+      <label for="university_id">学校（可输入名称筛选）</label>
+      <input id="university-filter" type="text" placeholder="输入“四川”可筛选学校" aria-controls="university_id"
+             autocomplete="off">
+      <select id="university_id" name="university_id" required>
+        <option value="" selected disabled>请选择学校</option>
+        {% for uni in universities %}
+          <option value="{{ uni.id }}" data-name="{{ uni.name }} {{ uni.city }}"
+                  {% if selected_university_id == uni.id %}selected{% endif %}>
+            {{ uni.name }}（{{ uni.city }} · {{ '本科' if uni.education_level == 'undergraduate' else '专科' }}）
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-field">
+      <label for="campus_id">校区</label>
+      <select id="campus_id" name="campus_id" required>
+        <option value="" selected disabled>请先选择学校</option>
+        {% for uni in universities %}
+          {% for campus in uni.campuses %}
+            <option value="{{ campus.id }}" data-university="{{ uni.id }}"
+                    data-single="{{ '1' if uni.single_campus else '0' }}"
+                    {% if uni.single_campus %}data-single-name="{{ uni.name }}"{% endif %}
+                    {% if selected_campus_id == campus.id %}selected{% endif %}>
+              {{ uni.name if uni.single_campus else campus.name }}
+            </option>
+          {% endfor %}
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">下一步</button>
+  </form>
+</section>
+
+<script>
+  // 学校筛选与校区联动：不依赖外部框架
+  (function () {
+    var filterInput = document.getElementById('university-filter');
+    var universitySelect = document.getElementById('university_id');
+    var campusSelect = document.getElementById('campus_id');
+
+    function refreshCampuses() {
+      var uniId = universitySelect.value;
+      var options = campusSelect.querySelectorAll('option[data-university]');
+      var matched = 0;
+      options.forEach(function (option) {
+        var visible = option.dataset.university === uniId;
+        option.hidden = !visible;
+        if (visible) {
+          matched += 1;
+          if (matched === 1) { option.selected = true; }
+        }
+      });
+      campusSelect.querySelector('option[value=""]').hidden = matched > 0;
+      if (matched === 0) { campusSelect.value = ''; }
+    }
+
+    filterInput.addEventListener('input', function () {
+      var keyword = filterInput.value.trim().toLowerCase();
+      universitySelect.querySelectorAll('option[data-name]').forEach(function (option) {
+        option.hidden = keyword !== '' && option.dataset.name.toLowerCase().indexOf(keyword) === -1;
+      });
+    });
+
+    universitySelect.addEventListener('change', refreshCampuses);
+    refreshCampuses();
+  })();
+</script>
+{% endblock %}

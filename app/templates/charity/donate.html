@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}提交捐赠 - {{ project.title }} - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>提交实物捐赠：{{ project.title }}</h1>
+  <p class="page-lead">接收组织：{{ project.recipient_org }} · 截止时间：{{ project.deadline | local_dt }}</p>
+  <p class="page-lead">捐赠需送至本校公益站点，由站点核验接收后计入募集进度（FR-C02/FR-C03）。图片可选，用于站点核验比对。</p>
+</section>
+
+<section class="card">
+  <h2>捐赠物资明细</h2>
+  {% if not needs %}
+    <p class="page-lead">该项目暂无物资需求，暂不接受捐赠。</p>
+  {% else %}
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <div class="form-field">
+        <label for="station_id">接收站点</label>
+        <select id="station_id" name="station_id" required>
+          {% for station in stations %}<option value="{{ station.id }}">{{ station.name }}（{{ station.address }}）</option>{% endfor %}
+        </select>
+        {% if not stations %}<p class="field-hint">本校暂无启用公益站点，请先联系平台管理员创建。</p>{% endif %}
+      </div>
+
+      {% for need in needs %}
+        <fieldset class="form-field">
+          <legend>{{ need.item_name }}（目标 {{ need.target_quantity }}{{ need.unit }}，已接收 {{ need.accepted_quantity }}{{ need.unit }}）</legend>
+          <label for="quantity_{{ need.id }}">捐赠数量（{{ need.unit }}）</label>
+          <input id="quantity_{{ need.id }}" name="quantity_{{ need.id }}" type="number" min="1" max="{{ need.target_quantity - need.accepted_quantity }}" value="0">
+          <label for="condition_{{ need.id }}">成色</label>
+          <select id="condition_{{ need.id }}" name="condition_{{ need.id }}">
+            <option value="new">全新</option>
+            <option value="like_new">几乎全新</option>
+            <option value="good" selected>成色良好</option>
+            <option value="fair">有使用痕迹</option>
+          </select>
+          <label for="note_{{ need.id }}">说明（可选）</label>
+          <input id="note_{{ need.id }}" name="note_{{ need.id }}" type="text" placeholder="例如：已清洗干净">
+          <label for="image_{{ need.id }}">物资图片（可选，JPEG/PNG/WebP，3MB 内）</label>
+          <input id="image_{{ need.id }}" name="image_{{ need.id }}" type="file" accept="image/jpeg,image/png,image/webp">
+          <p class="page-lead">图片不得包含身份证、联系方式或清晰的个人人脸；图片由管理员人工核验。</p>
+        </fieldset>
+      {% endfor %}
+
+      <div class="form-field">
+        <label for="donor_note">捐赠留言（可选）</label>
+        <textarea id="donor_note" name="donor_note" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary" {% if not stations %}disabled{% endif %}>提交捐赠</button>
+    </form>
+  {% endif %}
+</section>
+{% endblock %}

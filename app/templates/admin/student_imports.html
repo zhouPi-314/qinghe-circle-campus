@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}学生名单导入 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>学生名单导入</h1>
+  <p class="page-lead">UTF-8 CSV，表头：学号,姓名,手机号,校区代码,年级,班级,专业,学院。失败行原因可查（FR-U03/U04）。</p>
+  <form method="post" action="{{ url_for('admin.upload_roster') }}" enctype="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <select name="university_id" required>
+      {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
+    </select>
+    <input type="file" name="roster" accept=".csv,text/csv" required>
+    <button type="submit" class="btn btn-primary">上传并导入</button>
+  </form>
+
+  <h2>导入批次</h2>
+  {% if batches %}
+    <div class="table-scroll">
+      <table class="org-table">
+        <thead><tr><th>时间</th><th>总行数</th><th>成功</th><th>失败</th><th>失败明细</th></tr></thead>
+        <tbody>{% for batch in batches %}
+          <tr><td>{{ batch.created_at | local_dt }}</td><td>{{ batch.total_rows }}</td>
+            <td>{{ batch.success_rows }}</td><td>{{ batch.failed_rows }}</td>
+            <td>{% for e in batch.error_summary %}第{{ e.row }}行 {{ e.student_no or '—' }}：{{ e.reason }}；{% endfor %}</td></tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="page-lead">暂无导入批次。</p>
+  {% endif %}
+</section>
+{% endblock %}

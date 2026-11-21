@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}学生注册 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card auth-card">
+  <h1>学生注册</h1>
+  <p class="page-lead">
+    学校：{{ university.name }}。<br>
+    姓名、学院、专业、年级、班级和校区由学校名单带入，无法自行修改。
+  </p>
+
+  <form method="post" action="{{ url_for('auth.register') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ next_target or '' }}">
+
+    <div class="form-field {% if field_errors.student_no %}has-error{% endif %}">
+      <label for="student_no">学号</label>
+      <input id="student_no" name="student_no" type="text" value="{{ form.get('student_no', '') }}" required
+             aria-describedby="{{ 'err-student-no' if field_errors.student_no else '' }}">
+      {% if field_errors.student_no %}<p class="field-error" id="err-student-no">{{ field_errors.student_no }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.phone %}has-error{% endif %}">
+      <label for="phone">手机号</label>
+      <input id="phone" name="phone" type="tel" value="{{ form.get('phone', '') }}" maxlength="11" required
+             aria-describedby="{{ 'err-phone' if field_errors.phone else 'phone-hint' }}">
+      <p class="field-hint" id="phone-hint">必须与学校导入名单中的手机号一致。</p>
+      {% if field_errors.phone %}<p class="field-error" id="err-phone">{{ field_errors.phone }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.password %}has-error{% endif %}">
+      <label for="password">设置密码</label>
+      <input id="password" name="password" type="password" autocomplete="new-password" required
+             aria-describedby="{{ 'err-password' if field_errors.password else 'password-hint' }}">
+      <p class="field-hint" id="password-hint">至少 8 位，需同时包含字母和数字。</p>
+      {% if field_errors.password %}<p class="field-error" id="err-password">{{ field_errors.password }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.password_confirm %}has-error{% endif %}">
+      <label for="password_confirm">确认密码</label>
+      <input id="password_confirm" name="password_confirm" type="password" autocomplete="new-password" required
+             aria-describedby="{{ 'err-password-confirm' if field_errors.password_confirm else '' }}">
+      {% if field_errors.password_confirm %}
+        <p class="field-error" id="err-password-confirm">{{ field_errors.password_confirm }}</p>
+      {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">注册</button>
+  </form>
+
+  <p class="form-footnote">已在名单中注册过？<a href="{{ url_for('auth.login') }}">前往登录</a></p>
+</section>
+{% endblock %}

@@ -1,0 +1,89 @@
+{
+  "checked_at": "2026-11-20",
+  "status": "review-only; not written into Word",
+  "charity": [
+    {
+      "file": "assets/charity/qinqing-hope-promo.mp4",
+      "title": "亲青公益首页公益宣传视频",
+      "organization": "中国青少年发展基金会 / 亲青公益",
+      "source_page": "https://www.qinqing.cydf.org.cn/",
+      "rights_note": "Public campaign material on the official platform. Copyright remains with the original organization; retained as attributed course-demo material without an additional project license."
+    },
+    {
+      "file": "assets/charity/qinqing-hope-poster.png",
+      "title": "亲青公益宣传视频海报",
+      "organization": "中国青少年发展基金会 / 亲青公益",
+      "source_page": "https://www.qinqing.cydf.org.cn/",
+      "rights_note": "Used only as the video poster and scene illustration; it does not prove Qinghe Circle activity."
+    },
+    {
+      "file": "assets/charity/cvf-doctor-volunteer.jpg",
+      "title": "“当代雷锋”庄仕华：医者仁同胞亲",
+      "organization": "中国志愿服务联合会",
+      "source_page": "https://www.cvf.org.cn/",
+      "rights_note": "Official public-service report image. Copyright remains with the original organization."
+    },
+    {
+      "file": "assets/charity/cvf-village-guard.jpg",
+      "title": "一束光，守护村寨的平安",
+      "organization": "中国志愿服务联合会",
+      "source_page": "https://www.cvf.org.cn/",
+      "rights_note": "Official public-service report image. Copyright remains with the original organization."
+    },
+    {
+      "file": "assets/charity/cvf-tiananmen-volunteer.jpg",
+      "title": "把天安门的故事，讲给世界",
+      "organization": "中国志愿服务联合会",
+      "source_page": "https://www.cvf.org.cn/",
+      "rights_note": "Official public-service report image. Copyright remains with the original organization."
+    }
+  ],
+  "universities": [
+    {
+      "school_code": "4151010610",
+      "name": "四川大学",
+      "image": "assets/schools/scu-north-gate.jpg",
+      "logo": "assets/logos/scu-logo.png",
+      "image_source": "https://www.scu.edu.cn/yxtz/index.jsp?urltype=tree.TreeTempUrl&wbtreeid=1401",
+      "logo_source": "https://www.scu.edu.cn/",
+      "status": "official-site source"
+    },
+    {
+      "school_code": "4151010613",
+      "name": "西南交通大学",
+      "image": "assets/schools/swjtu-campus.jpg",
+      "logo": "assets/logos/swjtu-logo.png",
+      "image_source": "https://www.swjtu.edu.cn/info/1782/143852.htm",
+      "logo_source": "https://www.swjtu.edu.cn/",
+      "status": "official-site source"
+    },
+    {
+      "school_code": "4151010614",
+      "name": "电子科技大学",
+      "image": "assets/schools/uestc-campus.jpg",
+      "logo": "assets/logos/uestc-logo.png",
+      "image_source": "https://www.uestc.edu.cn/",
+      "logo_source": "https://www.uestc.edu.cn/",
+      "status": "official-site source"
+    },
+    {
+      "school_code": "4151010651",
+      "name": "西南财经大学",
+      "image": "assets/schools/swufe-campus.jpg",
+      "logo": "assets/logos/swufe-logo.png",
+      "image_source": "https://www.swufe.edu.cn/xxgk/xyfg.htm",
+      "logo_source": "https://www.swufe.edu.cn/",
+      "status": "official-site source"
+    },
+    {
+      "school_code": "4151010626",
+      "name": "四川农业大学",
+      "image": "assets/schools/sicau-campus.jpg",
+      "logo": "assets/logos/sicau-logo.png",
+      "image_source": "https://www.sicau.edu.cn/xywh/xyfg.htm",
+      "logo_source": "https://www.sicau.edu.cn/",
+      "status": "official-site source"
+    }
+  ],
+  "known_gap": "The repository has verified official website sources for 10 universities only. The other 131 university records still point to the shared Ministry of Education spreadsheet, so they are not represented as having verified school-specific official media."
+}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}选择登录身份 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card auth-card">
+  <h1>选择登录身份</h1>
+  <p class="page-lead">先选择身份，再进入对应的登录界面。管理员账号不提供自主注册。</p>
+
+  <form method="post" action="{{ url_for('auth.identity') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="next" value="{{ next_target or '' }}">
+    <div class="form-field">
+      <label for="role">登录身份</label>
+      <select id="role" name="role" required>
+        <option value="" {% if not selected %}selected{% endif %} disabled>请选择身份</option>
+        {% for value, label in roles.items() %}
+          <option value="{{ value }}" {% if selected == value %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary">下一步</button>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>{{ project.title }}</h1>
+  <p class="page-lead">接收组织：{{ project.recipient_org }} · 截止：{{ project.deadline | local_dt }} · {{ '募集中' if project.status == 'active' else '已完成' }}</p>
+  <p>{{ project.description }}</p>
+  <p>{{ project.public_summary }}</p>
+</section>
+
+<section class="card">
+  <h2>目标物资与募集进度</h2>
+  {% for need in needs %}
+    <p>
+      {{ need.item_name }}（{{ need.unit }}）：
+      <strong>{{ need.accepted_quantity }} / {{ need.target_quantity }}</strong>
+      {% if need.accepted_quantity >= need.target_quantity %}<span class="status-completed">已满足</span>{% endif %}
+    </p>
+  {% endfor %}
+  {% if not needs %}<p class="page-lead">暂无登记的物资需求。</p>{% endif %}
+</section>
+
+{% if is_student and project.status == 'active' and not expired and stations %}
+<section class="card">
+  <h2>提交实物捐赠</h2>
+  <p class="page-lead">让闲置走出宿舍，让善意抵达远方。只接收实物，经站点核验后计入进度。</p>
+  <form method="post" action="{{ url_for('charity.donate', project_id=project.id) }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-field">
+      <label for="station_id">送达站点</label>
+      <select id="station_id" name="station_id" required>
+        {% for station in stations %}
+          <option value="{{ station.id }}">{{ station.name }}（{{ station.address }}）</option>
+        {% endfor %}
+      </select>
+    </div>
+    {% for need in needs %}
+      {% if need.accepted_quantity < need.target_quantity %}
+        <div class="form-field">
+          <label>{{ need.item_name }}（剩余 {{ need.target_quantity - need.accepted_quantity }} {{ need.unit }}）</label>
+          <input type="number" name="quantity_{{ need.id }}" min="1" max="{{ need.target_quantity - need.accepted_quantity }}" placeholder="捐赠数量">
+          <select name="condition_{{ need.id }}">
+            <option value="new">全新</option><option value="like_new">几乎全新</option>
+            <option value="good">成色良好</option><option value="fair">有使用痕迹</option>
+          </select>
+        </div>
+      {% endif %}
+    {% endfor %}
+    <div class="form-field">
+      <label for="donor_note">留言（可选）</label>
+      <textarea id="donor_note" name="donor_note" rows="2"></textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">提交捐赠</button>
+  </form>
+</section>
+{% elif is_student and expired %}
+<section class="card"><p class="page-lead">项目已过截止时间，停止接受新捐赠（BR-037）。</p></section>
+{% endif %}
+
+<section class="card">
+  <h2>公益回执与公示</h2>
+  {% if receipts %}
+    <ul class="request-list">
+      {% for receipt in receipts %}
+        <li><a href="{{ url_for('charity.receipt_detail', receipt_id=receipt.id) }}">{{ receipt.title }}</a>
+          <span class="timeline-time">{{ receipt.received_at | local_dt }}</span></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="page-lead">暂无已公示回执。</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - 青禾流转{% endblock %}
+{% block content %}
+<section class="card error-card">
+  <p class="error-status">{{ status }}</p>
+  <h1>{{ title }}</h1>
+  <p class="page-lead">{{ reason }}</p>
+  <p class="next-step"><strong>下一步：</strong>{{ next_step }}</p>
+  {% if request_id %}
+    <p class="request-id">请求标识：{{ request_id }}（联系管理员时请提供）</p>
+  {% endif %}
+  <a class="btn btn-primary" href="{{ url_for('main.index') }}">返回首页</a>
+</section>
+{% endblock %}

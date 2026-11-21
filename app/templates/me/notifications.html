@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}通知 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>站内通知</h1>
+  <p class="page-lead">
+    <a href="{{ url_for('circulation.notifications') }}" {% if not unread_only %}class="active-filter"{% endif %}>全部</a>
+    ·
+    <a href="{{ url_for('circulation.notifications', filter='unread') }}" {% if unread_only %}class="active-filter"{% endif %}>未读</a>
+  </p>
+
+  {% if notifications %}
+    <ul class="request-list">
+      {% for n in notifications %}
+        <li class="{% if not n.read_at %}notification-unread{% endif %}">
+          <div>
+            <strong>{{ n.title }}</strong>
+            <p>{{ n.body }}</p>
+            <span class="timeline-time">{{ n.created_at | local_dt }}</span>
+          </div>
+          {% if not n.read_at %}
+            <form method="post" action="{{ url_for('circulation.mark_notification', notification_id=n.id) }}" class="inline-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn btn-ghost">标记已读</button>
+            </form>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="page-lead">暂无{{ '未读' if unread_only else '' }}通知。申请、确认、交接和争议都会有站内记录。</p>
+  {% endif %}
+</section>
+{% endblock %}

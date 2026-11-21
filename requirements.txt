@@ -1,0 +1,9 @@
+# 青禾流转首版锁定依赖（交接书第 6 节允许范围）
+# Python 3.13 / PostgreSQL 18（Neon） / 持续以实际安装版本为准
+flask==3.1.2
+flask-sqlalchemy==3.1.1
+sqlalchemy==2.0.44
+psycopg[binary]==3.2.12
+boto3==1.40.62
+pytest==8.4.2
+ruff==0.14.6

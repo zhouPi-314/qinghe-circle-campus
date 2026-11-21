@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}公益核验 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>公益捐赠核验</h1>
+  <p class="page-lead">核验接收后数量才计入进度；确认数量不得超过目标（BR-035/BR-036）。</p>
+  {% if donations %}
+    {% for donation in donations %}
+      <div class="item-card" style="margin-bottom:14px;">
+        <div class="item-card-title">项目「{{ donation.project.title }}」 · 捐赠人 {{ donation.donor.nickname }}</div>
+        {% for item in donation.items %}
+          <p>
+            {{ item.item_name }}：捐赠 {{ item.quantity }}
+            <input type="number" name="accepted_{{ item.id }}" form="review-{{ donation.id }}"
+                   min="0" max="{{ item.quantity }}" value="{{ item.quantity }}" style="width:80px;">
+            （成色：{{ {'new':'全新','like_new':'几乎全新','good':'成色良好','fair':'有使用痕迹'}.get(item.condition, item.condition) }}）
+          </p>
+        {% endfor %}
+        {% if donation.donor_note %}<p>留言：{{ donation.donor_note }}</p>{% endif %}
+        <form id="review-{{ donation.id }}" method="post" action="{{ url_for('charity.review_donation', donation_id=donation.id) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" name="decision" value="accept" class="btn btn-primary">接收</button>
+        </form>
+        <form method="post" action="{{ url_for('charity.review_donation', donation_id=donation.id) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="decision" value="reject">
+          <input type="text" name="reject_reason" placeholder="拒绝原因" required>
+          <button type="submit" class="btn btn-danger">拒绝</button>
+        </form>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="page-lead">暂无待核验捐赠。</p>
+  {% endif %}
+</section>
+{% endblock %}

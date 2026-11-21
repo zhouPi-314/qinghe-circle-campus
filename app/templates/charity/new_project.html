@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}创建公益项目 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>创建公益项目</h1>
+  <p class="page-lead">项目属于你所在的高校；物资需求可在此一次填写多条（FR-C01）。</p>
+  <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="form-field">
+      <label for="title">项目名称</label>
+      <input id="title" name="title" type="text" required maxlength="160">
+    </div>
+    <div class="form-field">
+      <label for="description">项目描述</label>
+      <textarea id="description" name="description" rows="3" required></textarea>
+    </div>
+    <div class="form-field">
+      <label for="recipient_org">接收组织</label>
+      <input id="recipient_org" name="recipient_org" type="text" required maxlength="160">
+    </div>
+    <div class="form-field">
+      <label for="public_summary">公开说明</label>
+      <textarea id="public_summary" name="public_summary" rows="2" required></textarea>
+    </div>
+    <div class="form-field">
+      <label for="deadline">募集截止时间</label>
+      <input id="deadline" name="deadline" type="datetime-local" required>
+    </div>
+
+    <h2>物资需求（至少一项）</h2>
+    {% for i in range(3) %}
+      <fieldset class="form-field">
+        <legend>需求 {{ i + 1 }}</legend>
+        <label for="need_name_{{ i }}">物资名称</label>
+        <input id="need_name_{{ i }}" name="need_name_{{ i }}" type="text" maxlength="128"
+               {% if i == 0 %}required{% endif %}>
+        <label for="need_category_{{ i }}">物品类别</label>
+        <select id="need_category_{{ i }}" name="need_category_{{ i }}">
+          {% for category in categories %}<option value="{{ category.id }}">{{ category.name }}</option>{% endfor %}
+        </select>
+        <label for="need_target_{{ i }}">目标数量</label>
+        <input id="need_target_{{ i }}" name="need_target_{{ i }}" type="number" min="1" value="10">
+        <label for="need_unit_{{ i }}">单位</label>
+        <input id="need_unit_{{ i }}" name="need_unit_{{ i }}" type="text" value="件" maxlength="16">
+      </fieldset>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">创建项目</button>
+  </form>
+</section>
+{% endblock %}

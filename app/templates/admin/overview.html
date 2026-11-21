@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}平台概览 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>平台概览</h1>
+  <p class="page-lead">统计只包含管理范围（FR-M01）。管理入口：组织、账号、名单、审核、争议、审计。</p>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-num">{{ counts.universities }}</span><span class="stat-label">高校</span></div>
+    <div class="stat"><span class="stat-num">{{ counts.campuses }}</span><span class="stat-label">校区</span></div>
+    <div class="stat"><span class="stat-num">{{ counts.users }}</span><span class="stat-label">账号</span></div>
+    <div class="stat"><span class="stat-num">{{ counts.stations }}</span><span class="stat-label">站点</span></div>
+    <div class="stat"><span class="stat-num">{{ counts['items'] }}</span><span class="stat-label">物品</span></div>
+    <div class="stat"><span class="stat-num">{{ counts.requests }}</span><span class="stat-label">流转申请</span></div>
+    <div class="stat"><span class="stat-num">{{ counts.projects }}</span><span class="stat-label">公益项目</span></div>
+  </div>
+  <ul>
+    <li><a href="{{ url_for('admin.organizations') }}">组织管理（高校/校区/站点/授权）</a></li>
+    <li><a href="{{ url_for('admin.users') }}">账号管理（管理员账号导入）</a></li>
+    <li><a href="{{ url_for('admin.student_imports') }}">学生名单导入</a></li>
+    <li><a href="{{ url_for('admin.moderation') }}">内容审核</a></li>
+    <li><a href="{{ url_for('admin.disputes') }}">争议处理</a></li>
+    <li><a href="{{ url_for('admin.audit') }}">审计日志</a></li>
+  </ul>
+</section>
+<section class="card">
+  <h2>高校与校区</h2>
+  {% if universities %}
+    <div class="table-scroll">
+      <table class="org-table">
+        <thead><tr><th>学校</th><th>城市</th><th>校区</th></tr></thead>
+        <tbody>
+          {% for uni in universities %}
+            <tr><td>{{ uni.name }}</td><td>{{ uni.city }}</td>
+              <td>{{ uni.campuses | join('、') if uni.campuses else '—' }}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="page-lead">暂无高校数据。</p>
+  {% endif %}
+</section>
+{% endblock %}

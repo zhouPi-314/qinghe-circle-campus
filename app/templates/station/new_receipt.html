@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}公益回执登记 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>公益回执登记</h1>
+  <p class="page-lead">每份回执可追溯到已接收捐赠明细；公示后本校用户可见（FR-C06/C07）。</p>
+  <form method="get" action="{{ url_for('charity.new_receipt') }}">
+    <div class="form-field">
+      <label>选择公益项目</label>
+      <select name="project_id" onchange="this.form.submit()">
+        <option value="">请选择项目</option>
+        {% for project in projects %}
+          <option value="{{ project.id }}" {% if selected_project_id == project.id %}selected{% endif %}>{{ project.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+
+  {% if selected_project_id and donation_items %}
+  <form method="post" action="{{ url_for('charity.new_receipt') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="hidden" name="project_id" value="{{ selected_project_id }}">
+    <div class="form-field">
+      <label>登记站点（限授权站点）</label>
+      <select name="station_id" required>
+        {% for station in stations %}<option value="{{ station.id }}">{{ station.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="form-field"><label>回执标题</label><input type="text" name="title" required></div>
+    <div class="form-field"><label>接收组织</label><input type="text" name="recipient_org" required></div>
+    <div class="form-field"><label>接收时间</label><input type="datetime-local" name="received_at" required></div>
+    <h2>登记物资</h2>
+    {% for item in donation_items %}
+      <p>{{ item.item_name }}（已接收 {{ item.accepted_quantity }}）：
+        <input type="number" name="receipt_{{ item.id }}" min="0" max="{{ item.accepted_quantity }}" value="{{ item.accepted_quantity }}" style="width:80px;">
+      </p>
+    {% endfor %}
+    <div class="form-field"><label>回执说明（脱敏，不含可识别个人信息）</label><textarea name="public_note" rows="3" required></textarea></div>
+    <button type="submit" class="btn btn-primary">公示回执</button>
+  </form>
+  {% elif selected_project_id %}
+    <p class="page-lead">该项目暂无已接收的捐赠物资。</p>
+  {% endif %}
+</section>
+{% endblock %}

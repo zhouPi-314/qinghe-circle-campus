@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}内容审核 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>内容审核</h1>
+  <p class="page-lead">下架违规物品须记录原因；历史不删除（FR-M02、BR-043）。</p>
+  <div class="table-scroll">
+    <table class="org-table">
+      <thead><tr><th>物品</th><th>模式</th><th>状态</th><th>审核</th><th>操作</th></tr></thead>
+      <tbody>{% for item in items %}
+        <tr>
+          <td>{{ item.title }}</td><td>{{ item.mode }}</td>
+          <td>{{ item.status }}{% if item.moderation_status == 'hidden' %}（已隐藏：{{ item.moderation_reason }}）{% endif %}</td>
+          <td>{{ item.moderation_status }}</td>
+          <td>
+            {% if item.moderation_status == 'normal' %}
+            <form method="post" action="{{ url_for('admin.force_off_shelf', item_id=item.id) }}" class="inline-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="text" name="reason" placeholder="下架原因" required>
+              <button type="submit" class="btn btn-danger">强制下架</button>
+            </form>
+            {% else %}—{% endif %}
+          </td>
+        </tr>
+      {% endfor %}</tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}

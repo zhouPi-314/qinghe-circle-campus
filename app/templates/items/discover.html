@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}物品发现 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>物品发现</h1>
+  <p class="page-lead">有些东西，不必拥有也能用好。筛选本校物品并按当前状态申请。</p>
+
+  <form method="get" action="{{ url_for('items.discover') }}" class="filter-form">
+    <input type="text" name="q" value="{{ filters.q }}" placeholder="搜索名称或描述">
+    <select name="category">
+      <option value="">全部分类</option>
+      {% for cat in categories %}
+        <option value="{{ cat.id }}" {% if filters.category == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+      {% endfor %}
+    </select>
+    <select name="mode">
+      <option value="">全部方式</option>
+      {% for value, label in mode_labels.items() %}
+        <option value="{{ value }}" {% if filters.mode == value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+    <select name="campus">
+      <option value="">全部校区</option>
+      {% for campus in campuses %}
+        <option value="{{ campus.id }}" {% if filters.campus == campus.id %}selected{% endif %}>{{ campus.name }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="btn btn-primary">筛选</button>
+    <a class="btn btn-ghost" href="{{ url_for('items.discover') }}">重置</a>
+  </form>
+</section>
+
+<section class="card">
+  {% if items %}
+    <div class="item-grid">
+      {% for item in items %}
+        <a class="item-card" href="{{ url_for('items.detail', item_id=item.id) }}">
+          <div class="item-card-title">{{ item.title }}</div>
+          <div class="item-card-meta">
+            <span class="mode-chip">{{ mode_labels.get(item.mode, item.mode) }}</span>
+            <span class="status-chip status-{{ item.status }}">{{ {'active':'可申请','reserved':'已被申请','in_progress':'流转中','completed':'已完成'}.get(item.status, item.status) }}</span>
+          </div>
+          <div class="item-card-foot">
+            <span>{{ {'new':'全新','like_new':'几乎全新','good':'成色良好','fair':'有使用痕迹'}.get(item.condition, item.condition) }}</span>
+            {% if item.sale_price_cents %}<span class="price">¥{{ '%.2f' % (item.sale_price_cents / 100) }}</span>{% endif %}
+          </div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="page-lead">暂无符合条件的物品。可以调整筛选条件，或<a href="{{ url_for('items.new_item') }}">发布第一件物品</a>。</p>
+  {% endif %}
+</section>
+{% endblock %}

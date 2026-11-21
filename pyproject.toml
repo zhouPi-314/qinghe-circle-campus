@@ -1,0 +1,29 @@
+[project]
+name = "qinghe-circle-campus"
+version = "0.1.0"
+description = "青禾流转（Qinghe Circle Campus）- 校园物品共享流转与绿色回收平台"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    "flask==3.1.2",
+    "flask-sqlalchemy==3.1.1",
+    "sqlalchemy==2.0.44",
+    "psycopg[binary]==3.2.12",
+    "boto3==1.40.62",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+exclude = [".venv", ".workbuddy-ai", "work", "docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
+ignore = ["B008"]  # Flask 注入默认值（如 g）依赖调用时上下文
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+python_files = ["test_*.py"]
+markers = [
+    "integration: 需要 PostgreSQL 连接的集成测试",
+]

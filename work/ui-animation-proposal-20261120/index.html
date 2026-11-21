@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>青禾流转 · 两处动画修改预览</title>
+  <style>
+    :root {
+      --ink: #172b2d;
+      --muted: #617375;
+      --paper: #f5f7f3;
+      --line: #d5ded8;
+      --forest: #28566c;
+      --leaf: #6fa793;
+      --warm: #b94f35;
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 6%, rgba(111, 167, 147, .18), transparent 28rem),
+        var(--paper);
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    }
+    button { font: inherit; }
+    .wrap { width: min(1440px, calc(100% - 48px)); margin: 0 auto; padding: 48px 0 72px; }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--forest);
+      font: 700 12px/1.4 Consolas, monospace;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    h1 {
+      max-width: 880px;
+      margin: 0;
+      font-family: "Songti SC", SimSun, serif;
+      font-size: clamp(34px, 5vw, 60px);
+      font-weight: 700;
+      line-height: 1.08;
+    }
+    .lede { max-width: 760px; margin: 18px 0 0; color: var(--muted); font-size: 16px; line-height: 1.8; }
+    .status {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 20px;
+      padding: 8px 12px;
+      border: 1px solid #bdd1c7;
+      border-radius: 999px;
+      background: #fff;
+      color: #315d4f;
+      font-size: 13px;
+    }
+    .status::before { width: 7px; height: 7px; border-radius: 50%; background: var(--leaf); content: ""; }
+    .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 36px; }
+    .preview {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      box-shadow: 0 20px 54px rgba(24, 50, 52, .08);
+    }
+    .preview-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: end;
+      padding: 22px 24px 18px;
+    }
+    .preview-head h2 { margin: 0; font-family: "Songti SC", SimSun, serif; font-size: 25px; }
+    .preview-head p { max-width: 42ch; margin: 5px 0 0; color: var(--muted); font-size: 13px; line-height: 1.65; }
+    .figure-no { flex: none; color: var(--forest); font: 700 12px/1.2 Consolas, monospace; letter-spacing: .12em; }
+    .frame {
+      position: relative;
+      min-height: 330px;
+      overflow: hidden;
+      isolation: isolate;
+      background: #17333b;
+    }
+    .frame::after {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background:
+        linear-gradient(90deg, rgba(11, 28, 32, .88) 0%, rgba(11, 28, 32, .54) 44%, rgba(11, 28, 32, .08) 78%),
+        linear-gradient(0deg, rgba(11, 28, 32, .72), transparent 52%);
+      content: "";
+      pointer-events: none;
+    }
+    .campus-scene {
+      position: absolute;
+      inset: -4%;
+      z-index: 0;
+      background-position: center;
+      background-size: cover;
+      will-change: transform;
+      animation: campus-drift 15s ease-in-out infinite alternate;
+    }
+    .campus-scene.is-paused { animation-play-state: paused; }
+    @keyframes campus-drift {
+      from { transform: scale(1.02) translate3d(-1.2%, .6%, 0); }
+      to { transform: scale(1.1) translate3d(1.5%, -1.2%, 0); }
+    }
+    .media-control {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 3;
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .76);
+      border-radius: 50%;
+      background: rgba(18, 44, 49, .8);
+      box-shadow: 0 8px 22px rgba(8, 26, 30, .18);
+      backdrop-filter: blur(6px);
+      cursor: pointer;
+    }
+    .media-control:focus-visible { outline: 3px solid #f6c85f; outline-offset: 3px; }
+    .media-control img {
+      width: 25px;
+      height: 25px;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
+    .school-copy {
+      position: absolute;
+      bottom: 27px;
+      left: 28px;
+      z-index: 2;
+      width: min(72%, 370px);
+      color: #fff;
+    }
+    .school-copy small { color: rgba(255, 255, 255, .78); font: 700 11px/1.4 Consolas, monospace; letter-spacing: .12em; }
+    .school-copy h3 {
+      margin: 8px 0 7px;
+      font-family: "Songti SC", SimSun, serif;
+      font-size: clamp(25px, 3.2vw, 40px);
+      line-height: 1.2;
+      text-wrap: balance;
+    }
+    .school-copy p { margin: 0; color: rgba(255, 255, 255, .88); font-size: 13px; line-height: 1.65; }
+    .school-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 14px 24px 20px;
+      border-top: 1px solid var(--line);
+    }
+    .school-tab {
+      min-height: 40px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: #fff;
+      cursor: pointer;
+    }
+    .school-tab[aria-pressed="true"] { border-color: var(--forest); color: #fff; background: var(--forest); }
+    .school-tab:focus-visible, .video-toggle:focus-visible { outline: 3px solid #e7b649; outline-offset: 2px; }
+    .charity-frame {
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+      min-height: 330px;
+      background: #102d35;
+    }
+    .charity-copy {
+      position: relative;
+      z-index: 2;
+      align-self: center;
+      padding: 34px 12px 34px 28px;
+      color: #fff;
+    }
+    .charity-copy h3 { margin: 9px 0 12px; font-family: "Songti SC", SimSun, serif; font-size: clamp(24px, 2.4vw, 34px); line-height: 1.2; }
+    .charity-copy p { margin: 0; color: rgba(255, 255, 255, .78); font-size: 13px; line-height: 1.7; }
+    .charity-video-wrap { position: relative; min-width: 0; overflow: hidden; }
+    .charity-video-wrap video { width: 100%; height: 100%; object-fit: cover; }
+    .charity-video-wrap::after { position: absolute; inset: 0; background: linear-gradient(90deg, #102d35 0%, transparent 34%); content: ""; pointer-events: none; }
+    .video-toggle {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      z-index: 3;
+      display: grid;
+      width: 44px;
+      height: 44px;
+      place-items: center;
+      border: 1px solid rgba(255, 255, 255, .8);
+      border-radius: 50%;
+      color: #fff;
+      background: rgba(16, 45, 53, .82);
+      cursor: pointer;
+    }
+    .video-toggle svg { width: 17px; height: 17px; }
+    .charity-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); }
+    .charity-still { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: #dbe4df; }
+    .charity-still img { width: 100%; height: 100%; object-fit: cover; }
+    .charity-still span {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      left: 10px;
+      color: #fff;
+      font-size: 12px;
+      line-height: 1.45;
+      text-shadow: 0 1px 8px #000;
+    }
+    .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; margin-top: 26px; }
+    .note { padding: 24px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.78); }
+    .note h2 { margin: 0 0 10px; font-size: 17px; }
+    .note ul { margin: 0; padding-left: 20px; color: var(--muted); line-height: 1.8; }
+    .source-list { display: grid; gap: 7px; margin-top: 12px; color: var(--muted); font-size: 12px; }
+    .source-list a { color: var(--forest); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    @media (max-width: 1040px) {
+      .preview-grid, .notes { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 650px) {
+      .wrap { width: min(100% - 28px, 1440px); padding-top: 28px; }
+      .preview-head { padding: 18px; }
+      .frame { min-height: 380px; }
+      .charity-frame { grid-template-columns: 1fr; }
+      .charity-copy { padding: 28px 22px 20px; }
+      .charity-video-wrap { min-height: 220px; }
+      .charity-video-wrap::after { background: linear-gradient(180deg, #102d35 0%, transparent 38%); }
+      .charity-strip { grid-template-columns: 1fr; }
+      .charity-still { aspect-ratio: 16 / 8; }
+      .media-control { top: 14px; right: 14px; }
+      .school-copy { left: 20px; bottom: 22px; width: min(78%, 320px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .campus-scene { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <p class="eyebrow">Qinghe circle / visual revision</p>
+    <h1>两处动画只改介质和控件，不动页面骨架</h1>
+    <p class="lede">
+      图 2 改为随学校切换的校园实景微动画，校徽作为紧凑的播放/暂停控件；公益影像改为中国公益网站公开宣传素材。
+      下面只是可审阅样片，尚未写回 Word 或正式截图。
+    </p>
+    <div class="status">方案 A · 独立 Edge 已用于素材核验</div>
+
+    <section class="preview-grid" aria-label="动画修改预览">
+      <article class="preview">
+        <header class="preview-head">
+          <div>
+            <p class="eyebrow">School-specific media</p>
+            <h2>图 2 · 校级场景动画</h2>
+            <p>切换到不同学校时，画面与一句“旧物如何继续被使用”同步变化。校徽只有 25 px，外圈控件 44×44 px。</p>
+          </div>
+          <span class="figure-no">02</span>
+        </header>
+        <div class="frame">
+          <div class="campus-scene" id="campus-scene" role="img"></div>
+          <button class="media-control" id="campus-toggle" type="button" aria-label="暂停四川大学校园动画" aria-pressed="true">
+            <img id="campus-logo" src="assets/logos/scu-logo-icon.png" alt="">
+          </button>
+          <div class="school-copy" aria-live="polite">
+            <small id="school-label">SICHUAN UNIVERSITY</small>
+            <h3 id="school-line">让旧书，<br>在校园里继续被翻开</h3>
+            <p id="school-note">四川大学 · 校园实景素材 / 校官网</p>
+          </div>
+        </div>
+        <div class="school-tabs" aria-label="预览不同高校">
+          <button class="school-tab" type="button" data-school="scu" aria-pressed="true">四川大学</button>
+          <button class="school-tab" type="button" data-school="swjtu" aria-pressed="false">西南交通大学</button>
+          <button class="school-tab" type="button" data-school="uestc" aria-pressed="false">电子科技大学</button>
+          <button class="school-tab" type="button" data-school="swufe" aria-pressed="false">西南财经大学</button>
+          <button class="school-tab" type="button" data-school="sicau" aria-pressed="false">四川农业大学</button>
+        </div>
+      </article>
+
+      <article class="preview">
+        <header class="preview-head">
+          <div>
+            <p class="eyebrow">Chinese public-good media</p>
+            <h2>图 1 · 公益影像</h2>
+            <p>主视觉换为亲青公益宣传视频，图集换为中国志愿服务联合会公开现场图；不再使用国外图库里的公益场景。</p>
+          </div>
+          <span class="figure-no">01</span>
+        </header>
+        <div class="charity-frame">
+          <div class="charity-copy">
+            <p class="eyebrow" style="color:#aad8c9">Public good / 让去向被看见</p>
+            <h3>让闲置走出宿舍，<br>让善意抵达真实需要</h3>
+            <p>物资、服务对象与回执都以公开信息为准；宣传片只解释公益议题，不代表青禾流转已开展片中的活动。</p>
+          </div>
+          <div class="charity-video-wrap">
+            <video id="charity-video" muted loop playsinline preload="metadata"
+                   poster="assets/charity/qinqing-hope-poster.png"
+                   aria-label="亲青公益希望工程宣传视频">
+              <source src="assets/charity/qinqing-hope-promo.mp4" type="video/mp4">
+            </video>
+            <button class="video-toggle" id="charity-toggle" type="button" aria-label="播放公益宣传视频" aria-pressed="false">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="charity-strip" aria-label="中国公益现场素材">
+          <figure class="charity-still">
+            <img src="assets/charity/cvf-doctor-volunteer.jpg" alt="高原地区医生志愿者为群众开展服务">
+            <span>医疗志愿服务 · 中国志愿服务联合会</span>
+          </figure>
+          <figure class="charity-still">
+            <img src="assets/charity/cvf-village-guard.jpg" alt="志愿者在村寨为群众播放公益影像">
+            <span>村寨公益放映 · 中国志愿服务联合会</span>
+          </figure>
+          <figure class="charity-still">
+            <img src="assets/charity/cvf-tiananmen-volunteer.jpg" alt="景区内的志愿者为游客提供引导服务">
+            <span>公共引导服务 · 中国志愿服务联合会</span>
+          </figure>
+        </div>
+      </article>
+    </section>
+
+    <section class="notes">
+      <article class="note">
+        <h2>这次只动两处</h2>
+        <ul>
+          <li>校级主视觉由通用视频改为当前学校实景动画。</li>
+          <li>校徽替代原播放按钮，实际图案 25 px，热区仍为 44×44 px。</li>
+          <li>公益主视觉与三张现场图全部改用中国公益网站素材。</li>
+          <li>页面结构、导航、文案区和其余模块不改。</li>
+        </ul>
+      </article>
+      <article class="note">
+        <h2>尚未冒充完成的两件事</h2>
+        <ul>
+          <li>当前数据只对 10 所高校核验了官网；其余 131 所的官网来源尚未建立，不能诚实地标注为“每所高校官网素材”。</li>
+          <li>官网宣传素材的版权多归原机构。写入正式 Word 前应确认课程使用范围并保留出处；公开发布需另行取得授权。</li>
+        </ul>
+        <div class="source-list">
+          <span>亲青公益：<a href="https://www.qinqing.cydf.org.cn/">官网</a></span>
+          <span>中国志愿服务联合会：<a href="https://www.cvf.org.cn/">官网</a></span>
+          <span>高校素材：四川大学、西南交通大学、电子科技大学、西南财经大学、四川农业大学官网。</span>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <script>
+    const schools = {
+      scu: {
+        name: "四川大学",
+        label: "SICHUAN UNIVERSITY",
+        line: "让旧书，<br>在校园里继续被翻开",
+        note: "四川大学 · 望江校区北大门 / 校官网",
+        image: "assets/schools/scu-north-gate.jpg",
+        logo: "assets/logos/scu-logo-icon.png"
+      },
+      swjtu: {
+        name: "西南交通大学",
+        label: "SOUTHWEST JIAOTONG UNIVERSITY",
+        line: "让闲置从宿舍出发，<br>在校园里重新被需要",
+        note: "西南交通大学 · 校园实景 / 校官网",
+        image: "assets/schools/swjtu-campus.jpg",
+        logo: "assets/logos/swjtu-logo-icon.png"
+      },
+      uestc: {
+        name: "电子科技大学",
+        label: "UESTC",
+        line: "让一台旧设备，<br>成为下一门课的工具",
+        note: "电子科技大学 · 校园学习场景 / 校官网",
+        image: "assets/schools/uestc-campus.jpg",
+        logo: "assets/logos/uestc-logo-icon.png"
+      },
+      swufe: {
+        name: "西南财经大学",
+        label: "SOUTHWESTERN UNIVERSITY OF FINANCE AND ECONOMICS",
+        line: "让毕业季的物件，<br>拥有清晰的下一站",
+        note: "西南财经大学 · 校园实景 / 校官网",
+        image: "assets/schools/swufe-campus.jpg",
+        logo: "assets/logos/swufe-logo-icon.png"
+      },
+      sicau: {
+        name: "四川农业大学",
+        label: "SICHUAN AGRICULTURAL UNIVERSITY",
+        line: "让每一件旧物，<br>继续参与绿色校园",
+        note: "四川农业大学 · 校园实景 / 校官网",
+        image: "assets/schools/sicau-campus.jpg",
+        logo: "assets/logos/sicau-logo-icon.png"
+      }
+    };
+
+    const scene = document.querySelector("#campus-scene");
+    const campusToggle = document.querySelector("#campus-toggle");
+    const campusLogo = document.querySelector("#campus-logo");
+    const schoolLabel = document.querySelector("#school-label");
+    const schoolLine = document.querySelector("#school-line");
+    const schoolNote = document.querySelector("#school-note");
+    let activeSchool = "scu";
+    let playing = !matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function syncCampusState() {
+      scene.classList.toggle("is-paused", !playing);
+      campusToggle.setAttribute("aria-pressed", String(playing));
+      campusToggle.setAttribute("aria-label", `${playing ? "暂停" : "播放"}${schools[activeSchool].name}校园动画`);
+    }
+
+    function setSchool(key) {
+      activeSchool = key;
+      const school = schools[key];
+      scene.style.backgroundImage = `url("${school.image}")`;
+      scene.setAttribute("aria-label", school.note);
+      campusLogo.src = school.logo;
+      campusLogo.alt = `${school.name}校徽`;
+      schoolLabel.textContent = school.label;
+      schoolLine.innerHTML = school.line;
+      schoolNote.textContent = school.note;
+      document.querySelectorAll("[data-school]").forEach((button) => {
+        button.setAttribute("aria-pressed", String(button.dataset.school === key));
+      });
+      syncCampusState();
+    }
+
+    document.querySelectorAll("[data-school]").forEach((button) => {
+      button.addEventListener("click", () => setSchool(button.dataset.school));
+    });
+    campusToggle.addEventListener("click", () => {
+      playing = !playing;
+      syncCampusState();
+    });
+
+    const video = document.querySelector("#charity-video");
+    const videoToggle = document.querySelector("#charity-toggle");
+    const playIcon = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>';
+    const pauseIcon = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h4v14H7zm6 0h4v14h-4z"/></svg>';
+    function syncVideo() {
+      const isPlaying = !video.paused && !video.ended;
+      videoToggle.innerHTML = isPlaying ? pauseIcon : playIcon;
+      videoToggle.setAttribute("aria-pressed", String(isPlaying));
+      videoToggle.setAttribute("aria-label", isPlaying ? "暂停公益宣传视频" : "播放公益宣传视频");
+    }
+    video.addEventListener("play", syncVideo);
+    video.addEventListener("pause", syncVideo);
+    video.addEventListener("ended", syncVideo);
+    videoToggle.addEventListener("click", () => {
+      if (video.paused) video.play().catch(syncVideo);
+      else video.pause();
+    });
+
+    setSchool(activeSchool);
+    syncVideo();
+  </script>
+</body>
+</html>

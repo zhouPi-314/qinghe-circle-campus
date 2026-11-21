@@ -1,0 +1,19 @@
+命令: .venv/Scripts/python -m pytest tests（单进程串行运行）
+代码 commit: bf3b36b8300dd1fcfc8b492cebbc9b0e35ccd9bd
+分支: workerbuddy/6.3-implementation
+环境: Python 3.13.14 / Windows / 本地 PostgreSQL 18.6（独立测试库 qinghe_circle_test_<pid>）
+---
+============================= test session starts =============================
+platform win32 -- Python 3.13.14, pytest-8.4.2, pluggy-1.7.0
+rootdir: <PROJECT_ROOT>
+configfile: pyproject.toml
+collected 90 items
+
+tests\integration\test_borrow_loop.py .............                      [ 14%]
+tests\integration\test_health_and_errors.py .....                        [ 20%]
+tests\integration\test_permissions.py ...............                    [ 36%]
+tests\integration\test_register_and_login.py ...............             [ 53%]
+tests\unit\test_auth_validation.py .........                             [ 63%]
+tests\unit\test_states.py .................................              [100%]
+
+============================= 90 passed in 42.43s =============================

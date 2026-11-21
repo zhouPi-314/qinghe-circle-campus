@@ -1,0 +1,49 @@
+{
+  "documents": [
+    {
+      "file": "D:\\Python作业\\提交物\\6.2\\01-数据库设计与ER表核对.docx",
+      "counts": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "findings": []
+    },
+    {
+      "file": "D:\\Python作业\\提交物\\6.2\\02-系统架构与模块设计.docx",
+      "counts": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "findings": []
+    },
+    {
+      "file": "D:\\Python作业\\提交物\\6.2\\03-全局约定与权限矩阵.docx",
+      "counts": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "findings": []
+    },
+    {
+      "file": "D:\\Python作业\\提交物\\6.2\\04-UI规范与页面原型.docx",
+      "counts": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "findings": []
+    },
+    {
+      "file": "D:\\Python作业\\提交物\\6.2\\05-数据库建表脚本.docx",
+      "counts": {
+        "high": 0,
+        "medium": 0,
+        "low": 0
+      },
+      "findings": []
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}审计日志 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>审计日志</h1>
+  <p class="page-lead">关键操作的追加记录，不可删除（FR-M04）。</p>
+  {% if logs %}
+    <div class="table-scroll">
+      <table class="org-table">
+        <thead><tr><th>时间</th><th>操作者</th><th>动作</th><th>对象</th></tr></thead>
+        <tbody>{% for log in logs %}
+          <tr><td>{{ log.created_at | local_dt }}</td><td>{{ log.actor_user_id or '系统' }}</td>
+            <td>{{ log.action }}</td><td>{{ log.entity_type }}#{{ log.entity_id or '—' }}</td></tr>
+        {% endfor %}</tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="page-lead">暂无审计记录。</p>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}回收验收 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>回收验收</h1>
+  <p class="page-lead">只能处理授权站点的申请（FR-M03）。</p>
+  {% if requests %}
+    {% for req in requests %}
+      <div class="item-card" style="margin-bottom:14px;">
+        <div class="item-card-title">{{ req.item.title }} · {{ req.requester.nickname }}</div>
+        <p class="page-lead">
+          当前状态：{{ {'pending':'待处理','inspection_pending':'待验收'}.get(req.status, req.status) }}
+          {% if req.status == 'pending' %}· 期望送达：{{ req.recycle_details.preferred_start_at | local_dt }} ~ {{ req.recycle_details.preferred_end_at | local_dt }}{% endif %}
+        </p>
+        <form method="post" action="{{ url_for('circulation.decide', request_id=req.id) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" name="decision" value="accept" class="btn btn-primary">接受申请</button>
+        </form>
+        <form method="post" action="{{ url_for('circulation.decide', request_id=req.id) }}" class="inline-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" name="decision" value="reject" class="btn btn-danger">拒绝申请</button>
+        </form>
+        <a class="btn btn-ghost" href="{{ url_for('circulation.request_detail', request_id=req.id) }}">查看详情</a>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="page-lead">暂无待处理的回收申请。</p>
+  {% endif %}
+</section>
+{% endblock %}

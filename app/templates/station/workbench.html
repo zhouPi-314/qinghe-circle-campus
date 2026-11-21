@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}站点工作台 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>站点工作台</h1>
+  <p class="page-lead">授权站点：{{ stations | map(attribute='name') | join('、') if stations else '暂无授权站点' }}</p>
+  <ul>
+    <li><a href="{{ url_for('charity.station_recycling') }}">回收验收（{{ pending_recycles | length }} 条待处理）</a></li>
+    <li><a href="{{ url_for('charity.station_donations') }}">公益核验（{{ pending_donations | length }} 条待核验）</a></li>
+    <li><a href="{{ url_for('charity.new_receipt') }}">公益回执登记</a></li>
+  </ul>
+</section>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}发布物品 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card auth-card">
+  <h1>发布物品</h1>
+  <p class="page-lead">给闲置一个继续被需要的机会。图片上传随后续增量上线，当前可先发布文字信息。</p>
+
+  <form method="post" action="{{ url_for('items.new_item') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-field {% if field_errors.title %}has-error{% endif %}">
+      <label for="title">物品名称</label>
+      <input id="title" name="title" type="text" maxlength="160" value="{{ form.get('title', '') }}" required
+             aria-describedby="{{ 'err-title' if field_errors.title else '' }}">
+      {% if field_errors.title %}<p class="field-error" id="err-title">{{ field_errors.title }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.description %}has-error{% endif %}">
+      <label for="description">物品描述</label>
+      <textarea id="description" name="description" rows="4" required
+                aria-describedby="{{ 'err-description' if field_errors.description else '' }}">{{ form.get('description', '') }}</textarea>
+      {% if field_errors.description %}<p class="field-error" id="err-description">{{ field_errors.description }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.category_id %}has-error{% endif %}">
+      <label for="category_id">分类</label>
+      <select id="category_id" name="category_id" required>
+        <option value="" disabled selected>请选择分类</option>
+        {% for cat in categories %}
+          <option value="{{ cat.id }}">{{ cat.name }}</option>
+        {% endfor %}
+      </select>
+      {% if field_errors.category_id %}<p class="field-error" id="err-category">{{ field_errors.category_id }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.mode %}has-error{% endif %}">
+      <label for="mode">流转方式</label>
+      <select id="mode" name="mode" required>
+        <option value="" disabled selected>请选择流转方式</option>
+        {% for value, label in mode_labels.items() %}
+          <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+      {% if field_errors.mode %}<p class="field-error" id="err-mode">{{ field_errors.mode }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.condition %}has-error{% endif %}">
+      <label for="condition">成色</label>
+      <select id="condition" name="condition" required>
+        <option value="" disabled selected>请选择成色</option>
+        {% for value, label in condition_labels.items() %}
+          <option value="{{ value }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+      {% if field_errors.condition %}<p class="field-error" id="err-condition">{{ field_errors.condition }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.campus_id %}has-error{% endif %}">
+      <label for="campus_id">所在校区</label>
+      <select id="campus_id" name="campus_id" required>
+        <option value="" disabled selected>请选择校区</option>
+        {% for campus in campuses %}
+          <option value="{{ campus.id }}">{{ campus.name }}</option>
+        {% endfor %}
+      </select>
+      {% if field_errors.campus_id %}<p class="field-error" id="err-campus">{{ field_errors.campus_id }}</p>{% endif %}
+    </div>
+
+    <div class="form-field {% if field_errors.sale_price %}has-error{% endif %}">
+      <label for="sale_price">价格（仅二手交易必填）</label>
+      <input id="sale_price" name="sale_price" type="text" inputmode="decimal" value="{{ form.get('sale_price', '') }}"
+             aria-describedby="{{ 'err-price' if field_errors.sale_price else 'price-hint' }}">
+      <p class="field-hint" id="price-hint">选择"二手交易"时必填；其他方式请留空。教学模拟，不产生真实扣款。</p>
+      {% if field_errors.sale_price %}<p class="field-error" id="err-price">{{ field_errors.sale_price }}</p>{% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">发布物品</button>
+  </form>
+</section>
+{% endblock %}

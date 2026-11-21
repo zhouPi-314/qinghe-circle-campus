@@ -1,0 +1,2734 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>青禾流转 · 校园物品共享流转</title>
+  <meta name="description" content="青禾流转校园物品共享、二手交易、免费赠送与绿色回收平台设计原型。">
+  <style>
+    :root {
+      --bg: #f7f2e8;
+      --surface: #fffdf8;
+      --forest: #235a3b;
+      --leaf: #7bae7f;
+      --sage: #dde8d7;
+      --earth: #b66a3c;
+      --ink: #24312a;
+      --muted: #6e776f;
+      --line: #ddd6c8;
+      --blue: #2864a8;
+      --orange: #c47a16;
+      --red: #b53a2d;
+      --success: #2d7a4f;
+      --warning: #b7791f;
+      --danger: #a33a32;
+      --shadow: 0 14px 40px rgba(35, 90, 59, 0.11);
+      --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+      --sans: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+      --mono: "IBM Plex Mono", "Consolas", monospace;
+    }
+
+    * { box-sizing: border-box; }
+    html { color-scheme: light; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.65;
+    }
+    button, input, select, textarea { font: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; }
+    .app { min-height: 100vh; }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 30px;
+      padding: 18px 42px;
+      border-bottom: 1px solid rgba(221, 214, 200, 0.8);
+      background: rgba(247, 242, 232, 0.92);
+      backdrop-filter: blur(14px);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 185px;
+      font-family: var(--serif);
+      font-size: 22px;
+      font-weight: 700;
+    }
+    .brand-mark {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--forest);
+    }
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      background: #f7f2e8;
+      border-radius: 100% 0 100% 0;
+      transform: rotate(-30deg);
+    }
+    .brand-mark::before { width: 13px; height: 8px; left: 7px; top: 9px; }
+    .brand-mark::after { width: 10px; height: 6px; right: 6px; bottom: 8px; transform: rotate(145deg); }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex: 1;
+      color: var(--muted);
+    }
+    .nav a.active { color: var(--forest); font-weight: 700; }
+    .top-actions { display: flex; align-items: center; gap: 12px; }
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--sage);
+      color: var(--forest);
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .role-line { display: flex; gap: 8px; align-items: center; }
+    .role-tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 1px 8px;
+      border: 1px solid currentColor;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .role-student { color: var(--blue); background: #edf4fc; }
+    .role-station { color: var(--orange); background: #fff7e9; }
+    .role-admin { color: var(--red); background: #fff0ee; }
+    .role-university { color: #665a7a; background: #f3f0f7; }
+    .shell { display: grid; grid-template-columns: 220px minmax(0, 1fr); max-width: 1420px; margin: 0 auto; }
+    .sidebar {
+      min-height: calc(100vh - 75px);
+      padding: 30px 18px;
+      border-right: 1px solid var(--line);
+    }
+    .sidebar-group { margin-bottom: 25px; }
+    .sidebar-label { margin: 0 0 8px 12px; color: var(--muted); font-size: 12px; font-weight: 700; letter-spacing: 0.08em; }
+    .side-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+    }
+    .side-link.active { color: var(--forest); background: var(--sage); font-weight: 700; }
+    .side-icon { width: 18px; text-align: center; }
+    .main { padding: 36px 44px 80px; min-width: 0; }
+    .page-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; margin-bottom: 25px; }
+    .page-head h1 { margin: 0 0 5px; font-family: var(--serif); font-size: 32px; line-height: 1.25; }
+    .page-head p { margin: 0; color: var(--muted); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 9px 18px;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      font-weight: 700;
+    }
+    .btn-primary { color: #fff; background: var(--forest); }
+    .btn-secondary { color: var(--forest); border-color: var(--forest); background: transparent; }
+    .btn-ghost { color: var(--forest); border-color: var(--line); background: var(--surface); }
+    .btn-danger { color: var(--danger); border-color: #d9aaa4; background: #fff9f8; }
+    .btn-small { min-height: 34px; padding: 6px 12px; font-size: 13px; }
+    .hero-a {
+      display: grid;
+      grid-template-columns: minmax(0, 1.65fr) minmax(280px, 0.75fr);
+      align-items: stretch;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    .hero-copy {
+      padding: 42px 44px;
+      border: 1px solid #cfdccc;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 95% 18%, rgba(123, 174, 127, 0.24), transparent 28%),
+        var(--surface);
+    }
+    .hero-copy h1 {
+      max-width: 780px;
+      margin: 8px 0 16px;
+      font-family: var(--serif);
+      font-size: clamp(38px, 4.2vw, 62px);
+      line-height: 1.18;
+      letter-spacing: -0.03em;
+    }
+    .hero-copy p { max-width: 660px; margin: 0 0 25px; color: var(--muted); font-size: 17px; }
+    .hero-note {
+      display: grid;
+      align-content: end;
+      padding: 28px;
+      border-radius: 18px;
+      color: #f9f7ef;
+      background: var(--forest);
+      box-shadow: var(--shadow);
+    }
+    .hero-note strong { font-family: var(--serif); font-size: 28px; line-height: 1.3; }
+    .hero-note small { margin-top: 35px; color: #dce8dc; }
+    .mode-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .mode-card {
+      min-height: 146px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 253, 248, 0.68);
+    }
+    .mode-card b { display: block; margin: 22px 0 5px; font-family: var(--serif); font-size: 18px; }
+    .mode-card span { color: var(--muted); font-size: 13px; }
+    .mode-glyph { color: var(--earth); font-family: var(--sans); font-size: 12px; }
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 48px;
+      padding: 0 16px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      flex: 1;
+    }
+    .search-box input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); }
+    .filter-chip {
+      min-height: 48px;
+      padding: 10px 15px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--muted);
+    }
+    .item-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .item-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+    }
+    .item-visual {
+      position: relative;
+      height: 190px;
+      overflow: hidden;
+      background: #dce8d8;
+    }
+    .item-visual::before,
+    .item-visual::after { content: ""; position: absolute; border-radius: 50%; }
+    .item-visual::before { width: 170px; height: 170px; right: -35px; top: -35px; background: rgba(255,255,255,0.35); }
+    .item-visual::after { width: 100px; height: 100px; left: 24px; bottom: -35px; background: rgba(35,90,59,0.12); }
+    .item-visual.books { background: linear-gradient(135deg, #d6e6d1, #f3dfbd); }
+    .item-visual.digital { background: linear-gradient(135deg, #d9e7e4, #c6d8de); }
+    .item-visual.sports { background: linear-gradient(135deg, #f1d6be, #e2e9c7); }
+    .item-visual.daily { background: linear-gradient(135deg, #e9dccf, #d7e8dc); }
+    .object-label {
+      position: absolute;
+      left: 18px;
+      bottom: 16px;
+      z-index: 2;
+      padding: 8px 10px;
+      border: 1px solid rgba(35,90,59,0.25);
+      border-radius: 6px;
+      background: rgba(255,253,248,0.88);
+      color: var(--forest);
+      font-family: var(--serif);
+      font-weight: 700;
+    }
+    .item-body { padding: 18px; }
+    .item-meta { display: flex; justify-content: space-between; gap: 12px; align-items: center; }
+    .item-body h3 { margin: 8px 0 8px; font-family: var(--serif); font-size: 21px; }
+    .item-body p { margin: 0; color: var(--muted); font-size: 13px; }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 2px 9px;
+      border-radius: 999px;
+      background: #eef1e8;
+      color: var(--forest);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .price { color: var(--earth); font-family: var(--sans); font-weight: 700; font-variant-numeric: tabular-nums; }
+    .section-head { display: flex; justify-content: space-between; align-items: end; gap: 24px; margin: 35px 0 16px; }
+    .section-head h2 { margin: 0; font-family: var(--serif); font-size: 27px; }
+    .section-head p { margin: 3px 0 0; color: var(--muted); }
+    .dense-layout { display: grid; grid-template-columns: 230px minmax(0, 1fr); gap: 24px; }
+    .filter-panel { align-self: start; padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .filter-panel h3 { margin: 0 0 14px; font-size: 15px; }
+    .filter-panel label { display: block; margin: 12px 0; color: var(--muted); }
+    .filter-panel input { margin-right: 8px; accent-color: var(--forest); }
+    .list-row {
+      display: grid;
+      grid-template-columns: 92px minmax(0, 1fr) 120px;
+      align-items: center;
+      gap: 18px;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .list-row:first-child { border-radius: 12px 12px 0 0; }
+    .list-row:last-child { border-bottom: 0; border-radius: 0 0 12px 12px; }
+    .list-thumb { width: 92px; height: 78px; border-radius: 8px; background: var(--sage); }
+    .list-row h3 { margin: 0 0 4px; font-family: var(--serif); font-size: 19px; }
+    .list-row p { margin: 0; color: var(--muted); font-size: 13px; }
+    .list-action { text-align: right; }
+    .mosaic {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr 1fr;
+      grid-auto-rows: 210px;
+      gap: 16px;
+    }
+    .mosaic-card {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      border-radius: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+    }
+    .mosaic-card:nth-child(1) { grid-row: span 2; background: var(--forest); color: #fff; }
+    .mosaic-card:nth-child(2) { background: #e7d5bd; }
+    .mosaic-card:nth-child(3) { background: #dce8d8; }
+    .mosaic-card:nth-child(4) { background: #ecd4c5; }
+    .mosaic-card h3 { position: absolute; left: 22px; bottom: 20px; margin: 0; font-family: var(--serif); font-size: 25px; }
+    .mosaic-card small { position: absolute; left: 22px; bottom: 52px; color: inherit; opacity: 0.7; }
+    .detail-grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.7fr); gap: 24px; align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
+    .panel-pad { padding: 24px; }
+    .gallery { overflow: hidden; border-radius: 14px; background: #dbe8d5; }
+    .gallery-main { min-height: 420px; margin: 0; position: relative; overflow: hidden; background: linear-gradient(135deg, #c7dac1, #eddfc4); }
+    .gallery-main img { display: block; width: 100%; height: 100%; min-height: 420px; object-fit: cover; }
+    .gallery-main figcaption {
+      position: absolute;
+      left: 22px;
+      bottom: 20px;
+      padding: 7px 10px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--ink);
+      font-size: 12px;
+    }
+    .gallery-thumbs { display: flex; gap: 10px; padding: 12px; background: var(--surface); }
+    .thumb { width: 70px; height: 55px; border-radius: 6px; background: var(--sage); }
+    .sticky-action { position: sticky; top: 94px; }
+    .action-block { padding: 25px; }
+    .action-block h2 { margin: 0; font-family: var(--serif); font-size: 28px; }
+    .action-block .lead { color: var(--muted); }
+    .divider { height: 1px; margin: 20px 0; background: var(--line); }
+    .owner { display: flex; align-items: center; gap: 12px; }
+    .owner small { display: block; color: var(--muted); }
+    .form-grid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(290px, 0.55fr); gap: 24px; }
+    .field { margin-bottom: 18px; }
+    .field label { display: block; margin-bottom: 7px; font-weight: 700; }
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      min-height: 46px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .field textarea { min-height: 110px; resize: vertical; }
+    .field small { display: block; margin-top: 5px; color: var(--muted); }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .upload-box {
+      display: grid;
+      place-items: center;
+      min-height: 150px;
+      border: 1px dashed #aab5a5;
+      border-radius: 10px;
+      background: #f9f7ef;
+      color: var(--muted);
+    }
+    .timeline { position: relative; margin: 0; padding: 0 0 0 28px; list-style: none; }
+    .timeline::before { content: ""; position: absolute; left: 7px; top: 9px; bottom: 10px; width: 2px; background: #cddccb; }
+    .timeline li { position: relative; padding: 0 0 22px 8px; }
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      left: -28px;
+      top: 5px;
+      width: 14px;
+      height: 14px;
+      border: 3px solid var(--bg);
+      border-radius: 50%;
+      background: #a7b4a3;
+    }
+    .timeline li.done::before { background: var(--forest); }
+    .timeline li.current::before { background: var(--earth); box-shadow: 0 0 0 5px rgba(182,106,60,0.14); }
+    .timeline b { display: block; }
+    .timeline span { color: var(--muted); font-size: 13px; }
+    .handover-box { padding: 20px; border-radius: 12px; background: #eef5e9; }
+    .handover-code { margin: 12px 0 5px; color: var(--forest); font-family: var(--mono); font-size: 42px; letter-spacing: 0.18em; }
+    .progress { height: 10px; overflow: hidden; border-radius: 999px; background: #e5eadf; }
+    .progress > span { display: block; height: 100%; border-radius: inherit; background: var(--forest); }
+    .charity-hero {
+      padding: 34px;
+      border-radius: 18px;
+      color: #f9f7ef;
+      background: linear-gradient(135deg, #244f38, #3f7658);
+    }
+    .charity-hero h1 { max-width: 740px; margin: 8px 0 12px; font-family: var(--serif); font-size: 42px; line-height: 1.2; }
+    .charity-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 22px; margin-top: 22px; }
+    .need-row { padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .need-row:last-child { border-bottom: 0; }
+    .need-top { display: flex; justify-content: space-between; gap: 14px; margin-bottom: 11px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-bottom: 22px; }
+    .stat { padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+    .stat small { color: var(--muted); }
+    .stat b { display: block; margin-top: 7px; font-family: var(--serif); font-size: 29px; }
+    .todo-list { display: grid; gap: 12px; }
+    .todo {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: var(--surface);
+    }
+    .todo-index { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--sage); color: var(--forest); font-family: var(--sans); font-weight: 700; }
+    .todo b { display: block; }
+    .todo small { color: var(--muted); }
+    .admin-main { max-width: 1280px; margin: 0 auto; padding: 34px 42px 80px; }
+    .import-zone {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 25px;
+      padding: 28px;
+      border: 1px dashed #aab5a5;
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .data-table { width: 100%; border-collapse: collapse; background: var(--surface); }
+    .data-table th,
+    .data-table td { padding: 12px 14px; border-bottom: 1px solid var(--line); text-align: left; }
+    .data-table th { color: var(--muted); background: #f2eee4; font-size: 12px; }
+    .login-page {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(400px, 0.7fr);
+      min-height: 100vh;
+    }
+    .auth-page {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(520px, 1.1fr);
+      min-height: 100vh;
+    }
+    .auth-story {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 54px;
+      color: #f8f5ea;
+      background:
+        radial-gradient(circle at 28% 78%, rgba(255,255,255,0.11), transparent 24%),
+        linear-gradient(145deg, #234f37, #4b7e5e);
+    }
+    .auth-story h1 {
+      max-width: 630px;
+      margin: 16px 0;
+      font-family: var(--serif);
+      font-size: clamp(42px, 4.8vw, 66px);
+      line-height: 1.16;
+    }
+    .auth-content {
+      display: grid;
+      align-content: center;
+      padding: 54px 68px;
+      background: var(--surface);
+    }
+    .auth-content h2 { margin: 0 0 8px; font-family: var(--serif); font-size: 36px; }
+    .auth-content > p { margin: 0 0 28px; color: var(--muted); }
+    .context-box {
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .school-select {
+      width: 100%;
+      min-height: 50px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .campus-options { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    .campus-option {
+      padding: 9px 13px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--muted);
+    }
+    .campus-option.selected { border-color: var(--forest); color: var(--forest); background: var(--sage); font-weight: 700; }
+    .context-school-meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0 18px; }
+    .login-context {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 17px;
+      padding: 7px 11px;
+      border: 1px solid #cbd8ca;
+      border-radius: 999px;
+      color: var(--forest);
+      background: #f3f8f0;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .muted-note { margin-top: 18px; color: var(--muted); font-size: 13px; text-align: center; }
+    .login-art {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 54px;
+      color: #f8f5ea;
+      background:
+        radial-gradient(circle at 75% 18%, rgba(255,255,255,0.15), transparent 25%),
+        linear-gradient(145deg, #234f37, #4b7e5e);
+    }
+    .login-art h1 { max-width: 650px; margin: 18px 0; font-family: var(--serif); font-size: 56px; line-height: 1.18; }
+    .login-art .brand-mark,
+    .auth-story .brand-mark { background: #f7f2e8; }
+    .login-art .brand-mark::before,
+    .login-art .brand-mark::after,
+    .auth-story .brand-mark::before,
+    .auth-story .brand-mark::after { background: var(--forest); }
+    .login-panel { display: grid; align-content: center; padding: 64px; background: var(--surface); }
+    .login-panel h2 { margin: 0 0 8px; font-family: var(--serif); font-size: 34px; }
+    .login-panel p { margin: 0 0 30px; color: var(--muted); }
+    .proto-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      z-index: 99;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: #18251e;
+      color: #f7f2e8;
+      box-shadow: 0 12px 34px rgba(0,0,0,0.24);
+      transform: translateX(-50%);
+    }
+    .proto-bar button, .proto-bar select {
+      min-height: 34px;
+      border: 0;
+      border-radius: 999px;
+      background: #33463a;
+      color: #f7f2e8;
+    }
+    .proto-bar button { width: 34px; }
+    .proto-bar select { padding: 0 12px; }
+    .proto-label { min-width: 148px; text-align: center; font-size: 12px; }
+    .hidden { display: none !important; }
+    @media (max-width: 1060px) {
+      .item-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero-a, .detail-grid, .form-grid, .charity-grid { grid-template-columns: 1fr; }
+      .hero-note { min-height: 210px; }
+      .shell { grid-template-columns: 180px minmax(0, 1fr); }
+      .sticky-action { position: static; }
+      .login-page { grid-template-columns: 1fr 410px; }
+      .auth-page { grid-template-columns: 1fr 490px; }
+      .login-art h1 { font-size: 44px; }
+    }
+    @media (max-width: 760px) {
+      body { font-size: 14px; }
+      .topbar { padding: 14px 18px; gap: 14px; }
+      .brand { min-width: auto; font-size: 19px; }
+      .nav { display: none; }
+      .top-actions .btn { display: none; }
+      .shell { display: block; }
+      .sidebar { display: none; }
+      .main, .admin-main { padding: 26px 18px 84px; }
+      .hero-copy { padding: 30px 24px; }
+      .hero-copy h1 { font-size: 38px; }
+      .hero-a { gap: 16px; }
+      .mode-strip, .item-grid, .stat-grid { grid-template-columns: 1fr; }
+      .search-row { flex-wrap: wrap; }
+      .search-box { flex-basis: 100%; }
+      .filter-chip { flex: 1; }
+      .dense-layout { grid-template-columns: 1fr; }
+      .filter-panel { display: none; }
+      .list-row { grid-template-columns: 76px minmax(0, 1fr); }
+      .list-thumb { width: 76px; height: 64px; }
+      .list-action { grid-column: 2; text-align: left; }
+      .mosaic { grid-template-columns: 1fr; grid-auto-rows: 240px; }
+      .mosaic-card:nth-child(1) { grid-row: span 1; }
+      .two-col { grid-template-columns: 1fr; }
+      .login-page { display: block; }
+      .auth-page { display: block; }
+      .auth-story { min-height: 300px; padding: 32px 25px; }
+      .auth-content { padding: 38px 22px 76px; }
+      .login-art { min-height: 320px; padding: 32px 25px; }
+      .login-art h1 { font-size: 38px; }
+      .login-panel { padding: 40px 24px 80px; }
+      .import-zone { grid-template-columns: 1fr; }
+      .data-table { font-size: 12px; }
+      .proto-label { min-width: 100px; }
+    }
+
+    /* 6.2 visual system: campus circulation ledger */
+    :root {
+      --bg: #f2f6f7;
+      --surface: #ffffff;
+      --paper: #e5edef;
+      /* legacy token name retained for prototype compatibility; the value is the current cool blue. */
+      --forest: #28566c;
+      --forest-deep: #173c50;
+      --forest-soft: #3d7087;
+      --leaf: #6fa793;
+      --sage: #dcece8;
+      --earth: #b94f35;
+      --ink: #18262d;
+      --muted: #5f6e74;
+      --line: #d6e0e3;
+      --line-strong: #99a9ae;
+      --shadow: 0 18px 48px rgba(31, 70, 88, 0.13);
+      --radius: 8px;
+    }
+
+    ::selection { color: #fff; background: var(--forest); }
+    html { scrollbar-color: var(--line-strong) var(--bg); }
+    body { font-size: 15px; line-height: 1.7; }
+    button, a, input, select, textarea { border-radius: var(--radius); }
+    input::placeholder, textarea::placeholder { color: #6a7168; opacity: 1; }
+    :focus-visible { outline: 3px solid var(--earth); outline-offset: 3px; }
+
+    .topbar {
+      min-height: 72px;
+      padding: 0 36px;
+      gap: 34px;
+      border-color: var(--line);
+      background: rgba(242, 246, 247, 0.96);
+      backdrop-filter: none;
+    }
+    .brand { min-width: 178px; font-size: 21px; letter-spacing: 0.02em; }
+    .brand-mark { width: 30px; height: 30px; }
+    .nav { gap: 28px; font-size: 14px; }
+    .nav a { position: relative; min-height: 44px; display: inline-flex; align-items: center; }
+    .nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 5px;
+      height: 2px;
+      background: transparent;
+    }
+    .nav a.active::after { background: var(--forest); }
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border: 1px solid var(--line-strong);
+      background: transparent;
+    }
+    .role-tag {
+      min-height: 24px;
+      border-radius: 2px;
+      background: transparent !important;
+    }
+    .btn {
+      min-height: 44px;
+      border-radius: 2px;
+      transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+    }
+    .btn-small { min-height: 38px; }
+    .btn-primary:hover { background: var(--forest-deep); }
+    .btn-secondary:hover { color: #fff; background: var(--forest); }
+    .btn-ghost:hover { background: var(--paper); }
+
+    .shell {
+      grid-template-columns: 206px minmax(0, 1fr);
+      max-width: 1480px;
+      border-left: 1px solid rgba(156, 162, 147, 0.35);
+      border-right: 1px solid rgba(156, 162, 147, 0.35);
+    }
+    .sidebar {
+      min-height: calc(100vh - 72px);
+      padding: 32px 16px;
+      background: rgba(229, 237, 239, 0.66);
+    }
+    .sidebar-label {
+      margin: 0 10px 9px;
+      color: #737c70;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+    .side-link {
+      min-height: 44px;
+      padding: 9px 11px;
+      border-radius: 2px;
+      transition: background 160ms ease, color 160ms ease;
+    }
+    .side-link:hover { color: var(--ink); background: rgba(255, 253, 248, 0.6); }
+    .side-link.active { background: var(--forest); color: #fff; }
+    .side-icon { width: 20px; height: 20px; display: inline-grid; place-items: center; }
+    .ui-icon { width: 18px; height: 18px; flex: 0 0 auto; }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 32px;
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .back-link:hover { color: var(--forest); }
+    .main { padding: 42px 46px 92px; }
+    .page-head { margin-bottom: 28px; }
+    .page-head h1 {
+      margin: 0 0 8px;
+      font-size: clamp(34px, 3.4vw, 48px);
+      line-height: 1.16;
+      letter-spacing: -0.025em;
+    }
+    .page-head p { max-width: 72ch; }
+
+    .hero-a {
+      grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.55fr);
+      gap: 0;
+      margin-bottom: 30px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+    }
+    .hero-copy {
+      padding: 54px 52px 46px;
+      border: 0;
+      border-radius: 0;
+      background: var(--surface);
+      color: var(--ink);
+    }
+    .hero-copy h1 {
+      max-width: 820px;
+      margin: 0 0 22px;
+      font-size: clamp(44px, 3.7vw, 62px);
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+    .hero-copy p {
+      max-width: 60ch;
+      margin-bottom: 28px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+    .hero-copy .btn-primary { color: #fff; background: var(--forest); }
+    .hero-copy .btn-secondary { color: var(--forest); border-color: var(--forest); }
+    .hero-copy .btn-secondary:hover { color: #fff; background: var(--forest); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    .hero-note {
+      position: relative;
+      align-content: space-between;
+      min-height: 360px;
+      padding: 0;
+      border-radius: 0;
+      border-left: 0;
+      background: var(--forest-deep);
+      box-shadow: none;
+      color: #fff;
+      overflow: hidden;
+    }
+    .hero-note::after,
+    .auth-story::after,
+    .login-art::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(180deg, rgba(15, 41, 53, 0.08), rgba(15, 41, 53, 0.78));
+    }
+    .hero-note::before {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      left: var(--glow-x, 70%);
+      top: var(--glow-y, 25%);
+      width: 260px;
+      height: 260px;
+      pointer-events: none;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(188, 235, 222, 0.34), transparent 68%);
+      mix-blend-mode: screen;
+      transform: translate(-50%, -50%);
+      transition: left 420ms ease-out, top 420ms ease-out;
+    }
+    .hero-photo,
+    .hero-video,
+    .auth-photo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .hero-video { z-index: 0; }
+    .school-scene {
+      animation: school-scene-drift 15s ease-in-out infinite alternate;
+      transform-origin: center;
+      will-change: transform;
+    }
+    .school-scene.is-paused { animation-play-state: paused; }
+    @keyframes school-scene-drift {
+      from { transform: scale(1.02) translate3d(-1.2%, 0.6%, 0); }
+      to { transform: scale(1.1) translate3d(1.5%, -1.2%, 0); }
+    }
+    .hero-note .video-toggle { top: 16px; right: 16px; }
+    .hero-note-content {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      height: 100%;
+      align-content: space-between;
+      padding: 30px;
+    }
+    .hero-note strong { display: block; margin-bottom: 12px; font-size: 26px; }
+    .hero-note small { display: block; color: #f3f7f8; line-height: 1.75; }
+    .hero-note .hero-count {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+      color: #f2f7f8;
+    }
+    .hero-note .hero-count span {
+      font-size: 12px;
+      letter-spacing: 0.02em;
+    }
+    .hero-note .hero-count b { font-family: var(--serif); font-size: 70px; line-height: 0.8; }
+
+    .mode-strip {
+      gap: 12px;
+      margin-bottom: 28px;
+      border: 0;
+    }
+    .mode-card {
+      min-height: 150px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      transition: background 160ms ease;
+    }
+    .mode-card:hover { background: #f2f9fa; }
+    .mode-card b { margin: 16px 0 7px; font-size: 20px; }
+    .mode-top { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .mode-icon {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      color: var(--forest);
+      background: var(--sage);
+    }
+    .mode-icon .ui-icon { width: 20px; height: 20px; }
+    .mode-glyph { color: var(--earth); font-family: var(--sans); font-size: 11px; letter-spacing: 0.04em; }
+
+    .search-row {
+      gap: 0;
+      margin-bottom: 22px;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+    }
+    .search-box {
+      min-height: 46px;
+      border: 0;
+      border-radius: 10px;
+      background: #f2f7f8;
+    }
+    .search-box .ui-icon { color: var(--muted); }
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-height: 46px;
+      border-color: var(--line);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--forest);
+    }
+    .filter-chip:hover { background: var(--sage); }
+    .section-head {
+      margin: 28px 0 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+    }
+    .item-grid { gap: 18px; }
+    .item-card {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: 0 8px 24px rgba(31, 70, 88, 0.06);
+    }
+    .item-visual {
+      height: 218px;
+      overflow: hidden;
+      border: 0;
+      border-radius: 0;
+      background: var(--sage);
+    }
+    .item-visual::after {
+      inset: 0;
+      width: auto;
+      height: auto;
+      border-radius: 0;
+      background: linear-gradient(180deg, transparent 55%, rgba(12, 34, 43, 0.18));
+    }
+    .item-visual.books { background: #dfe8d8; }
+    .item-visual.daily { background: #e9e1d3; }
+    .item-visual.sports { background: #dfe9d6; }
+    .item-visual.digital { background: #d9e4e5; }
+    .item-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 520ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .item-visual::before,
+    .item-visual::after { display: none; }
+    .object-label {
+      left: 18px;
+      bottom: 16px;
+      z-index: 2;
+      padding: 7px 10px;
+      border: 1px solid rgba(40, 86, 108, 0.24);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.86);
+      color: var(--forest);
+      font-family: var(--serif);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+    .item-body {
+      padding: 18px;
+      border-bottom: 0;
+    }
+    .item-body h3 { margin: 10px 0 7px; font-size: 23px; line-height: 1.3; }
+    .tag {
+      min-height: 23px;
+      padding: 1px 7px;
+      border: 1px solid rgba(23, 63, 49, 0.24);
+      border-radius: 2px;
+      background: transparent;
+    }
+    .price { font-family: var(--sans); font-size: 14px; font-variant-numeric: tabular-nums; }
+
+    .dense-layout { grid-template-columns: 210px minmax(0, 1fr); gap: 28px; }
+    .filter-panel {
+      padding: 18px 0;
+      border: 0;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+    }
+    .filter-panel label { min-height: 36px; display: flex; align-items: center; }
+    .panel {
+      border: 0;
+      border-top: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+    }
+    .list-row {
+      grid-template-columns: 110px minmax(0, 1fr) 120px;
+      padding: 18px 0;
+      background: transparent;
+    }
+    .list-row:first-child { border-radius: 0; }
+    .list-row:last-child { border-radius: 0; }
+    .list-thumb {
+      position: relative;
+      overflow: hidden;
+      width: 110px;
+      height: 82px;
+      border-radius: 10px;
+      background: var(--sage);
+      box-shadow: inset 0 0 0 1px rgba(23, 63, 49, 0.14);
+    }
+    .list-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+    .mosaic {
+      grid-auto-rows: 220px;
+      gap: 14px;
+      border: 0;
+      background: transparent;
+    }
+    .mosaic-card { border: 0; border-radius: 18px; }
+    .mosaic-card:nth-child(1) { background: var(--forest); }
+    .mosaic-card:nth-child(2) { background: #dfcdb3; }
+    .mosaic-card:nth-child(3) { background: #cbdac5; }
+    .mosaic-card:nth-child(4) { background: #dfbda9; }
+    .mosaic-card small { z-index: 2; font-family: var(--sans); letter-spacing: 0.04em; }
+    .mosaic-card h3 { z-index: 2; }
+    .mosaic-card.has-photo { color: #fff; }
+    .mosaic-card.has-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(13, 37, 49, 0.02), rgba(13, 37, 49, 0.74));
+    }
+    .mosaic-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .detail-grid { grid-template-columns: minmax(0, 1.4fr) minmax(310px, 0.62fr); gap: 30px; }
+    .gallery {
+      border-radius: 16px;
+      background: #d8e8df;
+      box-shadow: inset 0 0 0 1px rgba(23, 63, 49, 0.18);
+    }
+    .gallery-main { background: #d7e9df; }
+    .gallery-thumbs { background: transparent; padding: 10px 0 0; }
+    .thumb { border: 1px solid rgba(23, 63, 49, 0.2); border-radius: 2px; }
+    .sticky-action { border-top: 3px solid var(--forest); background: var(--surface); }
+    .action-block { padding: 25px 0 0; }
+    .panel-pad { padding: 26px 28px; }
+    .panel.panel-pad { border: 1px solid var(--line); border-top: 3px solid var(--forest); background: var(--surface); }
+    .handover-box { border: 1px solid var(--line); border-radius: 2px; background: #eef2e7; }
+    .progress { border-radius: 0; background: #ddd7ca; }
+    .progress { overflow: hidden; }
+    .progress > span {
+      width: var(--progress, 0%);
+      border-radius: 0;
+      background: linear-gradient(90deg, var(--forest), #60a592);
+      transform-origin: left;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      min-height: 48px;
+      border-color: var(--line-strong);
+      border-radius: 2px;
+      background: var(--surface);
+    }
+    .upload-box { border-color: var(--line-strong); border-radius: 2px; background: rgba(251, 248, 240, 0.5); }
+
+    .charity-hero {
+      position: relative;
+      overflow: hidden;
+      display: block;
+      min-height: 460px;
+      padding: 0;
+      border-radius: 18px;
+      background: var(--forest-deep);
+    }
+    .charity-copy {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      min-height: 460px;
+      max-width: 760px;
+      flex-direction: column;
+      justify-content: center;
+      padding: 48px 52px;
+    }
+    .charity-copy p { max-width: 58ch; color: #eef6f7; }
+    .charity-copy .btn-primary { color: var(--forest-deep); background: #fff; }
+    .charity-copy .btn-secondary { color: #fff; border-color: rgba(255, 255, 255, 0.72); }
+    .charity-copy .btn-secondary:hover { color: var(--forest-deep); background: #fff; }
+    .charity-media {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      min-height: 0;
+      border-radius: inherit;
+      background: var(--forest-deep);
+    }
+    .charity-media video,
+    .charity-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .charity-media::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(9, 27, 37, 0.94) 0%, rgba(10, 34, 46, 0.82) 43%, rgba(10, 34, 46, 0.2) 100%),
+        linear-gradient(0deg, rgba(9, 27, 37, 0.68), transparent 42%);
+    }
+    .charity-media figcaption {
+      position: absolute;
+      left: auto;
+      right: 20px;
+      bottom: 16px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      width: min(430px, calc(100% - 40px));
+      color: #eff7f8;
+      font-size: 11px;
+    }
+    .charity-media figcaption span:first-child {
+      padding: 3px 7px;
+      border: 1px solid rgba(255, 255, 255, 0.56);
+      border-radius: 999px;
+      background: rgba(13, 39, 51, 0.42);
+    }
+    .charity-grid { gap: 28px; }
+    .charity-grid .panel { background: var(--surface); padding: 26px; border: 1px solid var(--line); border-top: 3px solid var(--forest); }
+    .video-toggle {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      border-radius: 50%;
+      background: rgba(13, 39, 51, 0.64);
+      color: #fff;
+      backdrop-filter: blur(8px);
+    }
+    .video-toggle .ui-icon { width: 18px; height: 18px; }
+    .school-media-toggle {
+      overflow: hidden;
+      padding: 0;
+      border: 0;
+      background: #fff;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.72);
+    }
+    .school-media-toggle .school-badge {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .school-media-toggle[aria-pressed="false"] .school-badge { opacity: 0.78; }
+    .hero-note .video-toggle {
+      border-color: rgba(255, 255, 255, 0.72);
+      background: rgba(13, 39, 51, 0.58);
+    }
+
+    .editorial-story {
+      display: grid;
+      grid-template-columns: minmax(210px, 0.74fr) minmax(0, 1.16fr) minmax(190px, 0.78fr);
+      grid-template-rows: 195px 170px;
+      gap: 14px;
+      margin: 42px 0 8px;
+    }
+    .editorial-copy,
+    .editorial-photo,
+    .editorial-quote {
+      position: relative;
+      overflow: hidden;
+      border-radius: 16px;
+    }
+    .editorial-copy {
+      grid-row: span 2;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 26px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .editorial-copy h2 {
+      margin: 12px 0;
+      font-family: var(--serif);
+      font-size: clamp(26px, 2.5vw, 32px);
+      line-height: 1.25;
+    }
+    .editorial-copy p { margin: 0; color: var(--muted); }
+    .editorial-copy .btn { align-self: flex-start; }
+    .editorial-photo { margin: 0; background: #dbe9e6; }
+    .editorial-photo.tall { grid-row: span 2; }
+    .editorial-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .editorial-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 46%, rgba(11, 35, 46, 0.82));
+    }
+    .editorial-photo figcaption {
+      position: absolute;
+      z-index: 2;
+      left: 18px;
+      right: 18px;
+      bottom: 16px;
+      color: #fff;
+    }
+    .editorial-photo figcaption b { display: block; font-family: var(--serif); font-size: 21px; }
+    .editorial-photo figcaption small { display: block; margin-top: 5px; color: #e5eff1; font-size: 10px; }
+    .editorial-quote {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      color: #fff;
+      background: var(--forest-deep);
+    }
+    .editorial-quote p { margin: 0; font-family: var(--serif); font-size: 24px; line-height: 1.4; }
+    .editorial-quote small { color: #d6e8eb; }
+
+    .impact-gallery { margin-top: 34px; }
+    .impact-mosaic {
+      display: grid;
+      grid-template-columns: 1.2fr 0.76fr 0.88fr;
+      grid-template-rows: 245px 190px;
+      gap: 14px;
+    }
+    .impact-photo,
+    .impact-note {
+      position: relative;
+      overflow: hidden;
+      margin: 0;
+      border-radius: 16px;
+    }
+    .impact-photo.major { grid-row: span 2; }
+    .impact-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .impact-photo::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 50%, rgba(11, 35, 46, 0.82));
+    }
+    .impact-photo figcaption {
+      position: absolute;
+      z-index: 2;
+      left: 18px;
+      right: 18px;
+      bottom: 16px;
+      color: #fff;
+    }
+    .impact-photo figcaption b { display: block; font-family: var(--serif); font-size: 21px; }
+    .impact-photo figcaption small { display: block; margin-top: 5px; color: #e4eef0; font-size: 10px; }
+    .impact-note {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+    }
+    .impact-note strong { font-family: var(--serif); font-size: 28px; line-height: 1.25; }
+    .impact-note .impact-number {
+      color: var(--earth);
+      font-family: var(--mono);
+      font-size: 38px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .public-media-section { margin-top: 38px; }
+    .public-media-grid {
+      display: grid;
+      grid-template-columns: 1.28fr 0.78fr 0.78fr;
+      gap: 14px;
+    }
+    .public-media-card {
+      position: relative;
+      min-height: 270px;
+      margin: 0;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--forest-deep);
+      color: #fff;
+    }
+    .public-media-card video,
+    .public-media-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .public-media-card.portrait img { object-position: 84% center; }
+    .public-media-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(180deg, transparent 35%, rgba(9, 29, 39, 0.9));
+    }
+    .public-media-card figcaption {
+      position: absolute;
+      z-index: 2;
+      right: 20px;
+      bottom: 18px;
+      left: 20px;
+    }
+    .public-media-card figcaption b {
+      display: block;
+      font-family: var(--serif);
+      font-size: 22px;
+      line-height: 1.35;
+    }
+    .public-media-card figcaption small {
+      display: block;
+      margin-top: 7px;
+      color: #e5eff1;
+      font-size: 10px;
+      line-height: 1.55;
+    }
+    .public-media-card .video-toggle { top: 14px; right: 14px; }
+
+    .official-network {
+      margin-top: 28px;
+      padding: 28px;
+      border: 1px solid var(--line);
+      background: rgba(255, 253, 248, 0.72);
+    }
+    .official-network-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    .official-network-head h2 { margin: 5px 0 0; font-family: var(--serif); font-size: 28px; }
+    .official-network-head p { max-width: 64ch; margin: 6px 0 0; color: var(--muted); }
+    .official-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .official-card {
+      display: flex;
+      min-height: 150px;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      background: var(--surface);
+      transition: border-color 160ms ease, transform 160ms ease;
+    }
+    .official-card:hover { border-color: var(--forest); transform: translateY(-2px); }
+    .official-logo {
+      display: flex;
+      min-height: 62px;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 9px 10px;
+      background: #f4f1e8;
+    }
+    .official-logo.dark { background: var(--forest-deep); }
+    .official-logo img {
+      display: block;
+      max-width: 100%;
+      max-height: 42px;
+      object-fit: contain;
+    }
+    .official-logo.pair {
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 4px;
+    }
+    .official-logo.pair img { width: auto; object-position: left center; }
+    .official-logo.pair img:first-child { max-height: 18px; }
+    .official-logo.pair img:last-child { max-height: 25px; }
+    .official-logo.unep-word {
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: center;
+      color: var(--forest);
+      font-family: var(--mono);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    .official-logo.unep-word small {
+      font-family: var(--sans);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0;
+      color: var(--muted);
+    }
+    .official-card b { display: block; font-size: 14px; line-height: 1.45; }
+    .official-card small { display: block; margin-top: 4px; color: var(--muted); font-size: 11px; }
+    .official-card .official-link {
+      color: var(--forest);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .official-disclaimer {
+      margin: 16px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.7;
+    }
+    .official-disclaimer a { color: var(--forest); text-decoration: underline; text-underline-offset: 3px; }
+
+    .section-kicker {
+      margin: 0;
+      color: var(--earth);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .stat-grid {
+      gap: 0;
+      margin-bottom: 28px;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+    }
+    .stat {
+      padding: 18px 20px;
+      border: 0;
+      border-right: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+    }
+    .stat:last-child { border-right: 0; }
+    .stat b { font-size: 34px; }
+    .todo-list { gap: 0; border-top: 1px solid var(--line); }
+    .todo {
+      grid-template-columns: 42px minmax(0, 1fr) auto;
+      padding: 17px 0;
+      border: 0;
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+    }
+    .todo-index { border-radius: 1px; background: transparent; border: 1px solid var(--line-strong); font-family: var(--sans); }
+    .import-zone {
+      padding: 28px 0;
+      border: 0;
+      border-top: 1px solid var(--ink);
+      border-bottom: 1px solid var(--line);
+      border-radius: 0;
+      background: transparent;
+    }
+    .table-wrap { overflow-x: auto; }
+    .data-table { background: transparent; min-width: 720px; }
+    .data-table th { background: var(--paper); font-family: var(--sans); font-size: 11px; letter-spacing: 0.03em; }
+
+    .auth-page { grid-template-columns: minmax(0, 0.82fr) minmax(520px, 1.18fr); }
+    .auth-story,
+    .login-art {
+      position: relative;
+      overflow: hidden;
+      background: var(--forest);
+    }
+    .auth-story::after,
+    .login-art::after {
+      background:
+        linear-gradient(90deg, rgba(9, 28, 39, 0.86) 0%, rgba(9, 28, 39, 0.5) 58%, rgba(9, 28, 39, 0.2) 100%),
+        linear-gradient(0deg, rgba(9, 28, 39, 0.48), transparent 58%);
+    }
+    .auth-story h1,
+    .auth-story p,
+    .login-art h1,
+    .login-art p { text-shadow: 0 2px 20px rgba(8, 25, 35, 0.52); }
+    .auth-story > :not(.auth-photo),
+    .login-art > :not(.auth-photo) { position: relative; z-index: 2; }
+    .auth-story { padding: 48px; }
+    .auth-story h1,
+    .login-art h1 { letter-spacing: -0.03em; }
+    .auth-content {
+      align-content: start;
+      padding: 9vh 9vw 80px;
+      background: var(--surface);
+    }
+    .auth-content h2 { font-size: clamp(38px, 4vw, 54px); }
+    .identity-form { max-width: 620px; }
+    .identity-form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    .identity-select {
+      width: 100%;
+      min-height: 58px;
+      padding: 12px 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 10px;
+      background: var(--surface);
+      color: var(--ink);
+      font-family: var(--serif);
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .identity-help {
+      min-height: 54px;
+      margin: 12px 0 20px;
+      color: var(--muted);
+    }
+    .identity-form .btn { min-width: 180px; }
+    .context-box {
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--forest);
+      border-radius: 2px;
+      background: var(--surface);
+    }
+    .school-select {
+      min-height: 52px;
+      padding-right: 46px;
+      border-color: var(--line-strong);
+      border-radius: 2px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23626b61' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 15px center;
+    }
+    .campus-option { min-height: 44px; display: inline-flex; align-items: center; border-radius: 2px; background: transparent; }
+    .campus-option.selected { background: var(--forest); color: #fff; }
+    .login-context { border-radius: 2px; background: transparent; }
+    .login-panel { padding: 8vh 8vw; }
+    .login-panel p { max-width: 54ch; }
+    .login-panel .field input { background: #fff; }
+
+    .proto-bar { border-radius: 2px; background: var(--forest-deep); }
+    .proto-bar button,
+    .proto-bar select { border-radius: 2px; }
+
+    .mobile-dock { display: none; }
+
+    @keyframes rise-in {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes photo-settle {
+      from { transform: scale(1.035); }
+      to { transform: scale(1); }
+    }
+    @keyframes fade-in {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes bar-grow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+    @view-transition { navigation: auto; }
+    ::view-transition-old(root) { animation: fade-in 160ms ease reverse both; }
+    ::view-transition-new(root) { animation: fade-in 260ms ease both; }
+    @media (prefers-reduced-motion: no-preference) {
+      .motion-ready .hero-copy h1 { animation: rise-in 380ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .hero-copy p { animation: rise-in 380ms 70ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .hero-actions { animation: rise-in 380ms 140ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .hero-photo { animation: photo-settle 900ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .mode-card { animation: rise-in 300ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .mode-card:nth-child(2) { animation-delay: 55ms; }
+      .motion-ready .mode-card:nth-child(3) { animation-delay: 110ms; }
+      .motion-ready .mode-card:nth-child(4) { animation-delay: 165ms; }
+      .motion-ready .item-card {
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 320ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .motion-ready .item-card.is-visible { opacity: 1; transform: translateY(0); }
+      .motion-ready .identity-form { animation: rise-in 340ms 80ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .auth-content h2,
+      .motion-ready .login-panel h2 { animation: rise-in 340ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .auth-photo { animation: fade-in 500ms ease both; }
+      .motion-ready .charity-media { animation: rise-in 420ms 90ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .motion-ready .reveal {
+        opacity: 0;
+        transform: translateY(18px);
+        transition:
+          opacity 420ms ease var(--reveal-delay, 0ms),
+          transform 520ms cubic-bezier(0.22, 1, 0.36, 1) var(--reveal-delay, 0ms);
+      }
+      .motion-ready .reveal.is-visible { opacity: 1; transform: translateY(0); }
+      .motion-ready .progress > span { animation: bar-grow 720ms 180ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+      .mode-card:hover .mode-icon { transform: rotate(-6deg) scale(1.05); }
+      .editorial-photo:hover img,
+      .impact-photo:hover img { transform: scale(1.035); }
+      .btn .ui-icon,
+      .editorial-copy .ui-icon { transition: transform 180ms ease; }
+      .btn:hover .ui-icon,
+      .editorial-copy:hover .ui-icon { transform: translateX(3px); }
+    }
+    .btn:active,
+    .filter-chip:active,
+    .campus-option:active { transform: translateY(1px); }
+    .item-card { transition: border-color 180ms ease, box-shadow 180ms ease, transform 180ms ease; }
+    .item-card:hover {
+      border-color: var(--line-strong);
+      box-shadow: 0 14px 30px rgba(31, 70, 88, 0.12);
+      transform: translateY(-3px);
+    }
+    .item-card:hover .item-visual img { transform: scale(1.045); }
+    .motion-ready .item-card:nth-child(2):not(:hover) { transition-delay: 55ms; }
+    .motion-ready .item-card:nth-child(3):not(:hover) { transition-delay: 110ms; }
+    .motion-ready .item-card:nth-child(4):not(:hover) { transition-delay: 55ms; }
+    .motion-ready .item-card:nth-child(5):not(:hover) { transition-delay: 110ms; }
+    .motion-ready .item-card:nth-child(6):not(:hover) { transition-delay: 165ms; }
+    .mode-icon { transition: transform 180ms ease; }
+    .editorial-photo:hover,
+    .impact-photo:hover { box-shadow: 0 16px 34px rgba(31, 70, 88, 0.14); }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+      ::view-transition-group(root) { animation-duration: 0.01ms !important; }
+      .hero-note::before { display: none; }
+      .school-scene { animation: none !important; }
+    }
+
+    @media (max-width: 1060px) {
+      .topbar { padding: 0 24px; }
+      .nav { gap: 18px; }
+      .shell { grid-template-columns: 184px minmax(0, 1fr); }
+      .main { padding: 34px 28px 88px; }
+      .hero-a { grid-template-columns: 1fr; }
+      .hero-note { min-height: 190px; border-left: 0; border-top: 1px solid rgba(247, 242, 231, 0.2); }
+      .mode-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-card:nth-child(2) { border-right: 0; }
+      .mode-card:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .auth-page { grid-template-columns: 1fr 500px; }
+      .auth-content { padding: 7vh 52px 70px; }
+    }
+
+    @media (max-width: 900px) {
+      body { font-size: 14px; padding-bottom: 70px; }
+      .topbar { min-height: 64px; padding: 0 18px; gap: 12px; }
+      .brand { font-size: 19px; }
+      .top-actions { margin-left: auto; gap: 8px; }
+      .top-actions .btn { display: none; }
+      .role-tag { font-size: 10px; }
+      .nav {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 50;
+        display: flex;
+        justify-content: space-around;
+        gap: 0;
+        min-height: 58px;
+        padding: 6px 10px max(6px, env(safe-area-inset-bottom));
+        border-top: 1px solid var(--line);
+        background: rgba(251, 248, 240, 0.98);
+        backdrop-filter: blur(10px);
+      }
+      .nav a { min-height: 44px; padding: 0 8px; font-size: 12px; }
+      .nav a:nth-child(n+4) { display: none; }
+      .nav a::after { bottom: 2px; }
+      .shell { display: block; border: 0; }
+      .sidebar { display: none; }
+      .main,
+      .admin-main { padding: 26px 18px 32px; }
+      .page-head { display: block; }
+      .page-head .btn { margin-top: 16px; }
+      .hero-copy { padding: 34px 24px 32px; }
+      .hero-copy h1 { font-size: clamp(38px, 11vw, 48px); }
+      .hero-note { padding: 24px; }
+      .hero-note .hero-count b { font-size: 54px; }
+      .mode-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mode-card:nth-child(2) { border-right: 0; }
+      .mode-card:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .search-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .search-box { grid-column: 1 / -1; }
+      .filter-chip { width: 100%; }
+      .item-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .item-visual { height: 240px; }
+      .dense-layout,
+      .detail-grid,
+      .form-grid,
+      .charity-grid { grid-template-columns: 1fr; }
+      .editorial-story,
+      .impact-mosaic,
+      .public-media-grid { grid-template-columns: 1fr 1fr; grid-template-rows: auto; }
+      .editorial-copy,
+      .editorial-photo.tall,
+      .impact-photo.major { grid-row: auto; grid-column: 1 / -1; min-height: 260px; }
+      .public-media-card.media-video { grid-column: 1 / -1; min-height: 300px; }
+      .editorial-copy { min-height: auto; gap: 24px; }
+      .filter-panel { display: block; }
+      .list-row { grid-template-columns: 86px minmax(0, 1fr); }
+      .list-thumb { width: 86px; height: 72px; }
+      .list-action { grid-column: 2; display: flex; justify-content: space-between; align-items: center; }
+      .mosaic { grid-template-columns: 1fr; grid-auto-rows: 220px; }
+      .mosaic-card:nth-child(1) { grid-row: span 1; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .stat:nth-child(2) { border-right: 0; }
+      .stat:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
+      .two-col { grid-template-columns: 1fr; }
+      .auth-page,
+      .login-page { display: block; }
+      .auth-story { min-height: 250px; padding: 28px 22px; }
+      .auth-story h1 { font-size: 36px; }
+      .auth-content { padding: 36px 20px 80px; }
+      .login-art { min-height: 250px; padding: 28px 22px; }
+      .login-art h1 { font-size: 36px; }
+      .login-panel { padding: 36px 20px 80px; }
+      .charity-hero { min-height: 0; padding: 0; border-radius: 6px; }
+      .charity-copy { min-height: 540px; padding: 34px 24px 140px; }
+      .charity-hero h1 { font-size: 34px; }
+      .charity-media figcaption { left: 24px; right: 24px; bottom: 20px; width: auto; flex-direction: column; gap: 3px; }
+      .panel-pad { padding: 22px 18px; }
+      .official-network { padding: 22px 18px; }
+      .official-network-head { display: block; }
+      .import-zone { grid-template-columns: 1fr; }
+      .data-table { font-size: 12px; }
+      .proto-bar { bottom: 72px; max-width: calc(100vw - 24px); }
+      .proto-label { min-width: 80px; }
+    }
+
+    @media (max-width: 600px) {
+      .mode-strip,
+      .item-grid { grid-template-columns: 1fr; }
+      .editorial-story,
+      .impact-mosaic,
+      .public-media-grid { grid-template-columns: 1fr; }
+      .editorial-photo,
+      .impact-photo,
+      .impact-note,
+      .public-media-card { min-height: 230px; }
+      .public-media-card.media-video { grid-column: auto; min-height: 260px; }
+      .mode-card { border-right: 0; border-bottom: 1px solid var(--line); }
+      .mode-card:last-child { border-bottom: 0; }
+      .item-visual { height: 240px; }
+      .auth-content h2 { font-size: 32px; line-height: 1.25; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="prototype-bar" class="proto-bar hidden">
+    <button id="prev-variant" aria-label="上一个视觉方向">←</button>
+    <span id="variant-label" class="proto-label"></span>
+    <button id="next-variant" aria-label="下一个视觉方向">→</button>
+    <select id="view-select" aria-label="选择原型页面">
+      <option value="role">身份选择</option>
+      <option value="context">学校与校区</option>
+      <option value="register">学生注册</option>
+      <option value="discover">物品发现</option>
+      <option value="item">物品详情</option>
+      <option value="create">发布物品</option>
+      <option value="request">流转详情</option>
+      <option value="charity">公益项目</option>
+      <option value="donate">公益捐赠</option>
+      <option value="station">站点工作台</option>
+      <option value="admin">平台管理</option>
+      <option value="login">登录页</option>
+    </select>
+  </div>
+  <script src="university-data.js"></script>
+  <script src="university-media.js"></script>
+  <script>
+    const params = new URLSearchParams(location.search);
+    const view = params.get("view") || "role";
+    const variant = (params.get("variant") || "A").toUpperCase();
+    const loginRole = params.get("role") || "student";
+    const capture = params.get("capture") === "1";
+    const app = document.querySelector("#app");
+    const bar = document.querySelector("#prototype-bar");
+    const variantNames = { A: "青禾发现", B: "流转清单", C: "校园拾光册" };
+
+    const uiIcon = (name) => {
+      const paths = {
+        search: '<circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4 4"></path>',
+        swap: '<path d="M4 8h13l-3-3"></path><path d="M20 16H7l3 3"></path>',
+        plus: '<path d="M12 5v14M5 12h14"></path>',
+        heart: '<path d="M20.8 8.7c0 5.2-8.8 10-8.8 10S3.2 13.9 3.2 8.7A4.4 4.4 0 0 1 12 7.2a4.4 4.4 0 0 1 8.8 1.5Z"></path>',
+        check: '<path d="m5 12 4 4L19 6"></path>',
+        user: '<circle cx="12" cy="8" r="3.4"></circle><path d="M5.5 20c.7-3.5 3-5.4 6.5-5.4s5.8 1.9 6.5 5.4"></path>',
+        bell: '<path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 8h18c0-1-3-1-3-8"></path><path d="M10 21h4"></path>',
+        arrow: '<path d="M5 12h13"></path><path d="m14 7 5 5-5 5"></path>',
+        back: '<path d="M19 12H6"></path><path d="m11 7-5 5 5 5"></path>',
+        tag: '<path d="M4 5v6l9 9 7-7-9-9H5a1 1 0 0 0-1 1Z"></path><circle cx="8.5" cy="8.5" r="1"></circle>',
+        gift: '<path d="M4 10h16v11H4zM3 7h18v3H3zM12 7v14"></path><path d="M12 7H8.5a2.5 2.5 0 1 1 2.2-3.7L12 7Zm0 0h3.5a2.5 2.5 0 1 0-2.2-3.7L12 7Z"></path>',
+        recycle: '<path d="m7 7 3-3 3 3M10 4v10M17 9l3 3-3 3M20 12H10M14 20l-3-3-3 3M11 17v-5"></path>',
+        sliders: '<path d="M4 7h10M18 7h2M4 17h2M10 17h10M4 12h4M12 12h8"></path><circle cx="16" cy="7" r="2"></circle><circle cx="8" cy="17" r="2"></circle><circle cx="10" cy="12" r="2"></circle>',
+        pin: '<path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle>',
+        layers: '<path d="m12 3 9 5-9 5-9-5 9-5Z"></path><path d="m3 12 9 5 9-5M3 16l9 5 9-5"></path>',
+        play: '<path d="m8 5 11 7-11 7Z"></path>',
+        pause: '<path d="M9 5v14M15 5v14"></path>'
+      };
+      return `<svg class="ui-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${paths[name] || ""}</svg>`;
+    };
+
+    const roleBadge = (role) => {
+      if (role === "station") return '<span class="role-tag role-station">公益管理员（回收）</span>';
+      if (role === "admin") return '<span class="role-tag role-admin">平台管理员</span>';
+      if (role === "university_admin") return '<span class="role-tag role-university">校级管理员（预留）</span>';
+      return '<span class="role-tag role-student">学生</span>';
+    };
+
+    const topbar = (active = "items", role = "student") => `
+      <header class="topbar">
+        <a class="brand" href="?view=discover"><span class="brand-mark"></span>青禾流转</a>
+        <nav class="nav">
+          <a class="${active === "items" ? "active" : ""}" ${active === "items" ? 'aria-current="page"' : ""} href="?view=discover">物品发现</a>
+          <a class="${active === "requests" ? "active" : ""}" ${active === "requests" ? 'aria-current="page"' : ""} href="?view=request">我的流转</a>
+          <a class="${active === "charity" ? "active" : ""}" ${active === "charity" ? 'aria-current="page"' : ""} href="?view=charity">公益项目</a>
+          <a href="?view=station">站点工作台</a>
+          <a href="?view=admin">平台管理</a>
+        </nav>
+        <div class="top-actions">
+          <button class="btn btn-secondary btn-small">发布物品</button>
+          <div class="avatar">林</div>
+          ${roleBadge(role)}
+        </div>
+      </header>`;
+
+    const sidebar = (active) => `
+      <aside class="sidebar">
+        <div class="sidebar-group">
+          <p class="sidebar-label">流转</p>
+          <a class="side-link ${active === "items" ? "active" : ""}" ${active === "items" ? 'aria-current="page"' : ""} href="?view=discover"><span class="side-icon">${uiIcon("search")}</span>物品发现</a>
+          <a class="side-link ${active === "requests" ? "active" : ""}" ${active === "requests" ? 'aria-current="page"' : ""} href="?view=request"><span class="side-icon">${uiIcon("swap")}</span>我的流转</a>
+          <a class="side-link" href="?view=create"><span class="side-icon">${uiIcon("plus")}</span>发布物品</a>
+        </div>
+        <div class="sidebar-group">
+          <p class="sidebar-label">善意</p>
+          <a class="side-link ${active === "charity" ? "active" : ""}" ${active === "charity" ? 'aria-current="page"' : ""} href="?view=charity"><span class="side-icon">${uiIcon("heart")}</span>公益项目</a>
+          <a class="side-link" href="?view=request"><span class="side-icon">${uiIcon("check")}</span>公益回执</a>
+        </div>
+        <div class="sidebar-group">
+          <p class="sidebar-label">账号</p>
+          <a class="side-link" href="#"><span class="side-icon">${uiIcon("user")}</span>个人资料</a>
+          <a class="side-link" href="#"><span class="side-icon">${uiIcon("bell")}</span>消息通知</a>
+        </div>
+      </aside>`;
+
+    const studentShell = (content, active = "items", role = "student") => `
+      <div class="app">${topbar(active, role)}<div class="shell">${sidebar(active)}<main class="main">${content}</main></div></div>`;
+
+    const itemCard = (title, kind, mode, campus, price, label, image, imageAlt) => `
+      <article class="item-card">
+        <div class="item-visual ${kind}">
+          <img src="${image}" alt="${imageAlt}" loading="lazy" decoding="async">
+          <span class="object-label">${label}</span>
+        </div>
+        <div class="item-body">
+          <div class="item-meta"><span class="tag">${mode}</span><span class="price">${price}</span></div>
+          <h3>${title}</h3>
+          <p>${campus} · 九成新 · 今天更新</p>
+        </div>
+      </article>`;
+
+    const modeStrip = `
+      <section class="mode-strip">
+        <article class="mode-card"><div class="mode-top"><span class="mode-icon">${uiIcon("swap")}</span><span class="mode-glyph">BORROW</span></div><b>共享借还</b><span>有些东西，不必拥有也能用好</span></article>
+        <article class="mode-card"><div class="mode-top"><span class="mode-icon">${uiIcon("tag")}</span><span class="mode-glyph">SALE</span></div><b>二手交易</b><span>换个主人，好物继续发光</span></article>
+        <article class="mode-card"><div class="mode-top"><span class="mode-icon">${uiIcon("gift")}</span><span class="mode-glyph">GIVE</span></div><b>免费赠送</b><span>你放下的，也许正是别人寻找的</span></article>
+        <article class="mode-card"><div class="mode-top"><span class="mode-icon">${uiIcon("recycle")}</span><span class="mode-glyph">RECYCLE</span></div><b>绿色回收</b><span>校园旧物的下一段故事</span></article>
+      </section>`;
+
+    const discoveryA = () => {
+      const schoolCode = params.get("school") || "4151010610";
+      const university = selectedUniversity(schoolCode);
+      const media = (window.QINGHE_UNIVERSITY_MEDIA || {})[schoolCode];
+      const mediaMarkup = media
+        ? `<img class="hero-photo hero-video school-scene" data-school-scene src="${media.image}" alt="${media.alt}">
+           <button class="video-toggle school-media-toggle" type="button" data-school-media-toggle
+                   aria-label="暂停${university.name}校园实景动画" aria-pressed="true" title="暂停校园动画">
+             <img class="school-badge" src="${media.badge}" alt="">
+           </button>`
+        : `<video class="hero-photo hero-video" data-video-player data-video-label="中国校园日常场景示意"
+                  muted loop playsinline preload="metadata"
+                  poster="../assets/video/china-campus-moment-poster.jpg"
+                  aria-label="中国校园日常场景示意视频">
+             <source src="../assets/video/china-campus-moment.mp4" type="video/mp4">
+           </video>
+           <button class="video-toggle" type="button" data-video-toggle aria-label="播放校园场景视频" aria-pressed="false">
+             ${uiIcon("play")}
+           </button>`;
+      const mediaLine = media?.headline || "每一次流转，<br>都有来处，也有归处";
+      const mediaCredit = media
+        ? `${media.sceneLabel} · ${media.sourceLabel}`
+        : "场景示意 · LayG Traveller / Pexels";
+      return studentShell(`
+      <section class="hero-a">
+        <div class="hero-copy">
+          <h1>让每一件好物，<br>都遇见下一位需要的人</h1>
+          <p>校园物品共享流转与绿色回收平台。从一本书、一盏台灯到一辆旧单车，在青禾流转里找到它下一段被需要的故事。</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#available-items">看看正在流转的物品${uiIcon("arrow")}</a>
+            <a class="btn btn-secondary" href="?view=create">发布我的闲置</a>
+          </div>
+        </div>
+        <aside class="hero-note">
+          ${mediaMarkup}
+          <div class="hero-note-content">
+            <div class="hero-count"><span>FLOW MODES<br>流转方式</span><b>04</b></div>
+            <div>
+              <strong>${mediaLine}</strong>
+              <small>本校可见 · 交接可追溯 · 公益有回执<br>${mediaCredit}</small>
+            </div>
+          </div>
+        </aside>
+      </section>
+      ${modeStrip}
+      <div class="search-row">
+        <label class="search-box">${uiIcon("search")}<input aria-label="搜索物品" placeholder="搜索书名、物品或关键词"></label>
+        <button class="filter-chip">${uiIcon("layers")}全部分类</button>
+        <button class="filter-chip">${uiIcon("pin")}主校区</button>
+        <button class="filter-chip">${uiIcon("sliders")}全部方式</button>
+      </div>
+      <div class="section-head" id="available-items"><div><h2>正在流转</h2><p>同校跨校区可见，每件物品只保留一个进行中的流转关系。</p></div></div>
+      ${itemGrid()}
+      <section class="editorial-story" aria-labelledby="second-life-title">
+        <div class="editorial-copy reveal">
+          <div>
+            <p class="section-kicker">SECOND LIFE / 第二次被选择</p>
+            <h2 id="second-life-title">好物继续发光，<br>故事也继续发生</h2>
+            <p>真实使用痕迹、清楚的成色和可追溯的交接，让“继续使用”比“重新购买”更值得信任。</p>
+          </div>
+          <a class="btn btn-ghost" href="?view=create">给闲置一个新的去处${uiIcon("arrow")}</a>
+        </div>
+        <figure class="editorial-photo tall reveal" style="--reveal-delay:70ms">
+          <img src="../assets/photos/china-huaian-library-student.jpg" alt="中国淮安图书馆里的学生正在整理书包，旁边有简体中文提示" loading="lazy">
+          <figcaption>
+            <b>一本旧书，<br>也可能是一间教室的新书架</b>
+            <small>场景示意 · 图片：Usman AbdulrasheedGambo / Pexels</small>
+          </figcaption>
+        </figure>
+        <figure class="editorial-photo reveal" style="--reveal-delay:120ms">
+          <img src="../assets/photos/books-stacked-user-provided.jpg" alt="大量书籍整齐堆放在木地板上，等待被再次阅读" loading="lazy">
+          <figcaption>
+            <b>一摞旧书，<br>也有下一批读者</b>
+            <small>用户提供素材 · 来源未确认 · 课程过程记录</small>
+          </figcaption>
+        </figure>
+        <article class="editorial-quote reveal" style="--reveal-delay:160ms">
+          <p>“被继续使用”<br>本身就是一种<br>环保行动。</p>
+          <small>少买一件新物，也多留一份价值。</small>
+        </article>
+      </section>
+    `);
+    };
+
+    const itemGrid = () => `
+      <div class="item-grid">
+        ${itemCard("高等数学教材 第七版", "books", "赠送", "东校区", "免费", "教材", "../assets/photos/item-books-textbook-stack.jpg", "一摞等待继续使用的教材")}
+        ${itemCard("宿舍护眼台灯", "daily", "借用", "主校区", "约 7 天", "台灯", "../assets/photos/item-desk-lamp-yellow.jpg", "桌面上的黄色护眼台灯")}
+        ${itemCard("入门级羽毛球拍", "sports", "出售", "东校区", "¥ 38", "运动", "../assets/photos/item-badminton-racket.jpg", "草地上的羽毛球拍和羽毛球")}
+        ${itemCard("便携蓝牙音箱", "digital", "借用", "主校区", "约 3 天", "音箱", "../assets/photos/item-portable-speaker.jpg", "双手正在操作便携式蓝牙音箱")}
+        ${itemCard("考研英语真题册", "books", "赠送", "主校区", "免费", "真题", "../assets/photos/item-vintage-books.jpg", "大量叠放、等待再次阅读的旧书")}
+        ${itemCard("折叠收纳箱", "daily", "出售", "东校区", "¥ 16", "收纳", "../assets/photos/item-storage-boxes.jpg", "可叠放的简洁收纳箱")}
+      </div>`;
+
+    const discoveryB = () => studentShell(`
+      <div class="page-head">
+        <div><h1>流转清单</h1><p>先筛选，再比较。这里更适合快速找到现在就能用的东西。</p></div>
+        <button class="btn btn-primary">发布物品</button>
+      </div>
+      <div class="dense-layout">
+        <aside class="filter-panel">
+          <h3>流转方式</h3>
+          <label><input type="checkbox" checked> 共享借还</label>
+          <label><input type="checkbox" checked> 二手交易</label>
+          <label><input type="checkbox" checked> 免费赠送</label>
+          <label><input type="checkbox" checked> 绿色回收</label>
+          <h3 style="margin-top:22px">校区</h3>
+          <label><input type="checkbox" checked> 主校区</label>
+          <label><input type="checkbox" checked> 东校区</label>
+        </aside>
+        <section>
+          <div class="search-row"><label class="search-box">${uiIcon("search")}<input aria-label="搜索物品" placeholder="搜索书名、物品或关键词"></label><button class="filter-chip">最新发布</button></div>
+          <div class="panel">
+            ${[
+              ["高等数学教材 第七版", "赠送", "东校区 · 九成新", "免费", "../assets/photos/item-books-textbook-stack.jpg", "教材"],
+              ["宿舍护眼台灯", "借用", "主校区 · 可借 7 天", "约 7 天", "../assets/photos/item-desk-lamp-yellow.jpg", "台灯"],
+              ["入门级羽毛球拍", "出售", "东校区 · 八成新", "¥ 38", "../assets/photos/item-badminton-racket.jpg", "球拍"],
+              ["便携蓝牙音箱", "借用", "主校区 · 可借 3 天", "约 3 天", "../assets/photos/item-portable-speaker.jpg", "音箱"],
+              ["折叠收纳箱", "出售", "东校区 · 九成新", "¥ 16", "../assets/photos/item-storage-boxes.jpg", "收纳箱"]
+            ].map(([title, mode, meta, price, image, alt]) => `
+              <article class="list-row">
+                <div class="list-thumb"><img src="${image}" alt="${alt}" loading="lazy" decoding="async"></div>
+                <div><div class="item-meta" style="justify-content:flex-start"><span class="tag">${mode}</span><span class="tag">${meta.split(" · ")[1]}</span></div><h3>${title}</h3><p>${meta}</p></div>
+                <div class="list-action"><div class="price">${price}</div><a class="btn btn-ghost btn-small" href="?view=item">查看</a></div>
+              </article>`).join("")}
+          </div>
+        </section>
+      </div>
+    `);
+
+    const discoveryC = () => studentShell(`
+      <div class="page-head">
+        <div><h1>今天，校园里有什么在等待新主人</h1><p>用更轻的方式浏览物品，也看看每件东西背后的生活痕迹。</p></div>
+        <button class="btn btn-primary">发布闲置</button>
+      </div>
+      <div class="mosaic">
+        <article class="mosaic-card"><small>本周推荐</small><h3>让每一件好物，<br>都遇见下一位需要的人</h3></article>
+        <article class="mosaic-card has-photo">
+          <img src="../assets/photos/books-stacked-user-provided.jpg" alt="大量书籍整齐堆放在木地板上，等待再次阅读" loading="lazy">
+          <small>书籍再利用 · 用户提供素材</small><h3>一摞旧书，<br>等待新的读者</h3>
+        </article>
+        <article class="mosaic-card has-photo">
+          <img src="../assets/photos/china-rural-classroom-jiangxi.jpg" alt="中国乡村教室里的学生正在听讲" loading="lazy">
+          <small>课堂场景示意 · Greece-China News / Pexels</small><h3>绿色不是口号，<br>是每一次继续使用</h3>
+        </article>
+        <article class="mosaic-card has-photo">
+          <img src="../assets/photos/asian-students-laptops.jpg" alt="亚洲学生在校园里一起学习" loading="lazy">
+          <small>校园场景示意 · Kaboompics.com / Pexels</small><h3>校园旧物的<br>下一段故事</h3>
+        </article>
+      </div>
+      <div class="section-head"><div><h2>正在流转</h2><p>每件物品只保留一个进行中的流转关系。</p></div><a href="?view=discover&variant=A">切换到清单视图</a></div>
+      ${itemGrid()}
+    `);
+
+    const itemDetail = () => studentShell(`
+      <div class="page-head"><div><h1>宿舍护眼台灯</h1><p>主校区 · 共享借还 · 今天更新</p></div><span class="tag">可申请</span></div>
+      <div class="detail-grid">
+        <div class="gallery">
+          <figure class="gallery-main">
+            <img src="../assets/photos/item-desk-lamp-yellow.jpg"
+                 alt="桌面上的黄色护眼台灯">
+            <figcaption>图片：Alpha En / Pexels</figcaption>
+          </figure>
+          <div class="gallery-thumbs"><div class="thumb"></div><div class="thumb"></div><div class="thumb"></div></div>
+        </div>
+        <aside class="sticky-action panel">
+          <div class="action-block">
+            <span class="role-tag role-student">学生</span>
+            <h2>约 7 天</h2>
+            <p class="lead">可借时间由双方确认，到期后归还给出借人。</p>
+            <button class="btn btn-primary" style="width:100%">提交借用申请</button>
+            <div class="divider"></div>
+            <div class="owner"><div class="avatar">周</div><div><b>周同学</b><small>东校区 · 信用良好</small></div></div>
+            <div class="divider"></div>
+            <p><b>交接方式</b><br>确认后生成 6 位一次性交接码，10 分钟内有效。</p>
+          </div>
+        </aside>
+      </div>
+      <section class="panel panel-pad" style="margin-top:24px">
+        <h2 style="font-family:var(--serif);margin-top:0">物品说明</h2>
+        <p>三档亮度，灯臂可调。宿舍搬迁后闲置，希望借给准备考试的同学。物品在学校内自提，同校跨校区也可以约定交接。</p>
+      </section>
+    `);
+
+    const createItem = () => studentShell(`
+      <div class="page-head"><div><h1>发布物品</h1><p>先说清楚它适合怎样被使用，再决定用什么方式流转。</p></div></div>
+      <div class="form-grid">
+        <section class="panel panel-pad">
+          <div class="field"><label for="item-title">物品名称</label><input id="item-title" value="宿舍护眼台灯"></div>
+          <div class="two-col">
+            <div class="field"><label for="item-category">分类</label><select id="item-category"><option>生活用品</option><option>书籍教材</option><option>运动器材</option></select></div>
+            <div class="field"><label for="item-condition">成色</label><select id="item-condition"><option>九成新</option><option>全新</option><option>八成新</option></select></div>
+          </div>
+          <div class="field"><label for="item-mode">流转方式</label><select id="item-mode"><option>共享借还</option><option>二手交易</option><option>免费赠送</option><option>绿色回收</option></select></div>
+          <div class="field"><label for="item-description">物品说明</label><textarea id="item-description">三档亮度，灯臂可调，宿舍搬迁后闲置。</textarea></div>
+          <div class="field"><label>图片</label><div class="upload-box">拖入或选择图片<br><small>最多 5 张，单张不超过 3 MB</small></div></div>
+        </section>
+        <aside class="panel panel-pad">
+          <h2 style="font-family:var(--serif);margin-top:0">发布前确认</h2>
+          <p>同一件物品同一时间只能进入一种流转方式。</p>
+          <div class="divider"></div>
+          <p><b>校区</b><br>主校区</p>
+          <p><b>可见范围</b><br>青禾示范大学</p>
+          <button class="btn btn-primary" style="width:100%">确认发布</button>
+        </aside>
+      </div>
+    `);
+
+    const requestDetail = () => studentShell(`
+      <div class="page-head"><div><h1>借用申请 · 台灯</h1><p>申请编号 QH-20261119-0042</p></div><span class="tag" style="background:#fff1dc;color:var(--warning)">待交接</span></div>
+      <div class="detail-grid">
+        <section class="panel panel-pad">
+          <h2 style="font-family:var(--serif);margin-top:0">流转进度</h2>
+          <ol class="timeline">
+            <li class="done"><b>申请已提交</b><span>11 月 19 日 14:20</span></li>
+            <li class="done"><b>出借人已接受</b><span>11 月 19 日 14:32 · 借期 7 天</span></li>
+            <li class="current"><b>等待取件交接</b><span>请在 11 月 19 日 14:42 前输入交接码</span></li>
+            <li><b>借用中</b><span>交接成功后开始计算归还时间</span></li>
+            <li><b>归还确认</b><span>由出借人确认物品状态</span></li>
+          </ol>
+        </section>
+        <aside class="sticky-action panel">
+          <div class="action-block">
+            <div class="handover-box">
+              <small>一次性交接码</small>
+              <div class="handover-code">627104</div>
+              <small>剩余 09:38 · 只能使用一次</small>
+            </div>
+            <p class="lead">准时赴约，是物品与人之间的信任。当前双方都在青禾示范大学。</p>
+            <button class="btn btn-primary" style="width:100%">确认已交接</button>
+            <button class="btn btn-secondary" style="width:100%;margin-top:10px">交接前取消</button>
+          </div>
+        </aside>
+      </div>
+    `, "requests");
+
+    const charityPage = () => studentShell(`
+      <section class="charity-hero">
+        <div class="charity-copy">
+          <h1>让闲置走出宿舍，<br>让善意抵达远方</h1>
+          <p>当前项目为教学演示数据，不接收真实资金。实物捐赠由校内公益点线下核验；宣传图片和视频来自中国公益网站，不代表项目已开展对应线下活动。</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#charity-projects">查看公益项目${uiIcon("arrow")}</a>
+            <a class="btn btn-secondary" href="?view=donate">捐赠实物</a>
+          </div>
+        </div>
+        <figure class="charity-media">
+          <video data-video-player data-video-label="亲青公益希望工程宣传" muted loop playsinline preload="metadata"
+                 poster="../assets/video/qinqing-hope-poster.png"
+                 aria-label="亲青公益希望工程宣传视频">
+            <source src="../assets/video/qinqing-hope-promo.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+          </video>
+          <button class="video-toggle" type="button" data-video-toggle aria-label="播放亲青公益希望工程宣传视频" aria-pressed="false">
+            ${uiIcon("play")}
+          </button>
+          <figcaption>
+            <span>公益宣传影像</span>
+            <span>亲青公益 / 中国青少年发展基金会</span>
+          </figcaption>
+        </figure>
+      </section>
+      <div class="charity-grid" id="charity-projects">
+        <section class="panel panel-pad reveal">
+          <div class="section-head" style="margin-top:0"><div><h2>山村儿童阅读包</h2><p>接收组织：青禾青年志愿服务队</p></div><span class="tag">募集中</span></div>
+          <p>为合作学校补充适合小学高年级阅读的课外书，所有公开内容只展示物资数量、接收时间和组织，不展示儿童个人信息。</p>
+          <div class="need-row"><div class="need-top"><b>课外读物</b><span>138 / 200 本</span></div><div class="progress"><span style="--progress:69%"></span></div><small>还差 62 本</small></div>
+          <div class="need-row"><div class="need-top"><b>文具套装</b><span>40 / 80 套</span></div><div class="progress"><span style="--progress:50%"></span></div><small>还差 40 套</small></div>
+        </section>
+        <aside class="panel panel-pad reveal" style="--reveal-delay:70ms">
+          <h3>每一份小小善意，都有清楚的去向</h3>
+          <p>最近一次回执：10 月 28 日，120 本图书已由合作学校签收。</p>
+          <button class="btn btn-primary" style="width:100%">捐赠实物</button>
+          <button class="btn btn-ghost" style="width:100%;margin-top:10px">查看公益回执</button>
+        </aside>
+      </div>
+      <section class="impact-gallery" aria-labelledby="impact-gallery-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">GOODWILL IN ACTION / 善意正在发生</p>
+            <h2 id="impact-gallery-title">把一次捐赠，放进真实生活里</h2>
+            <p>从整理、交接到签收回执，善意需要被认真对待，也需要被清楚看见。</p>
+          </div>
+        </div>
+        <div class="impact-mosaic">
+          <figure class="impact-photo major reveal">
+            <img src="../assets/photos/china-public-good/cvf-doctor-volunteer.jpg" alt="高原地区医生志愿者为群众开展医疗志愿服务" loading="lazy">
+            <figcaption>
+              <b>志愿服务的温度，<br>来自一次次真实抵达</b>
+              <small>公益宣传图片 · 中国志愿服务联合会</small>
+            </figcaption>
+          </figure>
+          <article class="impact-note reveal" style="--reveal-delay:70ms">
+            <p class="section-kicker">回执不是终点</p>
+            <strong>每一份小小善意，<br>都有清楚的去向</strong>
+            <div>
+              <div class="impact-number">120</div>
+              <small>本图书已完成签收登记<br>（教学演示数据）</small>
+            </div>
+          </article>
+          <figure class="impact-photo reveal" style="--reveal-delay:110ms">
+            <img src="../assets/photos/china-public-good/cvf-village-guard.jpg" alt="志愿者在村寨为群众播放公益影像" loading="lazy">
+            <figcaption>
+              <b>一束光，<br>也能照进村寨的夜晚</b>
+              <small>公益宣传图片 · 中国志愿服务联合会</small>
+            </figcaption>
+          </figure>
+          <figure class="impact-photo reveal" style="--reveal-delay:150ms">
+            <img src="../assets/photos/china-public-good/cvf-tiananmen-volunteer.jpg" alt="景区内的志愿者为游客提供引导服务" loading="lazy">
+            <figcaption>
+              <b>把闲置送出宿舍，<br>也把公共善意带进日常</b>
+              <small>公益宣传图片 · 中国志愿服务联合会</small>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="public-media-section" aria-labelledby="public-media-title">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">PUBLIC GOOD IN FRAME / 公益影像</p>
+            <h2 id="public-media-title">把公益现场，放进画面里</h2>
+            <p>图片和视频均来自中国公益网站；它们用于说明志愿服务与公益议题，不代表平台已开展片中的活动。</p>
+          </div>
+        </div>
+        <div class="public-media-grid">
+          <figure class="public-media-card media-video">
+            <video data-video-player data-video-autoplay="false" data-video-label="腾讯基金会公益宣传"
+                   muted loop playsinline preload="metadata"
+                   poster="../assets/photos/china-public-good/cvf-tiananmen-volunteer.jpg"
+                   aria-label="腾讯基金会公益宣传视频">
+              <source src="../assets/video/tencent-foundation-promo.mp4" type="video/mp4">
+              您的浏览器不支持视频播放。
+            </video>
+            <button class="video-toggle" type="button" data-video-toggle aria-label="播放腾讯基金会公益宣传视频" aria-pressed="false">
+              ${uiIcon("play")}
+            </button>
+            <figcaption>
+              <b>让善意被看见，<br>也让行动有清楚的去向</b>
+              <small>腾讯基金会官网宣传视频</small>
+            </figcaption>
+          </figure>
+          <figure class="public-media-card portrait">
+            <img src="../assets/photos/china-public-good/cvf-doctor-volunteer.jpg" alt="医生志愿者在高原地区为群众服务" loading="lazy">
+            <figcaption>
+              <b>医疗志愿服务，<br>把关怀送到需要的地方</b>
+              <small>公益宣传图片 · 中国志愿服务联合会</small>
+            </figcaption>
+          </figure>
+          <figure class="public-media-card nature">
+            <img src="../assets/photos/china-public-good/cvf-hongyan-guide.webp" alt="志愿者向学生讲述红岩故事" loading="lazy">
+            <figcaption>
+              <b>把共同记忆，<br>讲给下一代听</b>
+              <small>公益宣传图片 · 中国志愿服务联合会</small>
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+      <section class="official-network" aria-labelledby="official-network-title">
+        <div class="official-network-head">
+          <div>
+            <p class="section-kicker">OFFICIAL REFERENCE / 官方入口</p>
+            <h2 id="official-network-title">公益议题参考机构</h2>
+            <p>保留官方入口与机构标识，便于后续核实项目、信息披露和素材授权；不把参考机构包装成合作方。</p>
+          </div>
+        </div>
+        <div class="official-grid">
+          <a class="official-card" href="https://www.unep.org/zh-hans" target="_blank" rel="noopener noreferrer">
+            <div class="official-logo unep-word">UNEP<small>环境议题 · 不使用联合国标志</small></div>
+            <div><b>联合国环境规划署</b><small>环境与气候议题官方入口</small></div>
+            <span class="official-link">访问官网 ↗</span>
+          </a>
+          <a class="official-card" href="https://www.cfrd.org.cn/" target="_blank" rel="noopener noreferrer">
+            <div class="official-logo"><img src="https://static.cfpa.org.cn/Images/index_logo.png" alt="中国乡村发展基金会标识" loading="lazy" referrerpolicy="no-referrer"></div>
+            <div><b>中国乡村发展基金会</b><small>乡村发展与公益项目</small></div>
+            <span class="official-link">访问官网 ↗</span>
+          </a>
+          <a class="official-card" href="https://www.cydf.org.cn/" target="_blank" rel="noopener noreferrer">
+            <div class="official-logo dark pair">
+              <img src="https://www.cydf.org.cn/_nuxt/logo_banner22.DsyWrKGG.png" alt="中国青少年发展基金会标识" loading="lazy" referrerpolicy="no-referrer">
+              <img src="https://www.cydf.org.cn/_nuxt/logo_banner11.HuBOqU-i.png" alt="希望工程标识" loading="lazy" referrerpolicy="no-referrer">
+            </div>
+            <div><b>中国青少年发展基金会</b><small>希望工程 · 教育公益</small></div>
+            <span class="official-link">访问官网 ↗</span>
+          </a>
+          <a class="official-card" href="https://gongyi.weibo.com/" target="_blank" rel="noopener noreferrer">
+            <div class="official-logo"><img src="https://gongyi.weibo.com/favicon.ico" alt="微博标识" loading="lazy" referrerpolicy="no-referrer"></div>
+            <div><b>微博微公益</b><small>公益项目传播与公众参与</small></div>
+            <span class="official-link">访问平台 ↗</span>
+          </a>
+          <a class="official-card" href="https://heyi.lvziku.cn/" target="_blank" rel="noopener noreferrer">
+            <div class="official-logo"><img src="https://heyi.lvziku.cn/Public/Home/img/logo.png" alt="合一绿学院绿资酷标识" loading="lazy" referrerpolicy="no-referrer"></div>
+            <div><b>合一绿学院</b><small>北京合一绿色公益基金会公开学习平台</small></div>
+            <span class="official-link">访问绿资酷 ↗</span>
+          </a>
+          <a class="official-card" href="https://www.cgf.org.cn/" target="_blank" rel="noopener noreferrer">
+            <div class="official-logo"><img src="https://www.cgf.org.cn/cgforgcn/picture/logo.png" alt="中国绿化基金会标识" loading="lazy" referrerpolicy="no-referrer"></div>
+            <div><b>中国绿化基金会</b><small>生态保护与绿色公众行动</small></div>
+            <span class="official-link">访问官网 ↗</span>
+          </a>
+          <a class="official-card" href="https://www.cvf.org.cn/" target="_blank" rel="noopener noreferrer">
+            <div class="official-logo"><img src="https://www.cvf.org.cn/images/zylogo.png" alt="中国志愿服务联合会标识" loading="lazy" referrerpolicy="no-referrer"></div>
+            <div><b>中国志愿服务联合会</b><small>志愿服务政策、规范与行业动态</small></div>
+            <span class="official-link">访问官网 ↗</span>
+          </a>
+        </div>
+        <p class="official-disclaimer">
+          本区仅用于课程原型的议题来源与官方入口展示，不表示任何机构与“青禾流转”存在合作、授权、项目执行或背书关系。机构名称与标识权利归原机构所有；外链标识仅作指代性识别。完整来源见
+          <a href="../assets/credits.json">资产来源清单</a>。
+        </p>
+      </section>
+    `, "charity");
+
+    const donatePage = () => studentShell(`
+      <div class="page-head"><div><h1>捐赠实物</h1><p>山村儿童阅读包 · 还差 62 本课外读物</p></div><span class="tag">本校公益项目</span></div>
+      <div class="form-grid">
+        <section class="panel panel-pad">
+          <div class="field"><label for="donation-item">捐赠物资</label><select id="donation-item"><option>课外读物</option><option>文具套装</option></select></div>
+          <div class="two-col">
+            <div class="field"><label for="donation-quantity">数量</label><input id="donation-quantity" type="number" min="1" value="3"></div>
+            <div class="field"><label for="donation-condition">成色</label><select id="donation-condition"><option>九成新</option><option>八成新</option><option>全新</option></select></div>
+          </div>
+          <div class="field"><label for="donation-station">接收站点</label><select id="donation-station"><option>东校区绿色共享站</option></select></div>
+          <div class="field"><label for="donation-note">补充说明</label><textarea id="donation-note">适合小学高年级阅读的科普和故事书。</textarea></div>
+          <div class="field"><label>物资照片</label><div class="upload-box">上传照片，方便站点提前确认</div></div>
+        </section>
+        <aside class="panel panel-pad">
+          <h2 style="font-family:var(--serif);margin-top:0">本次捐赠</h2>
+          <p>课外读物 <b>3 本</b></p>
+          <div class="divider"></div>
+          <p>项目剩余 <b>62 本</b><br>提交后仍需站点核验，核验通过才计入募集进度。</p>
+          <button class="btn btn-primary" style="width:100%">提交捐赠</button>
+        </aside>
+      </div>
+    `, "charity");
+
+    const stationShell = (content) => `
+      <div class="app">
+        <header class="topbar">
+          <a class="brand" href="#"><span class="brand-mark"></span>青禾流转</a>
+          <nav class="nav"><a class="active" aria-current="page" href="#">站点工作台</a><a href="#">回收验收</a><a href="#">公益核验</a><a href="#">回执管理</a></nav>
+          <div class="top-actions"><div class="avatar">陈</div>${roleBadge("station")}</div>
+        </header>
+        <main class="admin-main">${content}</main>
+      </div>`;
+
+    const stationDashboard = () => stationShell(`
+      <div class="page-head"><div><h1>东校区绿色共享站</h1><p>今天有 5 项待处理，其中 2 项为公益物资核验。</p></div><button class="btn btn-primary">登记公益回执</button></div>
+      <div class="stat-grid">
+        <div class="stat"><small>待验收回收</small><b>3</b></div>
+        <div class="stat"><small>待核验捐赠</small><b>2</b></div>
+        <div class="stat"><small>进行中项目</small><b>1</b></div>
+        <div class="stat"><small>本月已接收</small><b>86</b></div>
+      </div>
+      <section class="panel panel-pad">
+        <div class="section-head" style="margin-top:0"><div><h2>今天优先处理</h2><p>先核验已送达物资，再更新项目进度。</p></div></div>
+        <div class="todo-list">
+          <div class="todo"><span class="todo-index">01</span><div><b>《昆虫记》等 3 本图书</b><small>山村儿童阅读包 · 14:20 送达</small></div><button class="btn btn-ghost btn-small">去核验</button></div>
+          <div class="todo"><span class="todo-index">02</span><div><b>折叠自行车回收</b><small>用户已到站 · 等待验收</small></div><button class="btn btn-ghost btn-small">去验收</button></div>
+          <div class="todo"><span class="todo-index">03</span><div><b>公益项目回执</b><small>上次发放已满 7 天，可发布回执</small></div><button class="btn btn-ghost btn-small">去登记</button></div>
+        </div>
+      </section>
+    `);
+
+    const adminShell = (content) => `
+      <div class="app">
+        <header class="topbar">
+          <a class="brand" href="#"><span class="brand-mark"></span>青禾流转</a>
+          <nav class="nav"><a class="active" aria-current="page" href="#">平台概览</a><a href="#">组织管理</a><a href="#">学生名单</a><a href="#">账号管理</a><a href="#">争议与审计</a></nav>
+          <div class="top-actions"><div class="avatar">管</div>${roleBadge("admin")}</div>
+        </header>
+        <main class="admin-main">${content}</main>
+      </div>`;
+
+    const adminDashboard = () => adminShell(`
+      <div class="page-head"><div><h1>学生名单导入</h1><p>名单字段用于注册核验。系统只保存规范化哈希和末四位，不保存可回显的完整手机号。</p></div><button class="btn btn-primary">下载 CSV 模板</button></div>
+      <div class="stat-grid">
+        <div class="stat"><small>已接入高校</small><b>1</b></div>
+        <div class="stat"><small>有效名单记录</small><b>2,480</b></div>
+        <div class="stat"><small>已注册学生</small><b>1,226</b></div>
+        <div class="stat"><small>最近导入失败行</small><b>3</b></div>
+      </div>
+      <section class="import-zone">
+        <div><b>导入新的学生名单</b><p>支持 UTF-8 CSV，字段：姓名、学号、手机号、年级、班级、专业、学院、校区。</p></div>
+        <button class="btn btn-primary">选择 CSV 文件</button>
+      </section>
+      <div class="section-head"><div><h2>最近导入</h2><p>每次导入都保留批次、操作人和结果。</p></div></div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead><tr><th>批次</th><th>时间</th><th>操作人</th><th>成功</th><th>失败</th><th>状态</th></tr></thead>
+          <tbody>
+            <tr><td>QH-20261119-01</td><td>11 月 19 日 10:12</td><td>平台管理员</td><td>2480</td><td>3</td><td><span class="tag">已完成</span></td></tr>
+            <tr><td>QH-20261118-02</td><td>11 月 18 日 16:40</td><td>平台管理员</td><td>2478</td><td>5</td><td><span class="tag">已完成</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    `);
+
+    const universityData = window.QINGHE_UNIVERSITIES || [];
+    const roleConfig = {
+      student: {
+        name: "在校学生",
+        heading: "回到青禾",
+        field: "学号或手机号",
+        note: "学号或手机号登录，也可以使用模拟验证码。",
+      },
+      station: {
+        name: "公益管理员（回收）",
+        heading: "公益管理员登录",
+        field: "管理员账号",
+        note: "使用平台管理员导入的站点账号登录。",
+      },
+      admin: {
+        name: "平台管理员",
+        heading: "平台管理员登录",
+        field: "管理员账号",
+        note: "平台管理员账号由系统预设，当前首版预置 1 个，后续可继续创建。",
+      },
+      university_admin: {
+        name: "校级管理员（预留）",
+        heading: "校级管理员登录",
+        field: "管理员账号",
+        note: "账号由平台管理员统一导入，校级管理功能暂未开放。",
+      },
+    };
+
+    const authStory = () => `
+      <section class="auth-story">
+        <img class="auth-photo" src="../assets/photos/campus-students-george-pak-7972324.jpg" alt="几名大学生走在校园里">
+        <div class="brand" style="color:#fff"><span class="brand-mark"></span>青禾流转</div>
+        <div>
+          <h1>让每一件好物，<br>都遇见下一位需要的人</h1>
+          <p>校园物品共享流转与绿色回收平台</p>
+        </div>
+        <small>校园旧物的下一段故事 · 从一次选择开始</small>
+      </section>`;
+
+    const identityRoutes = {
+      student: "?view=context&role=student",
+      station: "?view=login&role=station",
+      admin: "?view=login&role=admin",
+      university_admin: "?view=login&role=university_admin",
+    };
+    const identityDescriptions = {
+      student: "选择学校和校区后，使用学号或手机号登录。",
+      station: "使用平台管理员导入的站点账号登录。",
+      admin: "使用系统预设的平台管理员账号登录。",
+      university_admin: "使用平台管理员导入的账号登录，管理功能暂未开放。",
+    };
+
+    const rolePage = () => `
+      <main class="auth-page">
+        ${authStory()}
+        <section class="auth-content">
+          <h2>选择登录身份</h2>
+          <p>请选择与你账号匹配的身份，再进入对应的登录流程。</p>
+          <form class="identity-form" id="identity-form">
+            <label for="identity-select">登录身份</label>
+            <select class="identity-select" id="identity-select">
+              <option value="student">在校学生</option>
+              <option value="station">公益管理员（回收）</option>
+              <option value="admin">平台管理员</option>
+              <option value="university_admin">校级管理员（预留）</option>
+            </select>
+            <p class="identity-help" id="identity-help">选择学校和校区后，使用学号或手机号登录。</p>
+            <button class="btn btn-primary" type="submit">继续登录</button>
+          </form>
+          <p class="muted-note">公益管理员、平台管理员和校级管理员均不能自主注册。</p>
+        </section>
+      </main>`;
+
+    const selectedUniversity = (code) =>
+      universityData.find((university) => university.schoolCode === code) || universityData[0];
+
+    const contextPage = () => {
+      const schoolCode = params.get("school") || "4151010610";
+      const university = selectedUniversity(schoolCode);
+      if (!university) return rolePage();
+      const campusCampuses = university.campuses || [];
+      return `
+        <main class="auth-page">
+          ${authStory()}
+          <section class="auth-content">
+            <a class="back-link" href="?view=role">${uiIcon("back")}返回身份选择</a>
+            <h2>先选择你的学校与校区</h2>
+            <p>平台会校验注册和登录账号是否属于所选学校，跨校数据不可见。</p>
+            <div class="context-box">
+              <label for="school-search" style="font-weight:700">学校</label>
+              <input id="school-search" class="school-select" style="margin-top:7px"
+                     type="search" list="school-options" value="${university.name}"
+                     placeholder="输入关键词搜索学校，如“四川”"
+                     autocomplete="off" aria-label="搜索并选择学校">
+              <datalist id="school-options">
+                ${universityData.map((item) => `<option value="${item.name}"></option>`).join("")}
+              </datalist>
+              <div class="context-school-meta">
+                <span class="tag">城市：${university.city}</span>
+                <span class="tag">${university.educationLevel === "undergraduate" ? "本科" : "专科"}</span>
+              </div>
+              <div style="font-weight:700">校区</div>
+              <div class="campus-options">
+                ${campusCampuses.map((campus, index) => `
+                  <a class="campus-option ${index === 0 ? "selected" : ""}"
+                     href="?view=login&role=student&school=${encodeURIComponent(university.schoolCode)}&campus=${encodeURIComponent(campus.code)}">
+                    ${campus.name}
+                  </a>`).join("")}
+              </div>
+              <p style="margin:18px 0 0;color:var(--muted);font-size:13px">
+                选择校区后进入登录。单校区高校的校区选项显示学校全称。当前临时库收录四川省 141 所普通高校。
+              </p>
+            </div>
+          </section>
+        </main>`;
+    };
+
+    const loginPage = () => {
+      const config = roleConfig[loginRole] || roleConfig.student;
+      const schoolCode = params.get("school") || "4151010610";
+      const campusCode = params.get("campus") || "WANGJIANG";
+      const university = selectedUniversity(schoolCode);
+      const campus = university?.campuses?.find((item) => item.code === campusCode) || university?.campuses?.[0];
+      const registration = loginRole === "student"
+        ? `<p style="text-align:center">还没有账号,<a href="?view=register&school=${encodeURIComponent(schoolCode)}&campus=${encodeURIComponent(campusCode)}"><b>前往注册</b></a></p>`
+        : loginRole === "station"
+          ? '<p class="muted-note">账号由平台管理员统一导入，不开放自主注册。</p>'
+          : loginRole === "admin"
+            ? '<p class="muted-note">平台管理员账号由系统预设，不开放自主注册。</p>'
+            : '<p class="muted-note">账号由平台管理员统一导入，校级管理功能暂未开放。</p>';
+      return `
+        <main class="login-page">
+          <section class="login-art">
+            <img class="auth-photo" src="../assets/photos/campus-students-george-pak-7972324.jpg" alt="几名大学生走在校园里">
+            <div class="brand" style="color:#fff"><span class="brand-mark"></span>青禾流转</div>
+            <div>
+              <h1>让每一件好物，<br>都遇见下一位需要的人</h1>
+              <p>校园物品共享流转与绿色回收平台</p>
+            </div>
+            <small>校园旧物的下一段故事 · 从一次登录开始</small>
+          </section>
+          <section class="login-panel">
+            <a class="back-link" href="?view=role">${uiIcon("back")}更换登录身份</a>
+            ${loginRole === "student" && university
+              ? `<div class="login-context">${university.name} · ${campus?.name || university.name}</div>`
+              : `<div class="login-context">${config.name}</div>`}
+            <h2>${config.heading}</h2>
+            <p>${config.note}</p>
+            <div class="field"><label for="login-account">${config.field}</label><input id="login-account" autocomplete="username" placeholder="请输入${config.field}"></div>
+            <div class="field"><label for="login-password">密码</label><input id="login-password" type="password" autocomplete="current-password" value="password"></div>
+            <button class="btn btn-primary" style="width:100%">登录</button>
+            <div class="divider"></div>
+            ${registration}
+          </section>
+        </main>`;
+    };
+
+    const registerPage = () => {
+      const schoolCode = params.get("school") || "4151010610";
+      const campusCode = params.get("campus") || "WANGJIANG";
+      const university = selectedUniversity(schoolCode);
+      const campus = university?.campuses?.find((item) => item.code === campusCode) || university?.campuses?.[0];
+      return `
+        <main class="login-page">
+          <section class="login-art">
+            <img class="auth-photo" src="../assets/photos/campus-students-george-pak-7972324.jpg" alt="几名大学生走在校园里">
+            <div class="brand" style="color:#fff"><span class="brand-mark"></span>青禾流转</div>
+            <div>
+              <h1>让每一件好物，<br>都遇见下一位需要的人</h1>
+              <p>校园物品共享流转与绿色回收平台</p>
+            </div>
+            <small>校园旧物的下一段故事 · 从一次登录开始</small>
+          </section>
+          <section class="login-panel">
+            <a class="back-link"
+               href="?view=login&role=student&school=${encodeURIComponent(schoolCode)}&campus=${encodeURIComponent(campusCode)}">${uiIcon("back")}返回学生登录</a>
+            <div class="login-context">${university.name} · ${campus?.name || university.name}</div>
+            <h2>学生注册</h2>
+            <p>注册信息将与学校导入的学生名单核验，只有学号和手机号匹配才能创建账号。</p>
+            <div class="two-col">
+              <div class="field"><label for="register-student-no">学号</label><input id="register-student-no" placeholder="请输入学号"></div>
+              <div class="field"><label for="register-phone">手机号</label><input id="register-phone" type="tel" autocomplete="tel" placeholder="请输入手机号"></div>
+            </div>
+            <div class="field"><label for="register-password">设置密码</label><input id="register-password" type="password" autocomplete="new-password" value="password"></div>
+            <div class="field"><label for="register-password-confirm">确认密码</label><input id="register-password-confirm" type="password" autocomplete="new-password" value="password"></div>
+            <button class="btn btn-primary" style="width:100%">提交注册</button>
+            <p class="muted-note">手机号不匹配时，请联系辅导员更改学校预留号码。</p>
+          </section>
+        </main>`;
+    };
+
+    const views = {
+      role: rolePage,
+      context: contextPage,
+      discover: () => variant === "B" ? discoveryB() : variant === "C" ? discoveryC() : discoveryA(),
+      item: itemDetail,
+      create: createItem,
+      request: requestDetail,
+      charity: charityPage,
+      donate: donatePage,
+      station: stationDashboard,
+      admin: adminDashboard,
+      login: loginPage,
+      register: registerPage
+    };
+
+    if (!views[view]) {
+      location.replace("?view=role");
+    } else {
+      app.innerHTML = views[view]();
+    }
+
+    if (view === "context") {
+      const schoolSearch = document.querySelector("#school-search");
+      const schoolOptions = document.querySelector("#school-options");
+      const renderSchoolOptions = (query) => {
+        const normalized = query.trim().toLocaleLowerCase("zh-CN");
+        const matches = normalized
+          ? universityData.filter((item) => item.name.toLocaleLowerCase("zh-CN").startsWith(normalized))
+          : universityData;
+        schoolOptions.innerHTML = matches.map((item) => `<option value="${item.name}"></option>`).join("");
+      };
+      const selectSchool = () => {
+        const university = universityData.find((item) => item.name === schoolSearch?.value.trim());
+        if (university) {
+          location.href = `?view=context&role=student&school=${encodeURIComponent(university.schoolCode)}`;
+        }
+      };
+      schoolSearch?.addEventListener("input", (event) => renderSchoolOptions(event.target.value));
+      schoolSearch?.addEventListener("change", selectSchool);
+      schoolSearch?.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") selectSchool();
+      });
+    }
+
+    if (view === "role") {
+      const identityForm = document.querySelector("#identity-form");
+      const identitySelect = document.querySelector("#identity-select");
+      const identityHelp = document.querySelector("#identity-help");
+      identitySelect?.addEventListener("change", () => {
+        identityHelp.textContent = identityDescriptions[identitySelect.value];
+        if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          identityHelp.animate(
+            [{ opacity: 0.4 }, { opacity: 1 }],
+            { duration: 180, easing: "ease-out" }
+          );
+        }
+      });
+      identityForm?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        location.href = identityRoutes[identitySelect.value];
+      });
+    }
+
+    const motionPreference = matchMedia("(prefers-reduced-motion: reduce)");
+    document.querySelectorAll("[data-school-scene]").forEach((scene) => {
+      const toggle = scene.parentElement?.querySelector("[data-school-media-toggle]");
+      if (!toggle) return;
+      const sceneLabel = scene.alt || "校园";
+      const syncSchoolScene = () => {
+        const isPlaying = !scene.classList.contains("is-paused");
+        toggle.setAttribute("aria-pressed", String(isPlaying));
+        toggle.setAttribute("aria-label", isPlaying ? `暂停${sceneLabel}动画` : `播放${sceneLabel}动画`);
+        toggle.title = isPlaying ? "暂停校园动画" : "播放校园动画";
+      };
+      if (capture || motionPreference.matches) scene.classList.add("is-paused");
+      toggle.disabled = motionPreference.matches;
+      toggle.addEventListener("click", () => {
+        scene.classList.toggle("is-paused");
+        syncSchoolScene();
+      });
+      syncSchoolScene();
+    });
+
+    for (const videoPlayer of document.querySelectorAll("[data-video-player]")) {
+      const videoToggle = videoPlayer.parentElement?.querySelector("[data-video-toggle]");
+      if (!videoToggle) continue;
+      const sceneLabel = videoPlayer.dataset.videoLabel || "场景";
+      const syncVideoButton = () => {
+        const isPlaying = !videoPlayer.paused && !videoPlayer.ended && videoPlayer.readyState >= 2;
+        videoToggle.innerHTML = uiIcon(isPlaying ? "pause" : "play");
+        videoToggle.setAttribute("aria-label", isPlaying ? `暂停${sceneLabel}视频` : `播放${sceneLabel}视频`);
+        videoToggle.setAttribute("aria-pressed", String(isPlaying));
+      };
+      videoPlayer.addEventListener("play", syncVideoButton);
+      videoPlayer.addEventListener("pause", syncVideoButton);
+      videoToggle.addEventListener("click", () => {
+        if (videoPlayer.paused) {
+          videoPlayer.play().catch(syncVideoButton);
+        } else {
+          videoPlayer.pause();
+        }
+      });
+      if (!capture && !motionPreference.matches && videoPlayer.dataset.videoAutoplay !== "false") {
+        videoPlayer.play().then(syncVideoButton).catch(syncVideoButton);
+      }
+      syncVideoButton();
+    }
+
+    const hero = document.querySelector(".hero-a");
+    const heroNote = hero?.querySelector(".hero-note");
+    if (hero && heroNote && matchMedia("(pointer: fine)").matches && !motionPreference.matches) {
+      hero.addEventListener("pointermove", (event) => {
+        const rect = hero.getBoundingClientRect();
+        heroNote.style.setProperty("--glow-x", `${((event.clientX - rect.left) / rect.width) * 100}%`);
+        heroNote.style.setProperty("--glow-y", `${((event.clientY - rect.top) / rect.height) * 100}%`);
+      });
+    }
+
+    if (!capture && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      document.body.classList.add("motion-ready");
+      const cards = [...document.querySelectorAll(".item-card")];
+      const reveals = [...document.querySelectorAll(".reveal")];
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver((entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            entry.target.classList.add("is-visible");
+            observer.unobserve(entry.target);
+          }
+        }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+        [...cards, ...reveals].forEach((element) => observer.observe(element));
+      } else {
+        cards.forEach((card) => card.classList.add("is-visible"));
+        reveals.forEach((element) => element.classList.add("is-visible"));
+      }
+    }
+
+    if (!capture) {
+      bar.classList.remove("hidden");
+      const label = document.querySelector("#variant-label");
+      const select = document.querySelector("#view-select");
+      select.value = view;
+      label.textContent = view === "discover" ? `${variant} · ${variantNames[variant]}` : `页面 · ${select.options[select.selectedIndex].text}`;
+      select.addEventListener("change", () => {
+        const next = new URLSearchParams({ view: select.value });
+        if (select.value === "discover") next.set("variant", variant);
+        location.href = `?${next.toString()}`;
+      });
+      const cycle = (step) => {
+        if (view !== "discover") return;
+        const keys = Object.keys(variantNames);
+        const index = keys.indexOf(variant);
+        const next = keys[(index + step + keys.length) % keys.length];
+        location.href = `?view=discover&variant=${next}`;
+      };
+      document.querySelector("#prev-variant").addEventListener("click", () => cycle(-1));
+      document.querySelector("#next-variant").addEventListener("click", () => cycle(1));
+      window.addEventListener("keydown", (event) => {
+        if (event.target.matches("input, textarea, select, [contenteditable]")) return;
+        if (event.key === "ArrowLeft") cycle(-1);
+        if (event.key === "ArrowRight") cycle(1);
+      });
+    }
+  </script>
+</body>
+</html>

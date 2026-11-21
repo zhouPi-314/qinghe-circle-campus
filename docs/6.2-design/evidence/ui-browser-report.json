@@ -1,0 +1,846 @@
+{
+  "renders": [
+    {
+      "output": "ui-role-select.png",
+      "query": "view=role",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台\n\n校园旧物的下一段故事 · 从一次选择开始\n选择登录身份\n\n请选择与你账号匹配的身份，再进入对应的登录流程。\n\n登录身份\n在校学生\n公益管理员（回收）\n平台管"
+    },
+    {
+      "output": "ui-school-campus.png",
+      "query": "view=context&role=student&school=4151010610",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台\n\n校园旧物的下一段故事 · 从一次选择开始\n返回身份选择\n先选择你的学校与校区\n\n平台会校验注册和登录账号是否属于所选学校，跨校数据不可见。\n\n学校 \n城市："
+    },
+    {
+      "output": "ui-list-a.png",
+      "query": "view=discover&variant=A",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 2142
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与"
+    },
+    {
+      "output": "ui-list-b.png",
+      "query": "view=discover&variant=B",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1014
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n流转清单\n\n先筛选，再比较。这里更适合快速找到现在就能用的"
+    },
+    {
+      "output": "ui-list-c.png",
+      "query": "view=discover&variant=C",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1627
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n今天，校园里有什么在等待新主人\n\n用更轻的方式浏览物品，也"
+    },
+    {
+      "output": "ui-list-mobile.png",
+      "query": "view=discover&variant=A",
+      "viewport": 390,
+      "content": {
+        "width": 390,
+        "height": 5403
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n林\n学生\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台。从一本书、一盏台灯到一辆旧单车，在青禾流转里找到它下一段被需要的故事。\n\n看看正在流转的物品\n发布我的闲置\nFLOW "
+    },
+    {
+      "output": "ui-item-detail.png",
+      "query": "view=item",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1720
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n宿舍护眼台灯\n\n主校区 · 共享借还 · 今天更新\n\n可申"
+    },
+    {
+      "output": "ui-create-item.png",
+      "query": "view=create",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1005
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n发布物品\n\n先说清楚它适合怎样被使用，再决定用什么方式流转"
+    },
+    {
+      "output": "ui-request-status.png",
+      "query": "view=request",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n借用申请 · 台灯\n\n申请编号 QH-20261119-0"
+    },
+    {
+      "output": "ui-donation-form.png",
+      "query": "view=donate",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1005
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n捐赠实物\n\n山村儿童阅读包 · 还差 62 本课外读物\n\n"
+    },
+    {
+      "output": "ui-charity.png",
+      "query": "view=charity",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 2838
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n物品发现\n我的流转\n公益项目\n站点工作台\n平台管理\n发布物品\n林\n学生\n\n流转\n\n物品发现\n我的流转\n发布物品\n\n善意\n\n公益项目\n公益回执\n\n账号\n\n个人资料\n消息通知\n让闲置走出宿舍，\n让善意抵达远方\n\n当前项目为教学演示数据"
+    },
+    {
+      "output": "ui-station-dashboard.png",
+      "query": "view=station",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n站点工作台\n回收验收\n公益核验\n回执管理\n陈\n公益管理员（回收）\n东校区绿色共享站\n\n今天有 5 项待处理，其中 2 项为公益物资核验。\n\n登记公益回执\n待验收回收\n3\n待核验捐赠\n2\n进行中项目\n1\n本月已接收\n86\n今天优先处"
+    },
+    {
+      "output": "ui-admin-import.png",
+      "query": "view=admin",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n平台概览\n组织管理\n学生名单\n账号管理\n争议与审计\n管\n平台管理员\n学生名单导入\n\n名单字段用于注册核验。系统只保存规范化哈希和末四位，不保存可回显的完整手机号。\n\n下载 CSV 模板\n已接入高校\n1\n有效名单记录\n2,480\n已"
+    },
+    {
+      "output": "ui-login.png",
+      "query": "view=login&role=student&school=4151010610&campus=WANGJIANG",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台\n\n校园旧物的下一段故事 · 从一次登录开始\n更换登录身份\n四川大学 · 望江校区\n回到青禾\n\n学号或手机号登录，也可以使用模拟验证码。\n\n学号或手机号\n密码\n"
+    },
+    {
+      "output": "ui-register.png",
+      "query": "view=register&school=4151010610&campus=WANGJIANG",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台\n\n校园旧物的下一段故事 · 从一次登录开始\n返回学生登录\n四川大学 · 望江校区\n学生注册\n\n注册信息将与学校导入的学生名单核验，只有学号和手机号匹配才能创建"
+    },
+    {
+      "output": "ui-login-station.png",
+      "query": "view=login&role=station",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台\n\n校园旧物的下一段故事 · 从一次登录开始\n更换登录身份\n公益管理员（回收）\n公益管理员登录\n\n使用平台管理员导入的站点账号登录。\n\n管理员账号\n密码\n登录\n"
+    },
+    {
+      "output": "ui-login-platform.png",
+      "query": "view=login&role=admin",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台\n\n校园旧物的下一段故事 · 从一次登录开始\n更换登录身份\n平台管理员\n平台管理员登录\n\n平台管理员账号由系统预设，当前首版预置 1 个，后续可继续创建。\n\n管"
+    },
+    {
+      "output": "ui-login-university-admin.png",
+      "query": "view=login&role=university_admin",
+      "viewport": 1440,
+      "content": {
+        "width": 1440,
+        "height": 1000
+      },
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "unlabeled_controls": 0,
+      "small_targets": 0,
+      "text": "青禾流转\n让每一件好物，\n都遇见下一位需要的人\n\n校园物品共享流转与绿色回收平台\n\n校园旧物的下一段故事 · 从一次登录开始\n更换登录身份\n校级管理员（预留）\n校级管理员登录\n\n账号由平台管理员统一导入，校级管理功能暂未开放。\n\n管理员账号"
+    },
+    {
+      "output": "discover-375.png",
+      "query": "view=discover&variant=A",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "discover-390.png",
+      "query": "view=discover&variant=A",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "discover-768.png",
+      "query": "view=discover&variant=A",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "discover-1024.png",
+      "query": "view=discover&variant=A",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "discover-1440.png",
+      "query": "view=discover&variant=A",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "role-375.png",
+      "query": "view=role",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "role-390.png",
+      "query": "view=role",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "role-768.png",
+      "query": "view=role",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "role-1024.png",
+      "query": "view=role",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "role-1440.png",
+      "query": "view=role",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "context-375.png",
+      "query": "view=context&role=student&school=4151010610",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "context-390.png",
+      "query": "view=context&role=student&school=4151010610",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "context-768.png",
+      "query": "view=context&role=student&school=4151010610",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "context-1024.png",
+      "query": "view=context&role=student&school=4151010610",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "context-1440.png",
+      "query": "view=context&role=student&school=4151010610",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "item-375.png",
+      "query": "view=item",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "item-390.png",
+      "query": "view=item",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "item-768.png",
+      "query": "view=item",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "item-1024.png",
+      "query": "view=item",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "item-1440.png",
+      "query": "view=item",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "admin-375.png",
+      "query": "view=admin",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "admin-390.png",
+      "query": "view=admin",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "admin-768.png",
+      "query": "view=admin",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "admin-1024.png",
+      "query": "view=admin",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "admin-1440.png",
+      "query": "view=admin",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "login-375.png",
+      "query": "view=login&role=student&school=4151010610&campus=WANGJIANG",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "login-390.png",
+      "query": "view=login&role=student&school=4151010610&campus=WANGJIANG",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "login-768.png",
+      "query": "view=login&role=student&school=4151010610&campus=WANGJIANG",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "login-1024.png",
+      "query": "view=login&role=student&school=4151010610&campus=WANGJIANG",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "login-1440.png",
+      "query": "view=login&role=student&school=4151010610&campus=WANGJIANG",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "none",
+      "nav_bottom_gap": null,
+      "nav_height": null
+    },
+    {
+      "output": "create-375.png",
+      "query": "view=create",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "create-390.png",
+      "query": "view=create",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "create-768.png",
+      "query": "view=create",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "create-1024.png",
+      "query": "view=create",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "create-1440.png",
+      "query": "view=create",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "charity-375.png",
+      "query": "view=charity",
+      "viewport": 375,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "charity-390.png",
+      "query": "view=charity",
+      "viewport": 390,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "charity-768.png",
+      "query": "view=charity",
+      "viewport": 768,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "fixed",
+      "nav_bottom_gap": 0,
+      "nav_height": 58
+    },
+    {
+      "output": "charity-1024.png",
+      "query": "view=charity",
+      "viewport": 1024,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    },
+    {
+      "output": "charity-1440.png",
+      "query": "view=charity",
+      "viewport": 1440,
+      "overflow": false,
+      "h1": 1,
+      "main": 1,
+      "nav_position": "static",
+      "nav_bottom_gap": 943,
+      "nav_height": 44
+    }
+  ],
+  "interaction": {
+    "school_search": {
+      "count": 53,
+      "prefix_only": true,
+      "first": [
+        "四川大学",
+        "四川轻化工大学",
+        "四川农业大学",
+        "四川师范大学",
+        "四川文理学院"
+      ]
+    },
+    "selected_school": {
+      "search": "?view=context&role=student&school=4151010614",
+      "heading": "先选择你的学校与校区"
+    },
+    "reduced_motion": {
+      "matches": true,
+      "duration": "1e-05s"
+    },
+    "role_flow": {
+      "options": [
+        "student",
+        "station",
+        "admin",
+        "university_admin"
+      ],
+      "button": "继续登录"
+    },
+    "role_destination": "?view=login&role=station",
+    "registration_visible": {
+      "student": true,
+      "station": false,
+      "admin": false,
+      "university_admin": false
+    },
+    "motion": {
+      "enabled": true,
+      "hero_animation": "rise-in",
+      "visible_items": 6,
+      "total_items": 6,
+      "last_visible": true,
+      "reduced_mode": {
+        "active": true,
+        "motion_ready": false
+      }
+    },
+    "school_scene": {
+      "count": 1,
+      "hasSource": true,
+      "badge_fills_control": true,
+      "toggle_label": "暂停四川大学望江校区北大门动画",
+      "toggle_size": [
+        44,
+        44
+      ],
+      "toggle_works": true
+    },
+    "school_badges": [
+      {
+        "name": "scu",
+        "source": "file:///D:/Python%E4%BD%9C%E4%B8%9A/Python%E6%9C%9F%E6%9C%AB%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1/docs/6.2-design/assets/badges/scu-full-badge.png",
+        "fills_control": true,
+        "object_fit": "cover"
+      },
+      {
+        "name": "swjtu",
+        "source": "file:///D:/Python%E4%BD%9C%E4%B8%9A/Python%E6%9C%9F%E6%9C%AB%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1/docs/6.2-design/assets/badges/swjtu-full-badge.png",
+        "fills_control": true,
+        "object_fit": "cover"
+      },
+      {
+        "name": "uestc",
+        "source": "file:///D:/Python%E4%BD%9C%E4%B8%9A/Python%E6%9C%9F%E6%9C%AB%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1/docs/6.2-design/assets/badges/uestc-full-badge.png",
+        "fills_control": true,
+        "object_fit": "cover"
+      },
+      {
+        "name": "swufe",
+        "source": "file:///D:/Python%E4%BD%9C%E4%B8%9A/Python%E6%9C%9F%E6%9C%AB%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1/docs/6.2-design/assets/badges/swufe-full-badge.png",
+        "fills_control": true,
+        "object_fit": "cover"
+      },
+      {
+        "name": "sicau",
+        "source": "file:///D:/Python%E4%BD%9C%E4%B8%9A/Python%E6%9C%9F%E6%9C%AB%E9%A1%B9%E7%9B%AE%E8%AE%BE%E8%AE%A1/docs/6.2-design/assets/badges/sicau-full-badge.png",
+        "fills_control": true,
+        "object_fit": "cover"
+      }
+    ],
+    "charity_videos": {
+      "count": 2,
+      "items": [
+        {
+          "hasSource": true,
+          "toggle_label": "播放亲青公益希望工程宣传视频",
+          "toggle_size": [
+            44,
+            44
+          ],
+          "toggle_works": true
+        },
+        {
+          "hasSource": true,
+          "toggle_label": "播放腾讯基金会公益宣传视频",
+          "toggle_size": [
+            44,
+            44
+          ],
+          "toggle_works": true
+        }
+      ]
+    }
+  }
+}
