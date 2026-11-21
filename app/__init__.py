@@ -26,6 +26,7 @@ def create_app(*, testing: bool = False) -> Flask:
 
     config = Config(project_root=PROJECT_ROOT)
     config.validate()
+    config.testing = testing
 
     app = Flask(__name__, template_folder="templates", static_folder="static")
     # 路由尾部斜杠不强制重定向（/admin 与 /admin/ 视为同一地址）
@@ -34,6 +35,10 @@ def create_app(*, testing: bool = False) -> Flask:
     app.config["APP_CONFIG"] = config
 
     db.init_app(app)
+
+    from app.core.sms import sms_sender_from_config
+
+    app.extensions["sms_sender"] = sms_sender_from_config(config)
 
     from app.core.auth import register_auth_hooks
     from app.core.errors import register_error_handlers

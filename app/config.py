@@ -1,6 +1,6 @@
 """应用配置：从环境变量加载，缺失必需项时快速失败。
 
-环境变量只使用交接书第 10 节允许的 8 个名称；
+环境变量只使用交接书第 10 节及 G5 扩展允许的名称；
 值只放在 .env.local 或平台 Secret 中，不写入代码。
 """
 
@@ -19,6 +19,12 @@ ALLOWED_ENV_VARS = (
     "R2_BUCKET_NAME",
     "R2_ENDPOINT",
     "R2_PUBLIC_BASE_URL",
+    "SMS_PROVIDER",
+    "ALIBABA_CLOUD_ACCESS_KEY_ID",
+    "ALIBABA_CLOUD_ACCESS_KEY_SECRET",
+    "ALIYUN_PNVS_SIGN_NAME",
+    "ALIYUN_PNVS_TEMPLATE_CODE",
+    "ALIYUN_PNVS_REGION_ID",
 )
 
 _REQUIRED = ("SECRET_KEY", "DATABASE_URL")
@@ -78,6 +84,18 @@ class Config:
             )
         )
 
+        self.sms_provider = os.environ.get("SMS_PROVIDER", "mock").strip().lower()
+        self.alibaba_cloud_access_key_id = os.environ.get("ALIBABA_CLOUD_ACCESS_KEY_ID")
+        self.alibaba_cloud_access_key_secret = os.environ.get(
+            "ALIBABA_CLOUD_ACCESS_KEY_SECRET"
+        )
+        self.aliyun_pnvs_sign_name = os.environ.get("ALIYUN_PNVS_SIGN_NAME")
+        self.aliyun_pnvs_template_code = os.environ.get("ALIYUN_PNVS_TEMPLATE_CODE")
+        self.aliyun_pnvs_region_id = (
+            os.environ.get("ALIYUN_PNVS_REGION_ID") or "cn-hangzhou"
+        )
+        self.vercel_env = os.environ.get("VERCEL_ENV")
+
         self.testing = False
 
     def validate(self) -> None:
@@ -95,6 +113,28 @@ class Config:
             )
         if len(self.secret_key) < 32:
             raise RuntimeError("SECRET_KEY 长度不足 32 字符，请更换更强的密钥。")
+        if self.sms_provider not in ("mock", "aliyun_pnvs"):
+            raise RuntimeError("SMS_PROVIDER 只能是 mock 或 aliyun_pnvs。")
+        if self.vercel_env == "production" and self.sms_provider == "mock":
+            raise RuntimeError("Production 环境禁止使用 Mock SMS Provider。")
+        if self.sms_provider == "aliyun_pnvs":
+            missing = [
+                name
+                for name, value in (
+                    ("ALIBABA_CLOUD_ACCESS_KEY_ID", self.alibaba_cloud_access_key_id),
+                    (
+                        "ALIBABA_CLOUD_ACCESS_KEY_SECRET",
+                        self.alibaba_cloud_access_key_secret,
+                    ),
+                    ("ALIYUN_PNVS_SIGN_NAME", self.aliyun_pnvs_sign_name),
+                    ("ALIYUN_PNVS_TEMPLATE_CODE", self.aliyun_pnvs_template_code),
+                )
+                if not value
+            ]
+            if missing:
+                raise RuntimeError(
+                    "阿里云短信认证配置缺失：" + "、".join(missing)
+                )
 
 
 def flask_config_from(config: Config, *, testing: bool = False) -> dict:
