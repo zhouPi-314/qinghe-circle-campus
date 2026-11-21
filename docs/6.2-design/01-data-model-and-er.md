@@ -116,7 +116,7 @@ erDiagram
 | 5 | `station_manager_assignments` | 管理员与站点授权关系 | `station_id`、`user_id`、`started_on`、`ended_on`、`status` | 同一账号同一站点只能有一条有效授权 |
 | 6 | `student_import_batches` | 学生名单导入批次 | `university_id`、`uploaded_by_user_id`、`file_sha256`、`success_rows`、`failed_rows`、`status` | 不保存原始名单文件，只保存摘要和结果 |
 | 7 | `student_registry_records` | 注册核验名单 | `student_no`、`full_name`、`phone_hash`、`campus_id`、`grade`、`class_name`、`major`、`college`、`registered_user_id` | 学号与手机号在高校内唯一 |
-| 8 | `login_verification_codes` | 模拟手机验证码 | `user_id`、`code_hash`、`expires_at`、`used_at`、`failed_attempts` | 60 秒有效、一次性、服务端校验 |
+| 8 | `login_verification_codes` | 登录验证码（历史兼容） | `user_id`、`code_hash`、`expires_at`、`used_at`、`failed_attempts` | 60 秒有效、一次性、服务端校验；注册短信使用 `registration_verification_requests` |
 | 9 | `item_categories` | 物品分类 | `slug`、`name`、`display_order`、`is_active` | 供物品和公益需求共用 |
 | 10 | `items` | 可流转物品主记录 | `university_id`、`campus_id`、`owner_user_id`、`category_id`、`mode`、`title`、`condition`、`status`、`sale_price_cents` | 一个物品只能处于一种模式；同一时刻最多一个进行中申请 |
 | 11 | `item_images` | 物品图片 | `item_id`、`object_key`、`content_type`、`byte_size`、`sort_order` | 最多 5 张；数据库保存 R2 对象 key |

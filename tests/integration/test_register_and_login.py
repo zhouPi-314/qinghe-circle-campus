@@ -620,9 +620,9 @@ class TestAdminLogin:
         assert client.get("/", follow_redirects=False).status_code == 302
 
 
-class TestReservedUniversityAdmin:
-    def test_university_admin_login_reserved(self, client, app, school):
-        """校级管理员为预留身份：可登录但无管理功能（SRS 第 3 节）。"""
+class TestUniversityAdminLogin:
+    def test_university_admin_login_reaches_scoped_dashboard(self, client, app, school):
+        """校级管理员可登录并进入本校管理范围（D-054）。"""
         with app.app_context():
             from datetime import datetime
 
@@ -649,5 +649,7 @@ class TestReservedUniversityAdmin:
             follow_redirects=True,
         )
         page = client.get("/auth/login").get_data(as_text=True)
+        assert "进入本校管理范围" in page
+        assert "暂未开放" not in page
         resp = submit_login(client, page, "uniadmin01", "uniadmin1")
         assert "校级管理员" in resp.get_data(as_text=True)

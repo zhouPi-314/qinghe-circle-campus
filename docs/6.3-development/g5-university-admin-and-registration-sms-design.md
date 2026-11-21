@@ -196,7 +196,7 @@ Cloudflare 官方 Free Managed Ruleset 面向所有套餐；Free 套餐还提供
 - Bot Fight Mode。
 - 单条针对 `/auth/register/*` 的 IP 限速规则，阈值与 App 的“10 分钟 8 次”规则一致或略宽，避免先于应用误伤正常请求。
 
-关键前提：当前公网域名是 `qinghe-campus.vercel.app`，Cloudflare 不能为不属于用户的 `vercel.app` 主机名启用 WAF。必须使用自有自定义域名，将 DNS 代理开启并指向 Vercel，Cloudflare 才会位于请求链路上。若暂时没有自定义域名，只能使用应用层防火墙和 Vercel 平台防护，不能宣称 Cloudflare WAF 已接管 vercel.app。
+关键前提：当前公网域名是 `qinghe-circle-campus.vercel.app`，Cloudflare 不能为不属于用户的 `vercel.app` 主机名启用 WAF。必须使用自有自定义域名，将 DNS 代理开启并指向 Vercel，Cloudflare 才会位于请求链路上。用户已决定暂缓 WAF；当前只使用应用层防火墙和 Vercel 平台防护，不能宣称 Cloudflare WAF 已接管 vercel.app。
 
 在 Cloudflare 代理场景中，应用优先读取 `CF-Connecting-IP`；直接访问 Vercel 时回退到平台提供的可信转发头。若无法证明请求来自 Cloudflare，不能信任客户端自行提交的同名 Header。
 

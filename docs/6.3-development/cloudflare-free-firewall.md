@@ -1,16 +1,17 @@
-# Cloudflare Free 防火墙接入评估
+# Cloudflare Free 防火墙接入评估（暂缓）
 
 | 项目 | 内容 |
 |---|---|
-| 日期 | 2026-11-21 |
+| 日期 | 2026-11-22 |
 | 当前入口 | `https://qinghe-circle-campus.vercel.app` |
 | 当前主机 | Vercel |
-| 结论 | 当前 vercel.app 无法直接接入 Cloudflare WAF；需要自有域名 |
-| 推荐顺序 | 应用层防护先行，自定义域名接入后启用 Cloudflare 代理 |
+| 结论 | 用户决定暂不接入；当前 vercel.app 无法直接使用 Cloudflare WAF |
+| 当前状态 | Cloudflare 仅用于 R2；WAF、Bot Fight Mode 和 Cloudflare Rate Limiting 未部署 |
+| 恢复条件 | 用户提供或批准购买自有域名后，再按本文流程评估 |
 
 ## 1. 当前限制
 
-Cloudflare WAF 只保护添加到用户 Cloudflare 账户并开启 DNS 代理的域名。`vercel.app` 由 Vercel 控制，不属于本项目自有域名，因此不能为 `qinghe-campus.vercel.app` 添加 Cloudflare WAF、Bot Fight Mode 或 Rate Limiting。
+Cloudflare WAF 只保护添加到用户 Cloudflare 账户并开启 DNS 代理的域名。`vercel.app` 由 Vercel 控制，不属于本项目自有域名，因此不能为 `qinghe-circle-campus.vercel.app` 添加 Cloudflare WAF、Bot Fight Mode 或 Rate Limiting。
 
 同时，即使以后启用自定义域名，默认 `*.vercel.app` 地址可能仍可访问。Cloudflare 是边缘防护层，不是唯一安全边界；应用层的高校权限、验证码、IP HMAC 频控和黑名单必须继续存在。
 
@@ -91,7 +92,7 @@ Free 只有有限规则，优先保护注册：
 
 ## 6. 上线验证
 
-1. `qinghe-campus.vercel.app` 和应用层防护仍可用。
+1. `qinghe-circle-campus.vercel.app` 和应用层防护仍可用。
 2. 自定义域名通过 Cloudflare 代理，证书为 Full (strict)。
 3. 直接访问 Vercel 默认域名仍受应用层频率限制。
 4. 连续第 9 次短信请求被应用阻断，产生 `sms_ip_threshold`。

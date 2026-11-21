@@ -27,7 +27,7 @@ A Campus Circular Sharing Platform
 
 > 本项目以开源方式分享，欢迎使用、提出问题和参与改进。它是校园场景的工程示例，不承诺生产级 SLA，也不接收真实公益资金。
 
-> **当前版本状态：** `v1.0.0` 已公开发布并部署。代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权。
+> **当前版本状态：** `v1.1.0` 已完成代码合并与发布前审查，包含校级管理员本校治理、图形验证码、阿里云短信认证和平台运维安全中心；Production 切换等待 Vercel/Neon 受控权限。代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权。
 
 ## 项目背景
 
@@ -185,7 +185,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 | Cloudflare R2 | 物品与公益图片上传、读取和删除 | 否，图片增强 |
 | Vercel + Neon | 公网应用入口与托管 PostgreSQL | 否，部署增强 |
 
-邮件验证码、支付结算和公开募捐不在当前实现范围内。真实短信使用阿里云号码认证短信认证；Cloudflare WAF 只在自有域名代理后启用。
+邮件验证码、支付结算和公开募捐不在当前实现范围内。真实短信使用阿里云号码认证短信认证；Cloudflare 当前只用于 R2，Cloudflare WAF 暂缓，未部署到公网。
 
 ## 演示顺序
 
@@ -209,7 +209,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 4. Vercel 使用仓库根目录的 Flask 入口 `main.py`。
 5. 部署后验证 `/health`、登录、数据库读写、R2 上传与公网读取。
 6. 先执行添加式数据库迁移，再部署新应用版本；阿里云短信先使用受控测试手机 smoke。
-7. Cloudflare WAF 需要自有域名、代理 DNS、Full (strict) 和源站共享 Header，不能直接套在 `vercel.app`。
+7. Cloudflare WAF 当前暂缓；若后续启用，需要自有域名、代理 DNS、Full (strict) 和源站共享 Header，不能直接套在 `vercel.app`。
 
 更完整的基础设施说明见 `docs/0-pre-development/07-Vercel-Neon-R2接入指南.md`。
 

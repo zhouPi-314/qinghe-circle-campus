@@ -70,7 +70,7 @@ _IDENTITY_COPY = {
         "footnote": "账号由平台管理员统一配置，不提供注册入口。",
     },
     "university_admin": {
-        "intro": "当前可登录，校级管理功能暂未开放。",
+        "intro": "登录后进入本校管理范围，不能跨校操作。",
         "account_label": "登录账号",
         "account_placeholder": "请输入登录账号",
         "context_label": "账号说明",

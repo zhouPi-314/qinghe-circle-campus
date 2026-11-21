@@ -3,9 +3,9 @@
 | 项目 | 内容 |
 |---|---|
 | 文档编号 | DES-ARCH-001 |
-| 版本 | 1.1 |
-| 日期 | 2026-11-19 |
-| 状态 | 已批准并冻结 |
+| 版本 | 1.2 |
+| 日期 | 2026-11-22 |
+| 状态 | 已批准（G5 架构已同步） |
 | 技术栈 | Python 3.13、Flask 3、Jinja2、Flask-SQLAlchemy、PostgreSQL 18、R2 |
 
 ## 1. 架构结论
@@ -209,7 +209,7 @@ flowchart LR
 | 数据库 | 本地 PostgreSQL 18 | Neon PostgreSQL |
 | 图片 | 本地 fake storage 或临时目录 | Cloudflare R2 |
 | 短信认证 | Mock Provider | 阿里云 PNVS 短信认证 |
-| 边缘防护 | Flask 应用层频控 | 应用层 + 可选 Cloudflare Free WAF |
+| 边缘防护 | Flask 应用层频控 | Vercel + 应用层安全事件和临时封禁；Cloudflare WAF 暂缓 |
 | 页面 | Jinja2 | 同一套 Jinja2 模板 |
 
 环境变量、密钥和 R2 凭据只从环境读取，不写入代码或文档。
@@ -231,3 +231,4 @@ flowchart LR
 |---|---|---|
 | 1.0 | 2026-11-19 | 建立分层架构、模块职责、service 接口和关键数据流 |
 | 1.1 | 2026-11-19 | 补齐管理账号和校园组织 service 接口，移除校级管理员首版职责冲突 |
+| 1.2 | 2026-11-22 | 同步 G5 校级管理员、阿里云短信、运维安全与 Cloudflare WAF 暂缓状态 |

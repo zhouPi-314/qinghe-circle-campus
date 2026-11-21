@@ -5,7 +5,7 @@
 ## 当前阶段
 
 - 项目名称：青禾流转（Qinghe Circle Campus）
-- 当前状态：G4 已批准并授权发布（D-042）；M6 开源公开发布已完成（D-043），GitHub 仓库为 Public 并开启 Issues/Discussions；后续仅进行课程最终走查、演示排练和缺陷维护，WorkerBuddy 保持停止
+- 当前状态：G4 已批准发布（D-042）。G5-A/B/C 已完成代码合并、286 项回归、依赖审计和 Word 同步；等待 Vercel/Neon 受控权限执行 Production 迁移与切换。Cloudflare WAF 暂缓（D-055）；WorkerBuddy 保持停止
 - G1 通过前不得进入 G2 业务编码；各门禁停止点见 `docs/00-governance/collaboration-and-quality-gates.md`
 
 ## 强制阅读顺序
@@ -56,6 +56,10 @@ WorkerBuddy 到达以下门禁时必须停止继续开发并等待审阅：
 3. **G2 第一条业务闭环**：第一条完整流转链及其测试完成后。
 4. **G3 全功能完成**：四类物品流转和公益首版完成后。
 5. **G4 发布候选**：Codex 验收、修复和最终回归完成后。
+6. **G5-A 校级管理员**：本校范围、账号、名单、审核、争议和审计通过后。
+7. **G5-B 注册短信**：图形验证码、阿里云短信和注册闭环通过后。
+8. **G5-C 运维治理**：安全事件、临时封禁、运行状况和错误日志通过后。
+9. **G5-R 发布候选**：迁移演练、Preview smoke、文档和 Word 同步完成后。
 
 门禁的具体完成条件和停止指令见 `collaboration-and-quality-gates.md` 和 WorkerBuddy 交接文档。
 
@@ -64,5 +68,5 @@ WorkerBuddy 到达以下门禁时必须停止继续开发并等待审阅：
 - 真实密钥只放在 `.env.local`、Vercel Secrets 或平台密钥管理中。
 - 不提交密码、验证码、数据库连接串、R2 Access Key、R2 Secret、API Token。
 - 不在日志或测试报告中输出学生手机号、密码和完整连接串。
-- 真实支付、短信、公开募捐和公益资金不进入当前版本。
+- 真实支付、公开募捐和公益资金不进入当前版本；真实短信只用于学生注册验证。
 

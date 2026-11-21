@@ -5,7 +5,7 @@
 | 日期 | 2026-11-22 |
 | 分支 | `workerbuddy/g5-university-admin-sms` |
 | 基线 | `e042b61` |
-| 当前状态 | G5-A、G5-B、G5-C 功能完成；等待最终合并与 Production 批准 |
+| 当前状态 | G5-A、G5-B、G5-C 功能已合并到本地 `main`；等待 Vercel/Neon 受控权限完成 Production 迁移与切换 |
 | 数据库 | 31 张表（原 27 张 + 注册验证 1 张 + 运维安全 3 张） |
 
 ## 1. 校级管理员
@@ -55,6 +55,7 @@
 
 - `pytest`：286 passed。
 - `ruff check app tests`：通过。
+- `pip-audit -r requirements.txt`：升级 Flask 3.1.3、pytest 9.0.3 后无已知漏洞。
 - 两项添加式迁移在 27 表旧基线上回放后得到 31 表。
 
 G5 功能集成后的阶段性结果：
@@ -73,13 +74,20 @@ G5 功能集成后的阶段性结果：
 - `sql/migrations/20261121_g5_security_operations.sql`
 - 两项均为添加式；注册验证迁移已在旧数据副本回放并确认既有行数不变。
 
-## 6. 未完成
+## 6. 安全与文档检查
+
+- 当前 `.env.local` 中的密钥、生产管理员密码、短信测试手机号和数据库连接串未出现在 Git 跟踪文件或 Git 历史中。
+- 7 份课程 Word 由 Markdown 重新生成，结构检查均为 0 个高、中、低问题。
+- 7 份 Word 经 Microsoft Word 导出 PDF 并逐页检查，共 73 页，无裁切、重叠、表格断裂或缺失图片。
+- Word 全文复核未发现“校级管理员预留”“管理功能暂未开放”“真实短信不可用”等旧表述。
+
+## 7. 未完成
 
 - Cloudflare 自有域名/DNS/WAF 控制台配置。
 - Neon 克隆库上的正式迁移演练。
 - Vercel Preview 完整页面 smoke 与 Production 切换。
 
-## 7. 界面证据
+## 8. 界面证据
 
 - `g5-register.png`：注册图形验证码、短信验证码、60 秒提示。
 - `g5-school-admin.png`：校级管理员本校概览。
