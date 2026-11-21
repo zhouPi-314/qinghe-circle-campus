@@ -11,8 +11,8 @@
 | 项 | 值 |
 |---|---|
 | 分支 | `workerbuddy/6.3-implementation` |
-| 代码 commit | `f44c1be`（G4 前加固，183 项测试） |
-| 文档/证据 commit | `ca2f32d` |
+| 代码 commit | `[private-history]`（G4 前加固，183 项测试） |
+| 文档/证据 commit | `[private-history]` |
 | 前置门禁 | G0（D-031）、G1（D-035）、G2（D-037）、G3（D-038 修复重提交 + 复审通过，D-040 正式批准） |
 | 加固决策 | D-039（行锁并发加固 + 公开文本 PII 规则检测） |
 

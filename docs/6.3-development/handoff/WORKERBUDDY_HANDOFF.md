@@ -10,7 +10,7 @@
 | 需求版本 | SRS-001 1.1（已批准冻结） |
 | 设计版本 | 6.2 设计集 1.9（其中 UI 1.7、设计审查 1.5） |
 | 工程标准 | `docs/00-governance/engineering-standards.md` 现行基线 |
-| 交接 commit | `1be11ed`（main 冻结基线）；实施分支 `workerbuddy/6.3-implementation` |
+| 交接 commit | `[private-history]`（main 冻结基线）；实施分支 `workerbuddy/6.3-implementation` |
 | 计划完成日期 | 2026-12-16 |
 
 ## 1. 交接结论
@@ -48,7 +48,7 @@
 | `sql/seed.sql` | 基础演示数据 | 空库初始化后的课程演示 |
 | `docs/6.2-design/prototype/index.html` | 设计评审原型 | 视觉和交互参考，不是产品代码 |
 | 6.2 课程 Word | 当前 5 份已同步最新 UI | 课程交付与冻结设计参考 |
-| 业务代码 | G1 基础骨架 + G2 共享借还闭环已实现（G2 代码 commit `bf3b36b`）；出售/赠送/回收与公益模块随后续增量 | G2 审核通过后按第 4 节顺序复制共享模式 |
+| 业务代码 | G1 基础骨架 + G2 共享借还闭环已实现（G2 代码 commit `[private-history]`）；出售/赠送/回收与公益模块随后续增量 | G2 审核通过后按第 4 节顺序复制共享模式 |
 
 已核验演示数据为 141 所四川省普通高校、161 条校区记录。公开版种子数据不再预置管理员账号，首次部署使用 `tools/create_platform_admin.py` 交互创建。多校区高校中以 `temporary` 标记的校区不得视为官网已核验数据。
 
@@ -206,7 +206,7 @@ WorkerBuddy 不修改 `tests/acceptance/`。发现设计矛盾先停止，记录
 已于 2026-11-20 通过。补齐记录：
 
 - 用户批准 6.1、6.2，冻结文档版本（已完成）；
-- 建立 Git 仓库并生成交接 commit（已完成：`1be11ed`）；
+- 建立 Git 仓库并生成交接 commit（已完成：`[private-history]`）；
 - WorkerBuddy 提交实施确认且无阻塞问题（已完成；用户书面确认见 D-031）。
 
 ### G1：基础骨架
@@ -231,7 +231,7 @@ Codex 完成独立验收、安全审查、受控修复和最终回归；WorkerBu
 
 | 阻塞项 | 影响 | 解除记录 |
 |---|---|---|
-| 当前目录没有 Git 仓库 | 无法提供可追踪交接 commit | 已初始化，基线 commit `1be11ed` |
+| 当前目录没有 Git 仓库 | 无法提供可追踪交接 commit | 已初始化，基线 commit `[private-history]` |
 | WorkerBuddy 尚未提交实施确认 | 无法证明已完成必读和接口理解 | 已按第 14 节模板提交，用户书面确认（D-031） |
 
 ## 14. WorkerBuddy 实施确认

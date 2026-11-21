@@ -6,9 +6,9 @@
 | 门禁 | G1：基础骨架（第三次提交） |
 | 提交者 | WorkerBuddy |
 | 提交日期 | 2026-11-20 |
-| **代码 commit** | **`363b901eca58c70da3ec809bc8e8f8971cace751`**（分支 `workerbuddy/6.3-implementation`） |
+| **代码 commit** | **`[private-history]`**（分支 `workerbuddy/6.3-implementation`） |
 | **证据 commit** | 本文件与测试证据所在 commit（见 `git log -- docs/6.3-development/evidence/`） |
-| 上一版报告 | v2（代码 commit `9cfd12b`），第二次审核退回，结论记录于 D-034 |
+| 上一版报告 | v2（代码 commit `[private-history]`），第二次审核退回，结论记录于 D-034 |
 | 需求版本 | SRS-001 1.1（已批准冻结） |
 | 设计版本 | 6.2 设计集 1.9（已批准冻结） |
 | 等待 | Codex review / 用户确认 |
@@ -22,7 +22,7 @@
 | 中 | 手机号哈希与 SECRET_KEY 绑定，缺轮换迁移方案 | 密钥版本化派生（`PHONE_HASH_KEY_VERSION=1`）并在代码注释、D-033、本报告明确迁移路径：重导名单 CSV 重建 registry 哈希 → 按 `registered_user_id` 同步回 users → 学号登录恢复；纳入 G4 发布检查单，未迁移前禁止轮换 SECRET_KEY | D-033、app/core/auth.py `phone_hmac_key()` |
 | 阻断 | 登录后无法返回原目标页（identity/student-context 丢 next） | `next` 贯穿整链：login→identity→student-context→login→落点；仅允许站内相对路径（拒绝 `//`、反斜杠、外链） | 新增端到端测试 `test_full_chain_returns_to_original_target`：6 步链路最终落点 `/me/profile` 200；另测 `//evil.com` 被丢弃 |
 | 高 | 开发库被污染（142/162/2/1） | `tools/init_database.py --reset` 重建开发库；实测 `universities=141 campuses=161 platform_admins=1 students=0`；固定旧测试库 `qinghe_circle_test` 已删除 | psql 实测输出见第 3 节 |
-| 高 | 交接书自相矛盾（版本 1.0、交接 commit 未生成、G0 未通过、业务代码未开始） | 交接书升版 1.2：文档版本号、交接 commit（`1be11ed` + 实施分支）、第 1 节交接结论、第 3 节业务代码状态全部与实际仓库对齐 | WORKERBUDDY_HANDOFF.md |
+| 高 | 交接书自相矛盾（版本 1.0、交接 commit 未生成、G0 未通过、业务代码未开始） | 交接书升版 1.2：文档版本号、交接 commit（`[private-history]` + 实施分支）、第 1 节交接结论、第 3 节业务代码状态全部与实际仓库对齐 | WORKERBUDDY_HANDOFF.md |
 | — | 首轮测试 deadlock（并发 pytest 进程） | 属测试环境并发问题，按上一条按运行隔离修复；本轮证据为单进程串行运行 | g1-test-output.txt 文件头注明"串行单进程运行" |
 
 上一轮未发现回归的项（SameSite、FLASK_DEBUG、psycopg 驱动、405 中文页、表名动态化、commit 固化、D-031）本轮保持并通过复核。
@@ -36,7 +36,7 @@
 | 基础鉴权和角色可用 | 通过 | 路由 + service 双层权限校验；三类角色登录测试齐全 |
 | 健康页和错误页可用 | 通过 | /health JSON；403/404/405/500 中文页含原因与下一步 |
 | 基础测试通过 | 通过 | pytest：44 passed（单元 9 + 集成 35）；Ruff 全通过 |
-| 固定 commit | `363b901` | 见文件头 |
+| 固定 commit | `[private-history]` | 见文件头 |
 
 ## 2. 启动命令与结果
 

@@ -1,5 +1,5 @@
 命令: .venv/Scripts/python -m pytest tests（单进程串行运行）
-代码 commit: bf3b36b8300dd1fcfc8b492cebbc9b0e35ccd9bd
+代码 commit: [private-history]
 分支: workerbuddy/6.3-implementation
 环境: Python 3.13.14 / Windows / 本地 PostgreSQL 18.6（独立测试库 qinghe_circle_test_<pid>）
 ---

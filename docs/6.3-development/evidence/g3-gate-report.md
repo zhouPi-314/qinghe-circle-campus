@@ -3,7 +3,7 @@
 | 项目 | 内容 |
 |---|---|
 | 阶段 | G3 全功能完成（第二次提交，首轮审核退回项已全部修复） |
-| 代码 commit | **`f0b4811`**（分支 `workerbuddy/6.3-implementation`）；首轮 G3 代码 commit `3fc7f7c` |
+| 代码 commit | **`[private-history]`**（分支 `workerbuddy/6.3-implementation`）；首轮 G3 代码 commit `[private-history]` |
 | 前置门禁 | G0（D-031）、G1（D-035）、G2（D-037，用户批准） |
 | 报告日期 | 2026-11-20 |
 | Python 版本 | **3.13.14**（见 `g3-python-version.txt`，v1 报告误写 3.13.12，已更正） |
@@ -98,7 +98,7 @@
 
 ```text
 GATE READY: G3（重提交）
-Commit: f0b4811（修复代码）；证据 commit 见 git log
+Commit: [private-history]（修复代码）；证据 commit 见 git log
 Scope completed: 首轮 12 项退回项（4 Standards + 8 Spec）全部修复；156 项测试全过；真实 R2 smoke test 通过
 Evidence: docs/6.3-development/evidence/g3-gate-report.md（v2）、g3-test-output.txt、g3-python-version.txt、g3-dependencies.txt、g3-ruff.txt
 Deviations: 交接码通知文案通用化（低风险）；无其他

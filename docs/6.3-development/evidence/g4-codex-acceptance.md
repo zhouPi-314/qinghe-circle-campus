@@ -3,7 +3,7 @@
 | 项目 | 内容 |
 |---|---|
 | 日期 | 2026-11-21 |
-| 代码基线 | `4ad517d` |
+| 代码基线 | `[private-history]` |
 | 验收分支 | `codex/6.3-acceptance` / `main` |
 | Production | `https://qinghe-circle-campus.vercel.app` |
 | 结论 | **G4 验收通过；用户已批准发布（D-042）** |

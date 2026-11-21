@@ -6,7 +6,7 @@
 | 门禁 | G2：第一条业务闭环（共享借还） |
 | 提交者 | WorkerBuddy |
 | 提交日期 | 2026-11-20 |
-| **代码 commit** | **`bf3b36b8300dd1fcfc8b492cebbc9b0e35ccd9bd`**（分支 `workerbuddy/6.3-implementation`） |
+| **代码 commit** | **`[private-history]`**（分支 `workerbuddy/6.3-implementation`） |
 | **证据 commit** | 本文件与测试证据所在 commit |
 | 上一门禁 | G1 第三次提交通过（D-035） |
 | 需求版本 | SRS-001 1.1（已批准冻结） |
@@ -21,7 +21,7 @@
 | 正常与异常分支 | 通过 | 拒绝、取消、错误码、过期码、旧版码失效、二次申请阻断、借期重叠、逾期显示、损坏转争议 |
 | 权限与高校隔离 | 通过 | 路由守卫 + service 层 actor 校验；跨校对象 404 不泄露存在性 |
 | service/route/model/template/tests 齐全 | 通过 | 见第 3 节结构 |
-| commit 和测试日志 | `bf3b36b` | evidence/g2-test-output.txt（文件头含 commit/分支/环境） |
+| commit 和测试日志 | `[private-history]` | evidence/g2-test-output.txt（文件头含 commit/分支/环境） |
 
 ## 2. 测试命令与结果
 

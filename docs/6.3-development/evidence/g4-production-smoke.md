@@ -3,7 +3,7 @@
 | 项目 | 内容 |
 |---|---|
 | 日期 | 2026-11-21 |
-| 代码 commit | `4ad517d` |
+| 代码 commit | `[private-history]` |
 | Production URL | `https://qinghe-circle-campus.vercel.app` |
 | 浏览器 | Microsoft Edge 157.0.4341.60 |
 | 环境 | Vercel Production + Neon PostgreSQL 18 + Cloudflare R2 |
