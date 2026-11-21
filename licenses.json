@@ -1,0 +1,82 @@
+{
+  "audited_at": "2026-11-21",
+  "scope": "Enterprise SaaS login page and direct project dependencies",
+  "new_third_party_assets": [],
+  "new_dependencies": [],
+  "original_design_assets": [
+    {
+      "name": "Qinghe circulation hero and interface icons",
+      "files": [
+        "app/templates/auth/login.html",
+        "app/static/css/login.css",
+        "app/static/js/login.js"
+      ],
+      "author": "zhouPi-314 / Codex",
+      "license": "MIT",
+      "source": "Original inline SVG, CSS and JavaScript created for this project",
+      "redistribution": "Covered by the repository MIT License"
+    }
+  ],
+  "fonts": [
+    {
+      "name": "Aptos, Segoe UI Variable, Noto Sans SC, Microsoft YaHei, Bahnschrift, Cascadia Code",
+      "distribution": "No font files are bundled or downloaded by this page",
+      "license_status": "Provided by the operating system/browser; individual system font licenses apply"
+    }
+  ],
+  "direct_dependencies": [
+    {
+      "name": "Flask",
+      "version": "3.1.2",
+      "license": "BSD-3-Clause",
+      "license_url": "https://palletsprojects.com/license/"
+    },
+    {
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "license": "BSD-3-Clause",
+      "license_url": "https://palletsprojects.com/license/"
+    },
+    {
+      "name": "Flask-SQLAlchemy",
+      "version": "3.1.1",
+      "license": "BSD-3-Clause",
+      "license_url": "https://github.com/pallets-eco/flask-sqlalchemy/blob/main/LICENSE.rst"
+    },
+    {
+      "name": "SQLAlchemy",
+      "version": "2.0.44",
+      "license": "MIT",
+      "license_url": "https://www.sqlalchemy.org/license.html"
+    },
+    {
+      "name": "psycopg",
+      "version": "3.2.12",
+      "license": "LGPL-3.0-only",
+      "license_url": "https://www.psycopg.org/license/"
+    },
+    {
+      "name": "boto3",
+      "version": "1.40.62",
+      "license": "Apache-2.0",
+      "license_url": "https://github.com/boto/boto3/blob/develop/LICENSE"
+    },
+    {
+      "name": "pytest",
+      "version": "8.4.2",
+      "license": "MIT",
+      "license_url": "https://docs.pytest.org/en/stable/license.html"
+    },
+    {
+      "name": "Ruff",
+      "version": "0.14.6",
+      "license": "MIT",
+      "license_url": "https://github.com/astral-sh/ruff/blob/main/LICENSE"
+    }
+  ],
+  "existing_media": {
+    "scope": "Not introduced or changed by the login redesign",
+    "record": "THIRD_PARTY_NOTICES.md, docs/6.2-design/assets/credits.json, work/ui-animation-proposal-20261120/sources.json"
+  },
+  "limitations": "This is a dependency and asset inventory, not legal advice. System-font licenses vary by installed operating system."
+}

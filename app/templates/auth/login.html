@@ -1,40 +1,204 @@
-{% extends "base.html" %}
-{% block title %}登录 - 青禾流转{% endblock %}
-{% block content %}
-<section class="card auth-card">
-  <h1>{{ role_display }}登录</h1>
-  {% if campus_display %}
-    <p class="page-lead">当前学校与校区：{{ campus_display }}</p>
-  {% else %}
-    <p class="page-lead">账号由平台管理员导入或系统预设，不提供注册入口。</p>
-  {% endif %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ role_display }}登录 - 青禾流转</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+</head>
+<body>
+  <main class="login-shell">
+    <section class="brand-panel" aria-labelledby="brand-title">
+      <div class="brand-ambient" aria-hidden="true"></div>
+      <header class="brand-lockup">
+        <a class="brand-mark-link" href="{{ url_for('auth.identity') }}" aria-label="返回青禾流转身份选择">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48" role="img">
+              <path d="M12 29c1-10 8-17 18-18-1 10-8 17-18 18Z"></path>
+              <path d="M13 34c7-7 13-11 22-14"></path>
+              <path d="M17 35c5 1 10 0 15-3"></path>
+            </svg>
+          </span>
+          <span>
+            <strong>青禾流转</strong>
+            <small>Qinghe Circle Campus</small>
+          </span>
+        </a>
+        <span class="network-status"><i aria-hidden="true"></i>校园循环网络在线</span>
+      </header>
 
-  <form method="post" action="{{ url_for('auth.login') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="hidden" name="next" value="{{ next_target or '' }}">
+      <div class="brand-copy">
+        <p class="brand-kicker">CAMPUS CIRCULAR NETWORK</p>
+        <h1 id="brand-title">让闲置重新流动<br><span>让每一次传递都有回应</span></h1>
+        <p class="brand-description">连接同校同学、公益站点与校园组织，让教材、器材和生活好物在可信范围内继续被需要。</p>
+      </div>
 
-    <div class="form-field {% if field_errors.identifier %}has-error{% endif %}">
-      <label for="identifier">{{ '学号或手机号' if role == 'student' else '登录账号' }}</label>
-      <input id="identifier" name="identifier" type="text" value="{{ identifier_value }}"
-             autocomplete="username" required
-             aria-describedby="{{ 'err-identifier' if field_errors.identifier else '' }}">
-      {% if field_errors.identifier %}<p class="field-error" id="err-identifier">{{ field_errors.identifier }}</p>{% endif %}
-    </div>
+      <div class="circulation-visual" aria-hidden="true">
+        <div class="visual-grid"></div>
+        <div class="orbit orbit-one"></div>
+        <div class="orbit orbit-two"></div>
+        <div class="orbit orbit-three"></div>
+        <div class="floating-dot dot-one"></div>
+        <div class="floating-dot dot-two"></div>
+        <div class="floating-dot dot-three"></div>
+        <div class="floating-dot dot-four"></div>
 
-    <div class="form-field {% if field_errors.password %}has-error{% endif %}">
-      <label for="password">密码</label>
-      <input id="password" name="password" type="password" autocomplete="current-password" required
-             aria-describedby="{{ 'err-password' if field_errors.password else '' }}">
-      {% if field_errors.password %}<p class="field-error" id="err-password">{{ field_errors.password }}</p>{% endif %}
-    </div>
+        <div class="hub-shadow"></div>
+        <div class="hub">
+          <div class="hub-ring hub-ring-back"></div>
+          <div class="hub-core">
+            <div class="hub-topline">
+              <span class="mini-status"><i></i>LIVE</span>
+              <span class="hub-route">同校流转中</span>
+            </div>
+            <div class="hub-center">
+              <svg class="hub-leaf" viewBox="0 0 120 120">
+                <path d="M31 74c2-25 22-43 55-45-2 27-22 46-55 45Z"></path>
+                <path d="M28 95c17-18 34-31 59-43"></path>
+                <path d="M37 93c13 3 28 1 42-7"></path>
+              </svg>
+              <span>共享 · 循环 · 再利用</span>
+            </div>
+            <div class="hub-stats">
+              <span><b>4</b>流转方式</span>
+              <span><b>141</b>四川高校</span>
+            </div>
+          </div>
+          <div class="hub-ring hub-ring-front"></div>
+        </div>
 
-    <button type="submit" class="btn btn-primary">登录</button>
-  </form>
+        <div class="floating-item item-book">
+          <span class="item-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H11v15H6.5A2.5 2.5 0 0 0 4 21.5v-15Z"></path><path d="M20 6.5A2.5 2.5 0 0 0 17.5 4H13v15h4.5a2.5 2.5 0 0 1 2.5 2.5v-15Z"></path></svg>
+          </span>
+          <span><b>书籍教材</b><small>等待新读者</small></span>
+        </div>
+        <div class="floating-item item-box">
+          <span class="item-icon">
+            <svg viewBox="0 0 24 24"><path d="m4 8 8-4 8 4-8 4-8-4Z"></path><path d="M4 8v12l8 4 8-4V8"></path><path d="M12 12v8"></path></svg>
+          </span>
+          <span><b>生活用品</b><small>找到下一位同学</small></span>
+        </div>
+        <div class="floating-item item-charity">
+          <span class="item-icon">
+            <svg viewBox="0 0 24 24"><path d="M12 20s-7-4.2-7-10a4 4 0 0 1 7-2.3A4 4 0 0 1 19 10c0 5.8-7 10-7 10Z"></path></svg>
+          </span>
+          <span><b>公益捐赠</b><small>站点核验可追溯</small></span>
+        </div>
+      </div>
 
-  {% if role == 'student' %}
-    <p class="form-footnote">还没有账号，<a href="{{ url_for('auth.register') }}">前往注册</a></p>
-  {% else %}
-    <p class="form-footnote">忘记密码或账号问题，请联系平台管理员。</p>
-  {% endif %}
-</section>
-{% endblock %}
+      <ul class="trust-points">
+        <li><strong>同校隔离</strong><span>跨校数据不可见</span></li>
+        <li><strong>全程留痕</strong><span>交接与审计可追溯</span></li>
+        <li><strong>绿色循环</strong><span>减少一次性闲置</span></li>
+      </ul>
+    </section>
+
+    <section class="form-panel" aria-labelledby="login-title">
+      <header class="form-topbar">
+        <span class="secure-label">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.9 8.1 7 10 4.1-1.9 7-5.4 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+          安全访问
+        </span>
+        <a href="{{ url_for('auth.identity') }}">切换登录身份</a>
+      </header>
+
+      <div class="login-card">
+        <div class="role-chip">{{ role_display }}</div>
+        <h2 id="login-title">欢迎回来</h2>
+        <p class="login-intro">登录后继续处理校园物品的发布、申请与交接。</p>
+
+        {% if campus_display %}
+          <div class="context-card">
+            <span class="context-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5"></path><path d="M5 10v9h14v-9"></path><path d="M9 19v-5h6v5"></path></svg>
+            </span>
+            <span><small>当前学校与校区</small><strong>{{ campus_display }}</strong></span>
+          </div>
+        {% else %}
+          <div class="context-card">
+            <span class="context-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H11v15H6.5A2.5 2.5 0 0 0 4 21.5v-15Z"></path><path d="M20 6.5A2.5 2.5 0 0 0 17.5 4H13v15h4.5a2.5 2.5 0 0 1 2.5 2.5v-15Z"></path></svg>
+            </span>
+            <span><small>账号说明</small><strong>管理员账号由平台统一配置，不提供注册入口</strong></span>
+          </div>
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="login-alerts" role="status">
+              {% for category, message in messages %}
+                <p class="login-alert login-alert-{{ category }}">{{ message }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form id="login-form" class="login-form" method="post" action="{{ url_for('auth.login') }}" data-role="{{ role }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ next_target or '' }}">
+
+          <div class="form-field {% if field_errors.identifier %}has-error{% endif %}">
+            <label for="identifier">{{ '学号或手机号' if role == 'student' else '登录账号' }}</label>
+            <div class="input-shell">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.7-3.4 3.2-5.2 7-5.2s6.3 1.8 7 5.2"></path></svg>
+              </span>
+              <input id="identifier" name="identifier" type="text" value="{{ identifier_value }}"
+                     autocomplete="username" required
+                     placeholder="{{ '请输入学号或手机号' if role == 'student' else '请输入登录账号' }}"
+                     aria-describedby="{{ 'err-identifier' if field_errors.identifier else '' }}">
+            </div>
+            {% if field_errors.identifier %}<p class="field-error" id="err-identifier">{{ field_errors.identifier }}</p>{% endif %}
+          </div>
+
+          <div class="form-field {% if field_errors.password %}has-error{% endif %}">
+            <label for="password">密码</label>
+            <div class="input-shell">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+              </span>
+              <input id="password" name="password" type="password" autocomplete="current-password" required
+                     placeholder="请输入密码"
+                     aria-describedby="{{ 'err-password' if field_errors.password else '' }}">
+              <button id="password-toggle" class="password-toggle" type="button"
+                      aria-label="显示密码" aria-controls="password" aria-pressed="false">
+                <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-5 9.5-5 9.5 5 9.5 5-3.4 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
+                <svg class="eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 16 16"></path><path d="M9.5 6.3A10 10 0 0 1 12 7c6.1 0 9.5 5 9.5 5a14 14 0 0 1-2.1 2.4"></path><path d="M6.1 8.1C3.9 9.6 2.5 12 2.5 12s3.4 5 9.5 5c1.3 0 2.5-.2 3.6-.6"></path></svg>
+              </button>
+            </div>
+            {% if field_errors.password %}<p class="field-error" id="err-password">{{ field_errors.password }}</p>{% endif %}
+          </div>
+
+          <div class="form-meta">
+            <label class="remember-control">
+              <input id="remember-account" name="remember_account" type="checkbox" value="1">
+              <span>记住账号</span>
+            </label>
+            <span>忘记密码请联系平台管理员</span>
+          </div>
+
+          <button class="submit-button" type="submit">
+            <span>进入青禾流转</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="m14 7 5 5-5 5"></path></svg>
+          </button>
+        </form>
+
+        <p class="login-footnote">
+          {% if role == 'student' %}
+            还没有账号？<a href="{{ url_for('auth.register') }}">前往学生注册</a>
+          {% else %}
+            账号由平台管理员统一配置，不提供注册入口。
+          {% endif %}
+        </p>
+      </div>
+
+      <footer class="panel-footer">
+        <span>青禾流转 · 校园循环共享平台</span>
+        <span>仅限本校用户访问</span>
+      </footer>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='js/login.js') }}" defer></script>
+</body>
+</html>

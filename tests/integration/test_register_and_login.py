@@ -90,6 +90,21 @@ class TestIdentityFlow:
         assert resp.status_code == 302
         assert "/auth/" in resp.headers["Location"]
 
+    def test_login_page_has_accessible_enterprise_form(self, client):
+        page = client.get("/auth/identity").get_data(as_text=True)
+        resp = client.post(
+            "/auth/identity",
+            data={"csrf_token": get_csrf_token(page), "role": "platform_admin"},
+            follow_redirects=True,
+        )
+        html = resp.get_data(as_text=True)
+        assert 'class="login-shell"' in html
+        assert '<label for="identifier">登录账号</label>' in html
+        assert '<label for="password">密码</label>' in html
+        assert 'id="password-toggle"' in html
+        assert 'aria-controls="password"' in html
+        assert 'name="remember_account"' in html
+
 
 class TestRegister:
     def test_register_success_and_login(self, client, app, school):
