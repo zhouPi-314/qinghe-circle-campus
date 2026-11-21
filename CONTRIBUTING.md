@@ -2,6 +2,8 @@
 
 感谢你关注青禾流转。欢迎提交 Bug、功能建议、可用性反馈和 Pull Request。
 
+开放式讨论可进入 GitHub Discussions；可复现缺陷和明确功能范围使用 Issues。
+
 ## 开始前
 
 1. 先搜索已有 Issue，避免重复。

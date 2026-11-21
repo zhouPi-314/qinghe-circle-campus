@@ -3,11 +3,12 @@
 | 项目 | 内容 |
 |---|---|
 | 日期 | 2026-11-21 |
-| 代码基线 | `acbc2f0` |
+| 公开初始基线 | `a12e96d` |
 | 许可 | 代码与原创文档 MIT；第三方媒体保留原权利 |
 | 测试 | 191 passed |
 | Ruff | 通过 |
-| 结果 | 可以公开仓库，等待 GitHub 可见性切换后的最终核验 |
+| 仓库 | <https://github.com/zhouPi-314/qinghe-circle-campus> |
+| 结果 | Public；默认分支 `main`；Issues 与 Discussions 已开启 |
 
 ## 1. 当前文件隐私检查
 
@@ -24,6 +25,7 @@
 - 所有提交作者与提交者邮箱统一为 GitHub noreply。
 - 已从历史版本清除旧课程演示口令、密码哈希盐、Cloudflare 账户 ID、Neon 项目/分支 ID、Vercel 项目/团队 ID 和 R2 公共主机。
 - 为保护隐私重写提交哈希；阶段文档中的旧短哈希属于私有审阅历史，不代表公开仓库中的当前入口。
+- 完整私有历史保存在维护者本地 bundle；公开仓库从无父提交的干净快照开始。
 
 ## 3. 媒体与署名
 
@@ -40,6 +42,7 @@
 - 复刻或发布修改版时应保留许可声明，并注明“基于 Qinghe Circle Campus / 青禾流转，作者 zhouPi-314”。
 - `CONTRIBUTING.md`、Issue 模板和 PR 模板提供参与改进入口。
 - `SECURITY.md` 要求私下报告密钥、权限绕过和真实个人信息问题。
+- GitHub 仓库使用 `main` 默认分支，公开可见，并开启 Issues 与 Discussions。
 
 ## 5. 证据
 

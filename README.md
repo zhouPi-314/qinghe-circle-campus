@@ -3,6 +3,7 @@
 面向高校的校园物品共享、二手流转、免费赠送、绿色回收与公益实物捐赠平台。项目使用 Flask 服务端渲染，支持多高校逻辑隔离、学生名单核验、四类流转状态机、一次性交接码、争议处理、公益回执和 R2 图片存储。
 
 - 在线演示：<https://qinghe-circle-campus.vercel.app>
+- GitHub：<https://github.com/zhouPi-314/qinghe-circle-campus>
 - Python：3.13
 - 数据库：PostgreSQL 18
 - 许可：代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权
@@ -132,6 +133,8 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 - `SECURITY.md`：安全漏洞私下报告方式
 - `THIRD_PARTY_NOTICES.md`：第三方素材与公开仓库删减说明
 - `docs/README.md`：需求和设计文档索引
+
+也欢迎在 GitHub Discussions 讨论使用场景、改进方向和愿意参与的工作。
 
 ## 已知限制
 

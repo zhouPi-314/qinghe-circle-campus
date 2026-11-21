@@ -5,7 +5,7 @@
 ## 当前阶段
 
 - 项目名称：青禾流转（Qinghe Circle Campus）
-- 当前状态：G4 已由用户批准通过并授权发布（D-042）；项目进入 M6 发布与课程交付收尾，Codex 负责 README、复现说明、证据索引、仓库清理和演示材料，WorkerBuddy 保持停止
+- 当前状态：G4 已批准并授权发布（D-042）；M6 开源公开发布已完成（D-043），GitHub 仓库为 Public 并开启 Issues/Discussions；后续仅进行课程最终走查、演示排练和缺陷维护，WorkerBuddy 保持停止
 - G1 通过前不得进入 G2 业务编码；各门禁停止点见 `docs/00-governance/collaboration-and-quality-gates.md`
 
 ## 强制阅读顺序
