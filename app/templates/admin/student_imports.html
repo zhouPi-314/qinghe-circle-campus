@@ -6,9 +6,14 @@
   <p class="page-lead">UTF-8 CSV，表头：学号,姓名,手机号,校区代码,年级,班级,专业,学院。失败行原因可查（FR-U03/U04）。</p>
   <form method="post" action="{{ url_for('admin.upload_roster') }}" enctype="multipart/form-data">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <select name="university_id" required>
-      {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
-    </select>
+    {% if g.current_user.is_platform_admin %}
+      <select name="university_id" required>
+        {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
+      </select>
+    {% else %}
+      <input type="hidden" name="university_id" value="{{ universities[0].id }}">
+      <span>{{ universities[0].name }}</span>
+    {% endif %}
     <input type="file" name="roster" accept=".csv,text/csv" required>
     <button type="submit" class="btn btn-primary">上传并导入</button>
   </form>

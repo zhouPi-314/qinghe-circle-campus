@@ -9,14 +9,18 @@ import pytest
 from app import db
 from app.core.errors import PermissionDeniedError
 from app.core.permissions import CurrentUser, ensure_actor_university, to_current_user
-from app.models.university import University
+from app.models.governance import AuditLog
+from app.models.university import StationManagerAssignment, University
 from app.models.user import User
-from app.services import org_service
+from app.services import auth_service, org_service
 from app.services.auth_service import hash_password
 from tests.fixtures.helpers import (
+    assign_manager,
     create_campus,
+    create_platform_admin,
     create_station,
     create_station_manager_user,
+    create_student_user,
     create_university,
     db_add,
 )
@@ -49,6 +53,8 @@ def schools(app):
         campus_a = create_campus(school_a, code="A-MAIN", name="甲主校区")
         campus_b = create_campus(school_b, code="B-MAIN", name="乙主校区")
         admin = _create_university_admin(school_a, "school-a-admin")
+        admin_b = _create_university_admin(school_b, "school-b-admin")
+        platform_admin, _ = create_platform_admin(login_name="platform-a")
         manager_a = create_station_manager_user(
             school_a, login_name="a-station", nickname="甲公益管理员"
         )
@@ -57,6 +63,13 @@ def schools(app):
         )
         station_a = create_station(school_a, campus_a, name="甲站点")
         station_b = create_station(school_b, campus_b, name="乙站点")
+        assignment_a = assign_manager(station_a, manager_a)
+        student_a = create_student_user(
+            school_a, campus_a, student_no="2025011", phone="13900005011"
+        )
+        student_b = create_student_user(
+            school_b, campus_b, student_no="2025012", phone="13900005012"
+        )
         yield {
             "a_id": school_a.id,
             "b_id": school_b.id,
@@ -66,7 +79,13 @@ def schools(app):
             "b_manager_id": manager_b.id,
             "a_station_id": station_a.id,
             "b_station_id": station_b.id,
+            "a_assignment_id": assignment_a.id,
+            "a_student_id": student_a.id,
+            "b_student_id": student_b.id,
+            "b_admin_id": admin_b.id,
+            "platform_admin_id": platform_admin.id,
             "actor": to_current_user(admin),
+            "platform_actor": to_current_user(platform_admin),
         }
 
 
@@ -272,3 +291,161 @@ def test_school_admin_can_render_scoped_admin_pages(client, schools):
     assert "创建校区" in html
     assert "创建站点" in html
     assert "新增高校" not in html
+
+
+def test_school_admin_user_and_university_lists_are_scoped(schools):
+    actor = schools["actor"]
+
+    users = auth_service.list_all_users(actor)
+    assert {user.id for user in users} == {
+        actor.id,
+        schools["a_manager_id"],
+        schools["a_student_id"],
+    }
+    assert all(user.role != "platform_admin" for user in users)
+    assert [university.id for university in auth_service.list_universities(actor)] == [
+        schools["a_id"]
+    ]
+
+
+def test_school_admin_can_create_only_own_station_manager(schools):
+    created = auth_service.import_managed_accounts(
+        schools["actor"],
+        university_id=schools["a_id"],
+        login_name="a-station-new",
+        role="station_manager",
+        password="station2x",
+        nickname="甲新管理员",
+    )
+
+    assert created.university_id == schools["a_id"]
+    assert created.role == "station_manager"
+
+    with pytest.raises(PermissionDeniedError):
+        auth_service.import_managed_accounts(
+            schools["actor"],
+            university_id=schools["b_id"],
+            login_name="b-forbidden",
+            role="station_manager",
+            password="station2x",
+            nickname="越权管理员",
+        )
+    with pytest.raises(PermissionDeniedError):
+        auth_service.import_managed_accounts(
+            schools["actor"],
+            university_id=schools["a_id"],
+            login_name="a-university-admin",
+            role="university_admin",
+            password="manager2x",
+            nickname="越权校级管理员",
+        )
+
+
+def test_school_admin_roster_import_and_history_are_scoped(schools):
+    csv_text = (
+        "学号,姓名,手机号,校区代码,年级,班级,专业,学院\n"
+        "2025901,甲新生,13800005901,A-MAIN,2025级,软工1班,软件工程,计算机学院\n"
+    )
+    batch = auth_service.import_students(
+        schools["actor"],
+        university_id=schools["a_id"],
+        csv_bytes=csv_text.encode("utf-8"),
+    )
+
+    assert batch.university_id == schools["a_id"]
+    assert batch.success_rows == 1
+    assert [row.id for row in auth_service.list_import_batches(schools["actor"])] == [batch.id]
+
+    with pytest.raises(PermissionDeniedError):
+        auth_service.import_students(
+            schools["actor"],
+            university_id=schools["b_id"],
+            csv_bytes=csv_text.replace("A-MAIN", "B-MAIN").encode("utf-8"),
+        )
+
+
+def test_school_admin_can_disable_student_and_end_manager_assignment(app, schools):
+    student = auth_service.set_user_status(
+        schools["actor"], schools["a_student_id"], status="disabled"
+    )
+    assert student.status == "disabled"
+
+    manager = auth_service.set_user_status(
+        schools["actor"], schools["a_manager_id"], status="disabled"
+    )
+    assert manager.status == "disabled"
+
+    assignment = db.session.get(StationManagerAssignment, schools["a_assignment_id"])
+    assert assignment.status == "ended"
+    assert assignment.ended_on is not None
+    assert db.session.query(AuditLog).filter_by(action="admin.user.status").count() == 2
+
+
+def test_school_admin_status_permissions_are_limited(app, schools):
+    actor = schools["actor"]
+
+    with pytest.raises(PermissionDeniedError):
+        auth_service.set_user_status(actor, actor.id, status="disabled")
+    with pytest.raises(PermissionDeniedError):
+        auth_service.set_user_status(actor, schools["b_student_id"], status="disabled")
+    with pytest.raises(PermissionDeniedError):
+        auth_service.set_user_status(actor, schools["b_admin_id"], status="disabled")
+    with pytest.raises(PermissionDeniedError):
+        auth_service.set_user_status(
+            actor, schools["platform_admin_id"], status="disabled"
+        )
+
+
+def test_platform_admin_can_disable_scoped_user(schools):
+    target = auth_service.set_user_status(
+        schools["platform_actor"], schools["b_student_id"], status="disabled"
+    )
+    assert target.status == "disabled"
+
+
+def test_platform_admin_can_disable_university_admin(schools):
+    target = auth_service.set_user_status(
+        schools["platform_actor"], schools["b_admin_id"], status="disabled"
+    )
+    assert target.status == "disabled"
+
+
+def test_school_admin_users_and_roster_pages_are_scoped(client, schools):
+    page = client.get("/auth/identity").get_data(as_text=True)
+    client.post(
+        "/auth/identity",
+        data={"csrf_token": get_csrf_token(page), "role": "university_admin"},
+        follow_redirects=True,
+    )
+    page = client.get("/auth/login").get_data(as_text=True)
+    client.post(
+        "/auth/login",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "identifier": "school-a-admin",
+            "password": "manager1",
+        },
+        follow_redirects=True,
+    )
+
+    users = client.get("/admin/users")
+    assert users.status_code == 200
+    users_html = users.get_data(as_text=True)
+    assert "甲公益管理员" in users_html
+    assert "乙公益管理员" not in users_html
+    assert 'value="university_admin"' not in users_html
+
+    imports = client.get("/admin/student-imports")
+    assert imports.status_code == 200
+    imports_html = imports.get_data(as_text=True)
+    assert "甲大学" in imports_html
+    assert "乙大学" not in imports_html
+
+    status_form_page = client.get("/admin/users").get_data(as_text=True)
+    response = client.post(
+        f"/admin/users/{schools['a_student_id']}/status",
+        data={"csrf_token": get_csrf_token(status_form_page), "status": "disabled"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    assert "账号状态已更新" in response.get_data(as_text=True)

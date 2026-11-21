@@ -27,6 +27,7 @@ from sqlalchemy import select
 from app import db
 from app.core.auth import is_valid_phone, normalize_phone, phone_hash
 from app.core.errors import ConflictError, InputError, NotFoundError, PermissionDeniedError
+from app.core.permissions import ensure_actor_university, is_university_manager
 from app.models.university import Campus, StudentRegistryRecord, University
 from app.models.user import User
 
@@ -336,8 +337,7 @@ def import_students(actor, *, university_id: int, csv_bytes: bytes):
     CSV 编码 UTF-8（兼容 BOM），表头：学号,姓名,手机号,校区代码,年级,班级,专业,学院。
     每行独立校验；失败行记录原因，不影响其他行；不保存原始文件。
     """
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以导入学生名单。")
+    ensure_actor_university(actor, university_id)
     import csv
     import hashlib
     import io
@@ -475,33 +475,33 @@ def import_students(actor, *, university_id: int, csv_bytes: bytes):
 
 
 def list_import_batches(actor, *, limit: int = 20):
-    """平台管理员查看名单导入批次（FR-U04）。"""
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以查看导入批次。")
+    """查看名单导入批次；校级管理员只查看本校（FR-U04）。"""
     from app.models.university import StudentImportBatch
 
-    stmt = select(StudentImportBatch).order_by(StudentImportBatch.created_at.desc()).limit(limit)
+    university_scope = _scope_university_id(actor)
+    stmt = select(StudentImportBatch)
+    if university_scope is not None:
+        stmt = stmt.where(StudentImportBatch.university_id == university_scope)
+    stmt = stmt.order_by(StudentImportBatch.created_at.desc()).limit(limit)
     return list(db.session.scalars(stmt).all())
 
 
 def list_all_users(actor) -> list[User]:
-    """平台管理员查看全部账号（BR-007 账号管理页）。"""
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以查看账号列表。")
-    return list(db.session.scalars(select(User).order_by(User.created_at.desc())).all())
+    """平台管理员查看全部账号；校级管理员只查看本校（BR-007）。"""
+    university_scope = _scope_university_id(actor)
+    stmt = select(User)
+    if university_scope is not None:
+        stmt = stmt.where(User.university_id == university_scope)
+    return list(db.session.scalars(stmt.order_by(User.created_at.desc())).all())
 
 
 def list_universities(actor) -> list[University]:
-    """启用高校（管理页下拉；service 层复验平台管理员）。"""
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以查看高校列表。")
-    return list(
-        db.session.scalars(
-            select(University)
-            .where(University.status == "active")
-            .order_by(University.code)
-        ).all()
-    )
+    """启用高校；校级管理员只返回本校。"""
+    university_scope = _scope_university_id(actor)
+    stmt = select(University).where(University.status == "active")
+    if university_scope is not None:
+        stmt = stmt.where(University.id == university_scope)
+    return list(db.session.scalars(stmt.order_by(University.code)).all())
 
 
 def import_managed_accounts(
@@ -513,10 +513,16 @@ def import_managed_accounts(
     - 校级管理员可导入账号，但管理功能暂未开放；
     - 公益管理员仍需平台管理员另行授权站点。
     """
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以导入管理员账号。")
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法导入管理员账号。")
     if role not in ("station_manager", "university_admin"):
         raise InputError("只能导入公益管理员或校级管理员账号。")
+    if actor.is_university_admin:
+        if role != "station_manager":
+            raise PermissionDeniedError("校级管理员只能创建公益管理员账号。")
+        if university_id is None:
+            university_id = actor.university_id
+        ensure_actor_university(actor, university_id)
     login_name = (login_name or "").strip()
     nickname = (nickname or "").strip() or login_name
     if not login_name:
@@ -562,3 +568,62 @@ def import_managed_accounts(
     )
     db.session.commit()
     return user
+
+
+def set_user_status(actor, user_id: int, *, status: str) -> User:
+    """启用或停用账号；校级管理员仅管理本校普通账号。"""
+    if status not in ("active", "disabled"):
+        raise InputError("账号状态无效。")
+    target = db.session.get(User, user_id)
+    if target is None:
+        raise NotFoundError("账号不存在。")
+    if actor is None or not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法管理账号。")
+    if target.id == actor.id:
+        raise PermissionDeniedError("不能停用自己的账号。")
+    if target.role == "platform_admin":
+        raise PermissionDeniedError("不能管理平台管理员账号。")
+    if actor.is_university_admin:
+        ensure_actor_university(actor, target.university_id)
+        if target.role not in ("student", "station_manager"):
+            raise PermissionDeniedError("校级管理员只能管理本校学生或公益管理员。")
+
+    now = datetime.now(UTC)
+    target.status = status
+    target.updated_at = now
+    if status == "disabled" and target.role == "station_manager":
+        from app.models.university import StationManagerAssignment
+
+        assignments = db.session.scalars(
+            select(StationManagerAssignment).where(
+                StationManagerAssignment.user_id == target.id,
+                StationManagerAssignment.status == "active",
+            )
+        ).all()
+        for assignment in assignments:
+            assignment.status = "ended"
+            assignment.ended_on = now.date()
+
+    from app.services.notification_service import record_audit
+
+    record_audit(
+        actor_user_id=actor.id,
+        university_id=target.university_id,
+        action="admin.user.status",
+        entity_type="user",
+        entity_id=target.id,
+        detail={"status": status, "role": target.role},
+    )
+    db.session.commit()
+    return target
+
+
+def _scope_university_id(actor) -> int | None:
+    """返回校级管理员本校 ID；平台管理员返回 None。"""
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法管理账号与名单。")
+    if actor.is_platform_admin:
+        return None
+    if actor.university_id is None:
+        raise PermissionDeniedError("校级管理员未绑定有效高校。")
+    return ensure_actor_university(actor, actor.university_id)

@@ -3,17 +3,24 @@
 {% block content %}
 <section class="card">
   <h1>账号管理</h1>
-  <p class="page-lead">管理员账号由平台管理员导入，不开放自主注册（BR-007）。学生账号由名单注册产生。</p>
-  <h2>导入管理员账号</h2>
+  <p class="page-lead">
+    {{ '管理员账号由平台管理员导入，不开放自主注册（BR-007）。学生账号由名单注册产生。' if g.current_user.is_platform_admin else '校级管理员只能查看本校账号并创建本校公益管理员。' }}
+  </p>
+  <h2>{{ '导入管理员账号' if g.current_user.is_platform_admin else '创建本校公益管理员' }}</h2>
   <form method="post" action="{{ url_for('admin.import_managed_account') }}" class="inline-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <select name="role" required>
       <option value="station_manager">公益管理员</option>
-      <option value="university_admin">校级管理员</option>
+      {% if g.current_user.is_platform_admin %}<option value="university_admin">校级管理员</option>{% endif %}
     </select>
-    <select name="university_id" required>
-      {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
-    </select>
+    {% if g.current_user.is_platform_admin %}
+      <select name="university_id" required>
+        {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
+      </select>
+    {% else %}
+      <input type="hidden" name="university_id" value="{{ universities[0].id }}">
+      <span>{{ universities[0].name }}</span>
+    {% endif %}
     <input type="text" name="login_name" placeholder="登录账号" required>
     <input type="text" name="nickname" placeholder="昵称">
     <input type="password" name="password" placeholder="初始密码" required>
@@ -23,10 +30,24 @@
   <h2>账号列表</h2>
   <div class="table-scroll">
     <table class="org-table">
-      <thead><tr><th>账号</th><th>昵称</th><th>角色</th><th>状态</th></tr></thead>
+      <thead><tr><th>账号</th><th>昵称</th><th>角色</th><th>状态</th><th>操作</th></tr></thead>
       <tbody>{% for user in users %}
         <tr><td>{{ user.login_name or user.student_no }}</td><td>{{ user.nickname }}</td>
-          <td>{{ role_labels.get(user.role, user.role) }}</td><td>{{ user.status }}</td></tr>
+          <td>{{ role_labels.get(user.role, user.role) }}</td><td>{{ user.status }}</td>
+          <td>
+            {% if user.id != g.current_user.id and user.role != 'platform_admin' and (g.current_user.is_platform_admin or user.role in ['student', 'station_manager']) %}
+              <form method="post" action="{{ url_for('admin.update_user_status', user_id=user.id) }}" class="inline-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="status" value="{{ 'disabled' if user.status == 'active' else 'active' }}">
+                <button type="submit" class="btn btn-ghost btn-compact">
+                  {{ '停用' if user.status == 'active' else '启用' }}
+                </button>
+              </form>
+            {% else %}
+              —
+            {% endif %}
+          </td>
+        </tr>
       {% endfor %}</tbody>
     </table>
   </div>

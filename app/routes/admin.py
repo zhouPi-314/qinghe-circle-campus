@@ -154,7 +154,7 @@ def assign_station_manager():
 
 
 @bp.get("/users")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def users():
     """账号与角色管理（BR-007）。"""
     rows = auth_service.list_all_users(g.current_user)
@@ -163,7 +163,7 @@ def users():
 
 
 @bp.post("/users/import")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def import_managed_account():
     try:
         auth_service.import_managed_accounts(
@@ -181,8 +181,22 @@ def import_managed_account():
     return redirect(url_for("admin.users"))
 
 
+@bp.post("/users/<int:user_id>/status")
+@roles_required("platform_admin", "university_admin")
+def update_user_status(user_id: int):
+    try:
+        auth_service.set_user_status(
+            g.current_user, user_id, status=request.form.get("status", "")
+        )
+    except InputError as err:
+        _flash_input_error(err)
+        return redirect(url_for("admin.users"))
+    flash("账号状态已更新。", "success")
+    return redirect(url_for("admin.users"))
+
+
 @bp.get("/student-imports")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def student_imports():
     """学生名单导入（FR-U03、FR-U04）。"""
     batches = auth_service.list_import_batches(g.current_user)
@@ -191,7 +205,7 @@ def student_imports():
 
 
 @bp.post("/student-imports")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def upload_roster():
     """上传 UTF-8 CSV 学生名单（中文或英文表头均可）。"""
     upload = request.files.get("roster")
