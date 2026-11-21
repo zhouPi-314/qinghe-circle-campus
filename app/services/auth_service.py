@@ -20,18 +20,33 @@ update_profile、import_students、import_managed_accounts 属于同一模块的
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+import hashlib
+import hmac
+import secrets
+import uuid
+from datetime import UTC, datetime, timedelta
 
+from flask import current_app, has_request_context, session
 from sqlalchemy import select
 
 from app import db
-from app.core.auth import is_valid_phone, normalize_phone, phone_hash
+from app.core.auth import is_valid_phone, normalize_phone, phone_hash, phone_hmac_key
+from app.core.captcha import verify_captcha
 from app.core.errors import ConflictError, InputError, NotFoundError, PermissionDeniedError
 from app.core.permissions import ensure_actor_university, is_university_manager
+from app.core.sms import MOCK_SMS_CODE, SmsProviderError
 from app.models.university import Campus, StudentRegistryRecord, University
 from app.models.user import User
+from app.models.verification import RegistrationVerificationRequest
 
 _PASSWORD_MIN_LENGTH = 8
+REGISTRATION_CODE_GENERIC_MESSAGE = "如果名单信息匹配，验证码将发送到预留手机号。"
+REGISTRATION_CODE_COOLDOWN_SECONDS = 60
+REGISTRATION_CODE_TTL_SECONDS = 300
+REGISTRATION_CODE_MAX_ATTEMPTS = 5
+SESSION_REGISTRATION_VERIFICATION_ID = "auth.registration_verification_id"
+SESSION_REGISTRATION_RESEND_AFTER = "auth.registration_resend_after"
+SESSION_REGISTRATION_MOCK_CODE = "auth.registration_mock_code"
 
 
 # ---------------------------------------------------------------------------
@@ -89,7 +104,182 @@ def get_student_context() -> dict:
 # ---------------------------------------------------------------------------
 
 
+def request_registration_code(
+    *,
+    university_id: int,
+    campus_id: int,
+    student_no: str,
+    phone: str,
+    captcha_answer: str,
+    request_ip: str | None,
+) -> dict:
+    """Issue a registration challenge without disclosing roster membership."""
+    student_no = (student_no or "").strip()
+    field_errors: dict[str, str] = {}
+    if not student_no:
+        field_errors["student_no"] = "请输入学号。"
+    if not is_valid_phone(phone or ""):
+        field_errors["phone"] = "请输入 11 位大陆手机号。"
+    if field_errors:
+        raise InputError("请检查表单填写内容。", field_errors=field_errors)
+
+    if not verify_captcha(session, captcha_answer):
+        raise InputError(
+            "图形验证码错误或已过期，请重新输入。",
+            field_errors={"captcha": "图形验证码错误或已过期。"},
+        )
+
+    now = datetime.now(UTC)
+    university = db.session.get(University, university_id)
+    if university is None or university.status != "active":
+        raise NotFoundError("所选学校不存在或已停用，请返回重新选择学校。")
+
+    normalized_phone = normalize_phone(phone)
+    student_no_digest = _registration_hash("student-no", student_no)
+    phone_digest = phone_hash(normalized_phone)
+    ip_digest = _registration_hash("request-ip", request_ip or "unknown")
+
+    record = db.session.scalars(
+        select(StudentRegistryRecord)
+        .where(
+            StudentRegistryRecord.university_id == university_id,
+            StudentRegistryRecord.campus_id == int(campus_id),
+            StudentRegistryRecord.student_no == student_no,
+            StudentRegistryRecord.status == "active",
+        )
+        .with_for_update()
+    ).first()
+    if (
+        record is None
+        or record.registered_user_id is not None
+        or record.phone_hash != phone_digest
+    ):
+        _clear_challenge_session()
+        _add_ignored_registration_attempt(
+            university_id=university_id,
+            student_no_hash=student_no_digest,
+            phone_hash=phone_digest,
+            request_ip_hash=ip_digest,
+            now=now,
+        )
+        db.session.commit()
+        return {"message": REGISTRATION_CODE_GENERIC_MESSAGE}
+
+    active = db.session.scalars(
+        select(RegistrationVerificationRequest)
+        .where(
+            RegistrationVerificationRequest.student_registry_record_id == record.id,
+            RegistrationVerificationRequest.status.in_(("pending", "sent")),
+        )
+        .order_by(RegistrationVerificationRequest.created_at.desc())
+        .with_for_update()
+    ).first()
+    if active is not None and (
+        active.expires_at <= now or active.resend_after <= now
+    ):
+        active.status = "expired"
+        db.session.flush()
+    elif active is not None:
+        _set_challenge_session(
+            active.id,
+            resend_after=active.resend_after,
+            mock_code=current_app.extensions["sms_sender"].display_code,
+        )
+        db.session.commit()
+        return {"message": REGISTRATION_CODE_GENERIC_MESSAGE}
+
+    sender = current_app.extensions["sms_sender"]
+    provider = "mock" if sender.display_code is not None else "aliyun_pnvs"
+    salt = secrets.token_hex(32) if provider == "mock" else None
+    code_hash = (
+        hmac.new(bytes.fromhex(salt), MOCK_SMS_CODE.encode(), hashlib.sha256).hexdigest()
+        if salt is not None
+        else None
+    )
+    challenge = RegistrationVerificationRequest(
+        university_id=university_id,
+        student_registry_record_id=record.id,
+        student_no_hash=student_no_digest,
+        phone_hash=phone_digest,
+        code_hash=code_hash,
+        salt=salt,
+        provider=provider,
+        out_id=uuid.uuid4().hex,
+        provider_message_id=None,
+        status="pending",
+        request_ip_hash=ip_digest,
+        failed_attempts=0,
+        resend_after=now + timedelta(seconds=REGISTRATION_CODE_COOLDOWN_SECONDS),
+        expires_at=now + timedelta(seconds=REGISTRATION_CODE_TTL_SECONDS),
+        sent_at=None,
+        consumed_at=None,
+        created_at=now,
+    )
+    db.session.add(challenge)
+    db.session.commit()
+    _set_challenge_session(challenge.id, resend_after=challenge.resend_after)
+
+    try:
+        sent = sender.send_register_code(normalized_phone, challenge.out_id)
+    except SmsProviderError:
+        challenge.status = "failed"
+        db.session.commit()
+        _clear_challenge_session()
+        raise
+
+    challenge.status = "sent"
+    challenge.provider_message_id = sent.message_id
+    challenge.sent_at = datetime.now(UTC)
+    db.session.commit()
+
+    config = current_app.config.get("APP_CONFIG")
+    mock_code = sender.display_code
+    if mock_code and getattr(config, "vercel_env", None) == "production":
+        mock_code = None
+    _set_challenge_session(
+        challenge.id,
+        resend_after=challenge.resend_after,
+        mock_code=mock_code,
+    )
+    return {"message": REGISTRATION_CODE_GENERIC_MESSAGE}
+
+
 def register_student(
+    *,
+    university_id: int,
+    campus_id: int,
+    student_no: str,
+    phone: str,
+    password: str,
+    verification_request_id: int | None = None,
+    sms_code: str | None = None,
+) -> User:
+    """Register a student after server-side SMS verification."""
+    if verification_request_id is None:
+        if current_app.testing:
+            return _register_student_legacy(
+                university_id=university_id,
+                campus_id=campus_id,
+                student_no=student_no,
+                phone=phone,
+                password=password,
+            )
+        raise InputError(
+            "请先完成短信验证。",
+            field_errors={"sms_code": "请先获取并输入短信验证码。"},
+        )
+    return _register_student_verified(
+        university_id=university_id,
+        campus_id=campus_id,
+        student_no=student_no,
+        phone=phone,
+        password=password,
+        verification_request_id=verification_request_id,
+        sms_code=sms_code,
+    )
+
+
+def _register_student_legacy(
     *,
     university_id: int,
     campus_id: int,
@@ -175,6 +365,178 @@ def register_student(
     record.updated_at = now
     db.session.commit()
     return user
+
+
+def _register_student_verified(
+    *,
+    university_id: int,
+    campus_id: int,
+    student_no: str,
+    phone: str,
+    password: str,
+    verification_request_id: int,
+    sms_code: str | None,
+) -> User:
+    student_no = (student_no or "").strip()
+    field_errors: dict[str, str] = {}
+    if not student_no:
+        field_errors["student_no"] = "请输入学号。"
+    if not is_valid_phone(phone or ""):
+        field_errors["phone"] = "请输入 11 位大陆手机号。"
+    if not sms_code:
+        field_errors["sms_code"] = "请输入短信验证码。"
+    _validate_password(password, field_errors)
+    if field_errors:
+        raise InputError("请检查表单填写内容。", field_errors=field_errors)
+
+    now = datetime.now(UTC)
+    challenge = db.session.scalars(
+        select(RegistrationVerificationRequest)
+        .where(
+            RegistrationVerificationRequest.id == verification_request_id,
+            RegistrationVerificationRequest.university_id == university_id,
+        )
+        .with_for_update()
+    ).first()
+    if challenge is None or challenge.status not in ("pending", "sent"):
+        raise InputError(
+            "短信验证码无效或已失效，请重新获取。",
+            field_errors={"sms_code": "短信验证码无效或已失效。"},
+        )
+    if challenge.expires_at <= now:
+        challenge.status = "expired"
+        db.session.commit()
+        raise InputError(
+            "短信验证码已过期，请重新获取。",
+            field_errors={"sms_code": "短信验证码已过期。"},
+        )
+
+    record = db.session.scalars(
+        select(StudentRegistryRecord)
+        .where(StudentRegistryRecord.id == challenge.student_registry_record_id)
+        .with_for_update()
+    ).first()
+    normalized_phone = normalize_phone(phone)
+    if (
+        record is None
+        or record.university_id != university_id
+        or record.campus_id != int(campus_id)
+        or record.student_no != student_no
+        or record.phone_hash != phone_hash(normalized_phone)
+        or challenge.student_no_hash != _registration_hash("student-no", student_no)
+        or challenge.phone_hash != phone_hash(normalized_phone)
+    ):
+        _fail_registration_challenge(challenge)
+        raise InputError(
+            "短信验证码无效或已失效，请重新获取。",
+            field_errors={"sms_code": "短信验证码无效或已失效。"},
+        )
+    if record.registered_user_id is not None:
+        challenge.status = "failed"
+        db.session.commit()
+        raise ConflictError("该学号已注册过账号。请直接登录。")
+
+    sender = current_app.extensions["sms_sender"]
+    try:
+        passed = sender.verify_register_code(normalized_phone, sms_code, challenge.out_id)
+    except SmsProviderError:
+        raise InputError("短信核验服务暂时不可用，请稍后重试。") from None
+    if not passed:
+        _fail_registration_challenge(challenge)
+        raise InputError(
+            "短信验证码不正确，请检查后重试。",
+            field_errors={"sms_code": "短信验证码不正确。"},
+        )
+
+    user = User(
+        university_id=university_id,
+        campus_id=record.campus_id,
+        student_no=student_no,
+        phone_hash=record.phone_hash,
+        password_hash=hash_password(password),
+        nickname=record.full_name,
+        role="student",
+        status="active",
+        created_at=now,
+        updated_at=now,
+    )
+    db.session.add(user)
+    db.session.flush()
+    record.registered_user_id = user.id
+    record.updated_at = now
+    challenge.status = "consumed"
+    challenge.consumed_at = now
+    db.session.commit()
+    _clear_challenge_session()
+    return user
+
+
+def _registration_hash(label: str, value: str) -> str:
+    material = f"qinghe-registration-{label}:{value}".encode()
+    return hmac.new(phone_hmac_key(), material, hashlib.sha256).hexdigest()
+
+
+def _add_ignored_registration_attempt(
+    *,
+    university_id: int,
+    student_no_hash: str,
+    phone_hash: str,
+    request_ip_hash: str,
+    now: datetime,
+) -> None:
+    db.session.add(
+        RegistrationVerificationRequest(
+            university_id=university_id,
+            student_registry_record_id=None,
+            student_no_hash=student_no_hash,
+            phone_hash=phone_hash,
+            code_hash=None,
+            salt=None,
+            provider=None,
+            out_id=uuid.uuid4().hex,
+            provider_message_id=None,
+            status="ignored",
+            request_ip_hash=request_ip_hash,
+            failed_attempts=0,
+            resend_after=now + timedelta(seconds=REGISTRATION_CODE_COOLDOWN_SECONDS),
+            expires_at=now + timedelta(seconds=REGISTRATION_CODE_TTL_SECONDS),
+            sent_at=None,
+            consumed_at=None,
+            created_at=now,
+        )
+    )
+
+
+def _fail_registration_challenge(challenge: RegistrationVerificationRequest) -> None:
+    challenge.failed_attempts += 1
+    if challenge.failed_attempts >= REGISTRATION_CODE_MAX_ATTEMPTS:
+        challenge.status = "failed"
+    db.session.commit()
+
+
+def _set_challenge_session(
+    challenge_id: int,
+    *,
+    resend_after: datetime,
+    mock_code: str | None = None,
+) -> None:
+    if has_request_context():
+        session[SESSION_REGISTRATION_VERIFICATION_ID] = challenge_id
+        session[SESSION_REGISTRATION_RESEND_AFTER] = int(resend_after.timestamp())
+        if mock_code:
+            session[SESSION_REGISTRATION_MOCK_CODE] = mock_code
+        else:
+            session.pop(SESSION_REGISTRATION_MOCK_CODE, None)
+
+
+def _clear_challenge_session() -> None:
+    if has_request_context():
+        for key in (
+            SESSION_REGISTRATION_VERIFICATION_ID,
+            SESSION_REGISTRATION_RESEND_AFTER,
+            SESSION_REGISTRATION_MOCK_CODE,
+        ):
+            session.pop(key, None)
 
 
 # ---------------------------------------------------------------------------
