@@ -131,7 +131,8 @@
             <div class="identity-popover">
               <h2 id="identity-panel-title">选择登录身份</h2>
               <p>选中身份后，下方登录界面会立即更新，不需要再次确认。</p>
-              <form id="identity-picker" method="post" action="{{ url_for('auth.identity') }}">
+              <form id="identity-picker" method="post" action="{{ url_for('auth.identity') }}"
+                    data-role-sync-url="{{ url_for('auth.select_identity') }}">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="next" value="{{ next_target or '' }}">
                 <fieldset class="identity-options">

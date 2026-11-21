@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-21T10:45:20.357Z",
+  "checked_at": "2026-11-21T11:02:45.776Z",
   "passed": true,
   "checks": [
     {
@@ -107,6 +107,16 @@
     },
     {
       "name": "identity selection stays on login page",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student identity updates in place",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student context link opens campus selector",
       "passed": true,
       "details": null
     },

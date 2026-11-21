@@ -120,6 +120,24 @@ class TestIdentityFlow:
         assert 'name="next" value="/me/profile"' in html
         assert 'id="login-form"' in html
 
+    def test_live_identity_selection_unblocks_student_context_and_register(
+        self, client, school
+    ):
+        page = client.get("/auth/login").get_data(as_text=True)
+        resp = client.post(
+            "/auth/select-role",
+            data={"csrf_token": get_csrf_token(page), "role": "student"},
+        )
+        assert resp.status_code == 200
+        assert resp.get_json() == {"ok": True, "role": "student"}
+
+        context = client.get("/auth/student-context")
+        assert context.status_code == 200
+        choose_campus(client, school["university_id"], school["campus_id"])
+        register = client.get("/auth/register")
+        assert register.status_code == 200
+        assert "学生注册" in register.get_data(as_text=True)
+
 
 class TestRegister:
     def test_register_success_and_login(self, client, app, school):

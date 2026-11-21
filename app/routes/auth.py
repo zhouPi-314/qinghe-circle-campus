@@ -10,7 +10,7 @@ next 参数贯穿 身份选择 → 学校校区选择 → 登录 → 登录后�
 
 from __future__ import annotations
 
-from flask import Blueprint, redirect, render_template, request, session, url_for
+from flask import Blueprint, jsonify, redirect, render_template, request, session, url_for
 
 from app.core import auth as session_auth
 from app.core.errors import InputError
@@ -126,6 +126,16 @@ def identity():
         campus_display=campus_display,
         next_target=target,
     )
+
+
+@bp.post("/select-role")
+def select_identity():
+    """实时身份切换：只写入会话身份，不发业务请求，也不触发页面跳转。"""
+    role = request.form.get("role", "").strip()
+    if role not in _IDENTITY_ROLES:
+        raise InputError("请选择有效的登录身份。")
+    session_auth.set_identity_role(role)
+    return jsonify({"ok": True, "role": role})
 
 
 @bp.route("/student-context", methods=["GET", "POST"])

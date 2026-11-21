@@ -40,6 +40,7 @@
   }
 
   let currentRole = form.dataset.role || "";
+  let roleSync = Promise.resolve(true);
 
   function storageKey(role) {
     return `qinghe.login.identifier.${role || "default"}`;
@@ -63,6 +64,29 @@
     toggle.disabled = !enabled;
     remember.disabled = !enabled;
     submit.disabled = !enabled;
+  }
+
+  function syncRole(role) {
+    const syncUrl = identityPicker?.dataset.roleSyncUrl;
+    if (!syncUrl) return roleSync;
+    const csrf = identityPicker.querySelector('input[name="csrf_token"]')?.value || "";
+    roleSync = roleSync.then(async () => {
+      try {
+        const response = await fetch(syncUrl, {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ csrf_token: csrf, role }),
+        });
+        if (response.ok) return true;
+      } catch (_error) {
+        // The visible error below explains that navigation must be retried.
+      }
+      roleNotice.textContent = "身份同步失败，请重新选择后再继续。";
+      roleNotice.hidden = false;
+      return false;
+    });
+    return roleSync;
   }
 
   function applyRole(role) {
@@ -113,6 +137,7 @@
 
     document.title = `${config.label}登录 - 青禾流转`;
     if (!roleChanged) restoreIdentifier(role);
+    syncRole(role);
     return true;
   }
 
@@ -142,6 +167,14 @@
       identitySwitcher.open = false;
       identitySwitcher.querySelector("summary")?.focus();
     }
+  });
+
+  [contextAction, footnoteLink].forEach((link) => {
+    link.addEventListener("click", async (event) => {
+      event.preventDefault();
+      const target = link.href;
+      if (await roleSync) window.location.assign(target);
+    });
   });
 
   if (!currentRole) {
