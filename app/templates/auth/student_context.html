@@ -1,81 +1,270 @@
-{% extends "base.html" %}
-{% block title %}选择学校与校区 - 青禾流转{% endblock %}
-{% block content %}
-<section class="card auth-card">
-  <h1>选择学校与校区</h1>
-  <p class="page-lead">学生账号必须属于所选学校。单校区高校的校区显示学校全称。</p>
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>选择学校与校区 - 青禾流转</title>
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem("qinghe.theme");
+        const system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = saved === "dark" || saved === "light" ? saved : system;
+      } catch (_error) {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/student-context.css') }}">
+</head>
+<body>
+  <main class="login-shell">
+    <section class="brand-panel campus-brand-panel" aria-labelledby="campus-brand-title">
+      <div class="brand-ambient" aria-hidden="true"></div>
+      <header class="brand-lockup">
+        <a class="brand-mark-link" href="{{ url_for('auth.login') }}" aria-label="返回青禾流转登录页">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <path d="M12 29c1-10 8-17 18-18-1 10-8 17-18 18Z"></path>
+              <path d="M13 34c7-7 13-11 22-14"></path>
+              <path d="M17 35c5 1 10 0 15-3"></path>
+            </svg>
+          </span>
+          <span>
+            <strong>青禾流转</strong>
+            <small>Qinghe Circle Campus</small>
+          </span>
+        </a>
+        <span class="network-status"><i aria-hidden="true"></i>校园身份核验中</span>
+      </header>
 
-  <form method="post" action="{{ url_for('auth.student_context') }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="hidden" name="next" value="{{ next_target or '' }}">
-    <div class="form-field">
-      <label for="university_id">学校（可输入名称筛选）</label>
-      <input id="university-filter" type="text" placeholder="输入“四川”可筛选学校" aria-controls="university_id"
-             autocomplete="off">
-      <select id="university_id" name="university_id" required>
-        <option value="" selected disabled>请选择学校</option>
-        {% for uni in universities %}
-          <option value="{{ uni.id }}" data-name="{{ uni.name }} {{ uni.city }}"
-                  {% if selected_university_id == uni.id %}selected{% endif %}>
-            {{ uni.name }}（{{ uni.city }} · {{ '本科' if uni.education_level == 'undergraduate' else '专科' }}）
-          </option>
-        {% endfor %}
-      </select>
-    </div>
+      <div class="brand-copy campus-brand-copy">
+        <p class="brand-kicker">CAMPUS COORDINATES</p>
+        <h1 id="campus-brand-title">找到你的校园坐标<br><span>让每件物品遇见同校的人</span></h1>
+        <p class="brand-description">
+          先确认学校和校区，再进入本校流转。相同的校园范围，让发布、申请与交接都有明确边界。
+        </p>
+      </div>
 
-    <div class="form-field">
-      <label for="campus_id">校区</label>
-      <select id="campus_id" name="campus_id" required>
-        <option value="" selected disabled>请先选择学校</option>
-        {% for uni in universities %}
-          {% for campus in uni.campuses %}
-            <option value="{{ campus.id }}" data-university="{{ uni.id }}"
-                    data-single="{{ '1' if uni.single_campus else '0' }}"
-                    {% if uni.single_campus %}data-single-name="{{ uni.name }}"{% endif %}
-                    {% if selected_campus_id == campus.id %}selected{% endif %}>
-              {{ uni.name if uni.single_campus else campus.name }}
-            </option>
-          {% endfor %}
-        {% endfor %}
-      </select>
-    </div>
+      <div class="campus-visual" aria-hidden="true">
+        <svg class="campus-route-map" viewBox="0 0 620 330">
+          <path class="route-line route-line-back" d="M64 226C132 148 228 128 306 168S460 236 554 132"></path>
+          <path class="route-line route-line-front" d="M64 226C132 148 228 128 306 168S460 236 554 132"></path>
+          <circle class="route-pulse pulse-one" cx="136" cy="155" r="5"></circle>
+          <circle class="route-pulse pulse-two" cx="420" cy="207" r="4"></circle>
+        </svg>
 
-    <button type="submit" class="btn btn-primary">下一步</button>
-  </form>
-</section>
+        <div class="campus-id-card">
+          <span class="campus-id-icon">
+            <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5"></path><path d="M5 10v9h14v-9"></path><path d="M9 19v-5h6v5"></path></svg>
+          </span>
+          <span>
+            <small>你的校园身份</small>
+            <strong>学校 · 校区</strong>
+          </span>
+          <b>{{ universities | length }}<small>所高校可选</small></b>
+        </div>
 
-<script>
-  // 学校筛选与校区联动：不依赖外部框架
-  (function () {
-    var filterInput = document.getElementById('university-filter');
-    var universitySelect = document.getElementById('university_id');
-    var campusSelect = document.getElementById('campus_id');
+        <div class="campus-node node-school">
+          <span class="node-dot"></span>
+          <span><small>第一步</small><strong>确认学校</strong></span>
+        </div>
+        <div class="campus-node node-campus">
+          <span class="node-dot"></span>
+          <span><small>第二步</small><strong>锁定校区</strong></span>
+        </div>
+        <div class="campus-node node-login">
+          <span class="node-dot"></span>
+          <span><small>同一网络</small><strong>进入学生登录</strong></span>
+        </div>
 
-    function refreshCampuses() {
-      var uniId = universitySelect.value;
-      var options = campusSelect.querySelectorAll('option[data-university]');
-      var matched = 0;
-      options.forEach(function (option) {
-        var visible = option.dataset.university === uniId;
-        option.hidden = !visible;
-        if (visible) {
-          matched += 1;
-          if (matched === 1) { option.selected = true; }
-        }
+        <div class="campus-building building-left">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="campus-building building-right">
+          <span></span><span></span>
+        </div>
+      </div>
+
+      <ul class="campus-proof">
+        <li><strong>同校范围</strong><span>只连接本校同学与站点</span></li>
+        <li><strong>校区联动</strong><span>选定学校后自动匹配校区</span></li>
+        <li><strong>身份继续</strong><span>下一步即可登录或注册</span></li>
+      </ul>
+    </section>
+
+    <section class="form-panel campus-form-panel" aria-labelledby="context-title">
+      <header class="form-topbar">
+        <span class="secure-label">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.9 8.1 7 10 4.1-1.9 7-5.4 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
+          学生登录范围
+        </span>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z"></path>
+            </svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+          </button>
+          <a href="{{ url_for('auth.login', next=next_target) if next_target else url_for('auth.login') }}">返回登录</a>
+        </div>
+      </header>
+
+      <div class="login-card context-form-card">
+        <div class="role-chip">在校学生</div>
+        <h2 id="context-title">选择学校与校区</h2>
+        <p class="login-intro">先选择学校，再从该校已登记校区中确认你的登录范围。</p>
+
+        <ol class="context-steps" aria-label="学生登录范围选择步骤">
+          <li class="is-current" data-step="school"><span>1</span>学校</li>
+          <li data-step="campus"><span>2</span>校区</li>
+          <li><span>3</span>学生登录</li>
+        </ol>
+
+        <form method="post" action="{{ url_for('auth.student_context') }}" id="student-context-form">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <input type="hidden" name="next" value="{{ next_target or '' }}">
+
+          <div class="form-field">
+            <label for="university-filter">搜索学校</label>
+            <div class="input-shell context-input-shell">
+              <span class="input-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path></svg>
+              </span>
+              <input id="university-filter" type="text" placeholder="输入“四川”可筛选学校"
+                     aria-controls="university_id" autocomplete="off">
+            </div>
+
+            <label class="context-select-label" for="university_id">选择学校</label>
+            <select id="university_id" name="university_id" required>
+              <option value="" selected disabled>请选择学校</option>
+              {% for uni in universities %}
+                <option value="{{ uni.id }}" data-name="{{ uni.name }} {{ uni.city }}"
+                        {% if selected_university_id == uni.id %}selected{% endif %}>
+                  {{ uni.name }}（{{ uni.city }} · {{ '本科' if uni.education_level == 'undergraduate' else '专科' }}）
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-field">
+            <label for="campus_id">校区</label>
+            <select id="campus_id" name="campus_id" required disabled>
+              <option value="" selected disabled>请先选择学校</option>
+              {% for uni in universities %}
+                {% for campus in uni.campuses %}
+                  <option value="{{ campus.id }}" data-university="{{ uni.id }}"
+                          data-single="{{ '1' if uni.single_campus else '0' }}"
+                          {% if uni.single_campus %}data-single-name="{{ uni.name }}"{% endif %}
+                          {% if selected_campus_id == campus.id %}selected{% endif %}>
+                    {{ uni.name if uni.single_campus else campus.name }}
+                  </option>
+                {% endfor %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="context-selection" id="selection-summary" role="status">
+            <span class="context-selection-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"></path><circle cx="12" cy="10" r="2"></circle></svg>
+            </span>
+            <span><small>当前选择</small><strong>尚未选择学校和校区</strong></span>
+          </div>
+
+          <button class="submit-button" type="submit" id="context-submit" disabled>
+            <span>继续学生登录</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="m14 7 5 5-5 5"></path></svg>
+          </button>
+        </form>
+
+        <p class="login-footnote">学生账号必须与学校导入名单中的学校和校区一致。</p>
+      </div>
+
+      <footer class="panel-footer">
+        <span>青禾流转 · 校园循环共享平台</span>
+        <span>同校范围 · 安全流转</span>
+      </footer>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
+  <script>
+    (() => {
+      const filterInput = document.getElementById("university-filter");
+      const universitySelect = document.getElementById("university_id");
+      const campusSelect = document.getElementById("campus_id");
+      const submit = document.getElementById("context-submit");
+      const summary = document.getElementById("selection-summary");
+      const stepSchool = document.querySelector('[data-step="school"]');
+      const stepCampus = document.querySelector('[data-step="campus"]');
+
+      function selectedUniversityName() {
+        return universitySelect.selectedIndex > 0 ? universitySelect.selectedOptions[0].textContent.trim() : "";
+      }
+
+      function selectedCampusName() {
+        return campusSelect.selectedIndex > 0 ? campusSelect.selectedOptions[0].textContent.trim() : "";
+      }
+
+      function updateSummary() {
+        const university = selectedUniversityName();
+        const campus = selectedCampusName();
+        const ready = Boolean(university && campus);
+        summary.querySelector("strong").textContent = ready
+          ? `${university} · ${campus}`
+          : university
+            ? `${university} · 等待选择校区`
+            : "尚未选择学校和校区";
+        summary.classList.toggle("is-ready", ready);
+        submit.disabled = !ready;
+        stepSchool.classList.toggle("is-complete", Boolean(university));
+        stepCampus.classList.toggle("is-current", Boolean(university) && !campus);
+        stepCampus.classList.toggle("is-complete", Boolean(campus));
+      }
+
+      function refreshCampuses() {
+        const universityId = universitySelect.value;
+        let firstVisible = null;
+        let matched = 0;
+        campusSelect.querySelectorAll("option[data-university]").forEach((option) => {
+          const visible = option.dataset.university === universityId;
+          option.hidden = !visible;
+          option.disabled = !visible;
+          if (visible) {
+            matched += 1;
+            if (!firstVisible) firstVisible = option;
+          }
+        });
+        const placeholder = campusSelect.querySelector('option[value=""]');
+        placeholder.hidden = matched > 0;
+        campusSelect.disabled = matched === 0;
+        const current = campusSelect.selectedOptions[0];
+        const currentVisible = current && current.dataset.university === universityId;
+        if (matched > 0 && !currentVisible) firstVisible.selected = true;
+        if (matched === 0) campusSelect.value = "";
+        updateSummary();
+      }
+
+      filterInput.addEventListener("input", () => {
+        const keyword = filterInput.value.trim().toLowerCase();
+        universitySelect.querySelectorAll("option[data-name]").forEach((option) => {
+          const visible = !keyword || option.dataset.name.toLowerCase().includes(keyword);
+          option.hidden = !visible;
+          option.disabled = !visible;
+        });
       });
-      campusSelect.querySelector('option[value=""]').hidden = matched > 0;
-      if (matched === 0) { campusSelect.value = ''; }
-    }
 
-    filterInput.addEventListener('input', function () {
-      var keyword = filterInput.value.trim().toLowerCase();
-      universitySelect.querySelectorAll('option[data-name]').forEach(function (option) {
-        option.hidden = keyword !== '' && option.dataset.name.toLowerCase().indexOf(keyword) === -1;
-      });
-    });
-
-    universitySelect.addEventListener('change', refreshCampuses);
-    refreshCampuses();
-  })();
-</script>
-{% endblock %}
+      universitySelect.addEventListener("change", refreshCampuses);
+      campusSelect.addEventListener("change", updateSummary);
+      refreshCampuses();
+      updateSummary();
+    })();
+  </script>
+</body>
+</html>

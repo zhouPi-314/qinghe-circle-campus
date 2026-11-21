@@ -201,6 +201,13 @@ class TestStudentContextEnforced:
         assert "先选择学校与校区" in html
         assert "/auth/student-context" in html
 
+        context = client.get("/auth/student-context")
+        assert context.status_code == 200
+        context_html = context.get_data(as_text=True)
+        assert 'class="campus-visual"' in context_html
+        assert 'id="selection-summary"' in context_html
+        assert 'id="university-filter"' in context_html
+
     def test_student_without_campus_cannot_login(self, client):
         """未选校区时直接 POST 登录被重定向回学校校区选择。"""
         choose_student_identity(client)

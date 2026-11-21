@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-11-21T11:02:45.776Z",
+  "checked_at": "2026-11-21T11:29:32.065Z",
   "passed": true,
   "checks": [
     {
@@ -117,6 +117,62 @@
     },
     {
       "name": "student context link opens campus selector",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student context uses split campus layout",
+      "passed": true,
+      "details": {
+        "viewport": 933,
+        "documentHeight": 933,
+        "overflowY": "hidden",
+        "visual": true
+      }
+    },
+    {
+      "name": "student context desktop has no vertical scrollbar",
+      "passed": true,
+      "details": {
+        "viewport": 933,
+        "documentHeight": 933,
+        "overflowY": "hidden",
+        "visual": true
+      }
+    },
+    {
+      "name": "student context theme toggles dark",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student context applies campus selection",
+      "passed": true,
+      "details": {
+        "campusDisabled": false,
+        "submitDisabled": false,
+        "summary": "青禾示范大学（成都市 · 本科） · 青禾示范大学"
+      }
+    },
+    {
+      "name": "student context summary updates live",
+      "passed": true,
+      "details": {
+        "campusDisabled": false,
+        "submitDisabled": false,
+        "summary": "青禾示范大学（成都市 · 本科） · 青禾示范大学"
+      }
+    },
+    {
+      "name": "student context compact desktop fits one viewport",
+      "passed": true,
+      "details": {
+        "documentHeight": 768,
+        "viewport": 768
+      }
+    },
+    {
+      "name": "student context mobile has no horizontal overflow",
       "passed": true,
       "details": null
     },
