@@ -1,8 +1,8 @@
 {% extends "base.html" %}
-{% block title %}平台概览 - 青禾流转{% endblock %}
+{% block title %}{{ '平台概览' if g.current_user.is_platform_admin else '本校管理' }} - 青禾流转{% endblock %}
 {% block content %}
 <section class="card">
-  <h1>平台概览</h1>
+  <h1>{{ '平台概览' if g.current_user.is_platform_admin else '本校管理' }}</h1>
   <p class="page-lead">统计只包含管理范围（FR-M01）。管理入口：组织、账号、名单、审核、争议、审计。</p>
   <div class="stat-row">
     <div class="stat"><span class="stat-num">{{ counts.universities }}</span><span class="stat-label">高校</span></div>
@@ -23,7 +23,7 @@
   </ul>
 </section>
 <section class="card">
-  <h2>高校与校区</h2>
+  <h2>{{ '高校与校区' if g.current_user.is_platform_admin else '本校与校区' }}</h2>
   {% if universities %}
     <div class="table-scroll">
       <table class="org-table">

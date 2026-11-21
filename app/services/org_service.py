@@ -16,6 +16,7 @@ from sqlalchemy import func, select
 
 from app import db
 from app.core.errors import ConflictError, InputError, PermissionDeniedError
+from app.core.permissions import ensure_actor_university, is_university_manager
 from app.models.university import (
     Campus,
     Station,
@@ -30,32 +31,44 @@ if TYPE_CHECKING:
 
 
 def get_organization_tree(actor: CurrentUser | None) -> dict:
-    """平台管理员概览：全局计数与高校-校区结构（FR-M01 的组织部分）。
+    """管理员概览：平台管理员全局，校级管理员仅本校（FR-M01）。
 
-    actor 必须是已登录的平台管理员；其他角色或未登录调用一律拒绝。
+    actor 必须是平台管理员或校级管理员；其他角色或未登录调用一律拒绝。
     """
-    if actor is None:
-        raise PermissionDeniedError("查看平台概览需要平台管理员身份。")
-    if actor.role != "platform_admin":
-        raise PermissionDeniedError("当前身份无法查看平台概览，该页面仅对平台管理员开放。")
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法查看管理概览。")
+    university_scope = _scope_university_id(actor)
 
     from app.models.charity import CharityProject
     from app.models.circulation import CirculationRequest
     from app.models.item import Item
 
+    def scoped_count(model) -> int:
+        stmt = select(func.count()).select_from(model)
+        if university_scope is not None:
+            stmt = stmt.where(model.university_id == university_scope)
+        return db.session.scalar(stmt) or 0
+
     counts = {
-        "universities": db.session.scalar(select(func.count()).select_from(University)) or 0,
-        "campuses": db.session.scalar(select(func.count()).select_from(Campus)) or 0,
-        "users": db.session.scalar(select(func.count()).select_from(User)) or 0,
-        "stations": db.session.scalar(select(func.count()).select_from(Station)) or 0,
-        "items": db.session.scalar(select(func.count()).select_from(Item)) or 0,
-        "requests": db.session.scalar(select(func.count()).select_from(CirculationRequest)) or 0,
-        "projects": db.session.scalar(select(func.count()).select_from(CharityProject)) or 0,
+        "universities": 1
+        if university_scope is not None
+        else db.session.scalar(select(func.count()).select_from(University)) or 0,
+        "campuses": scoped_count(Campus),
+        "users": scoped_count(User),
+        "stations": scoped_count(Station),
+        "items": scoped_count(Item),
+        "requests": scoped_count(CirculationRequest),
+        "projects": scoped_count(CharityProject),
     }
 
-    universities = db.session.scalars(select(University).order_by(University.code)).all()
+    university_stmt = select(University)
+    campus_stmt = select(Campus)
+    if university_scope is not None:
+        university_stmt = university_stmt.where(University.id == university_scope)
+        campus_stmt = campus_stmt.where(Campus.university_id == university_scope)
+    universities = db.session.scalars(university_stmt.order_by(University.code)).all()
     campuses = db.session.execute(
-        select(Campus).order_by(Campus.university_id, Campus.is_primary.desc(), Campus.id)
+        campus_stmt.order_by(Campus.university_id, Campus.is_primary.desc(), Campus.id)
     ).all()
 
     campuses_by_university: dict[int, list[str]] = {}
@@ -88,8 +101,8 @@ def create_campus(
     address: str | None = None,
     is_primary: bool = False,
 ) -> Campus:
-    """平台管理员维护校区（FR-U02）。"""
-    _require_platform_admin(actor)
+    """平台管理员或本校校级管理员维护校区（FR-U02）。"""
+    ensure_actor_university(actor, university_id)
     code = (code or "").strip()
     name = (name or "").strip()
     if not code or not name:
@@ -135,8 +148,8 @@ def create_station(
     address: str,
     service_hours: str | None = None,
 ) -> Station:
-    """平台管理员创建回收/公益站点（FR-U02）。"""
-    _require_platform_admin(actor)
+    """平台管理员或本校校级管理员创建回收/公益站点（FR-U02）。"""
+    ensure_actor_university(actor, university_id)
     name = (name or "").strip()
     address = (address or "").strip()
     if not name or not address:
@@ -175,14 +188,14 @@ def create_station(
 def assign_station_manager(
     actor, *, station_id: int, user_id: int, started_on
 ) -> StationManagerAssignment:
-    """平台管理员把公益管理员授权到站点（BR-007、FR-M03）。
+    """平台管理员或本校校级管理员授权公益管理员站点（BR-007、FR-M03）。
 
     同一账号同一站点只能有一条有效授权（数据库唯一索引兜底）。
     """
-    _require_platform_admin(actor)
     station = db.session.get(Station, station_id)
     if station is None or station.status != "active":
         raise InputError("站点不存在或已停用。")
+    ensure_actor_university(actor, station.university_id)
     user = db.session.get(User, user_id)
     if user is None or user.status != "active":
         raise InputError("账号不存在或已停用。")
@@ -239,35 +252,39 @@ def manager_scope(actor) -> list[Station]:
 
 
 def list_all_universities(actor) -> list[University]:
-    """平台管理员查看全部高校（含停用，管理页使用）。"""
-    _require_platform_admin(actor)
-    return list(db.session.scalars(select(University).order_by(University.code)).all())
+    """平台管理员查看全部高校；校级管理员只查看本校。"""
+    university_scope = _scope_university_id(actor)
+    stmt = select(University)
+    if university_scope is not None:
+        stmt = stmt.where(University.id == university_scope)
+    return list(db.session.scalars(stmt.order_by(University.code)).all())
 
 
 def list_all_stations(actor) -> list[Station]:
-    """平台管理员查看全部站点。"""
-    _require_platform_admin(actor)
-    return list(
-        db.session.scalars(select(Station).order_by(Station.university_id, Station.id)).all()
-    )
+    """平台管理员查看全部站点；校级管理员只查看本校。"""
+    university_scope = _scope_university_id(actor)
+    stmt = select(Station)
+    if university_scope is not None:
+        stmt = stmt.where(Station.university_id == university_scope)
+    return list(db.session.scalars(stmt.order_by(Station.university_id, Station.id)).all())
 
 
 def list_campuses(actor) -> list[Campus]:
-    """平台管理员查看全部校区（管理页下拉与列表）。"""
-    _require_platform_admin(actor)
-    return list(
-        db.session.scalars(select(Campus).order_by(Campus.university_id, Campus.id)).all()
-    )
+    """平台管理员查看全部校区；校级管理员只查看本校。"""
+    university_scope = _scope_university_id(actor)
+    stmt = select(Campus)
+    if university_scope is not None:
+        stmt = stmt.where(Campus.university_id == university_scope)
+    return list(db.session.scalars(stmt.order_by(Campus.university_id, Campus.id)).all())
 
 
 def list_station_managers(actor) -> list[User]:
-    """平台管理员查看公益管理员账号（授权表单下拉）。"""
-    _require_platform_admin(actor)
-    return list(
-        db.session.scalars(
-            select(User).where(User.role == "station_manager").order_by(User.login_name)
-        ).all()
-    )
+    """平台管理员查看全部公益管理员；校级管理员只查看本校。"""
+    university_scope = _scope_university_id(actor)
+    stmt = select(User).where(User.role == "station_manager")
+    if university_scope is not None:
+        stmt = stmt.where(User.university_id == university_scope)
+    return list(db.session.scalars(stmt.order_by(User.login_name)).all())
 
 
 def list_stations_for(actor, *, station_types: tuple[str, ...]) -> list[Station]:
@@ -367,3 +384,14 @@ def update_university(actor, university_id: int, *, fields: dict) -> University:
 def _require_platform_admin(actor) -> None:
     if actor is None or not actor.is_platform_admin:
         raise PermissionDeniedError("只有平台管理员可以执行该操作。")
+
+
+def _scope_university_id(actor) -> int | None:
+    """返回校级管理员的本校 ID；平台管理员返回 None 表示全局。"""
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法管理学校数据。")
+    if actor.is_platform_admin:
+        return None
+    if actor.university_id is None:
+        raise PermissionDeniedError("校级管理员未绑定有效高校。")
+    return ensure_actor_university(actor, actor.university_id)

@@ -49,6 +49,8 @@
           <a class="nav-link" href="{{ url_for('charity.project_list') }}">公益项目</a>
           {% if g.current_user.is_platform_admin %}
             <a class="nav-link" href="{{ url_for('admin.overview') }}">平台概览</a>
+          {% elif g.current_user.is_university_admin %}
+            <a class="nav-link" href="{{ url_for('admin.overview') }}">本校管理</a>
           {% endif %}
         </div>
         <div class="nav-actions">

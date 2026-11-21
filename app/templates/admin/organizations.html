@@ -3,40 +3,49 @@
 {% block content %}
 <section class="card">
   <h1>组织管理</h1>
-  <p class="page-lead">维护高校、校区和站点，授权公益管理员（FR-U02）。</p>
+  <p class="page-lead">
+    {{ '维护高校、校区和站点，授权公益管理员（FR-U02）。' if g.current_user.is_platform_admin else '维护本校校区和站点，授权本校公益管理员。' }}
+  </p>
 
-  <h2>新增高校</h2>
-  <form method="post" action="{{ url_for('admin.create_university') }}" class="inline-form">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="text" name="code" placeholder="高校代码" required>
-    <input type="text" name="name" placeholder="高校名称" required>
-    <input type="text" name="province" placeholder="省份" value="四川省">
-    <input type="text" name="city" placeholder="城市" required>
-    <select name="education_level"><option value="undergraduate">本科</option><option value="college">专科</option></select>
-    <select name="ownership"><option value="public">公办</option><option value="private">民办</option></select>
-    <button type="submit" class="btn btn-primary">创建高校</button>
-  </form>
+  {% if g.current_user.is_platform_admin %}
+    <h2>新增高校</h2>
+    <form method="post" action="{{ url_for('admin.create_university') }}" class="inline-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="text" name="code" placeholder="高校代码" required>
+      <input type="text" name="name" placeholder="高校名称" required>
+      <input type="text" name="province" placeholder="省份" value="四川省">
+      <input type="text" name="city" placeholder="城市" required>
+      <select name="education_level"><option value="undergraduate">本科</option><option value="college">专科</option></select>
+      <select name="ownership"><option value="public">公办</option><option value="private">民办</option></select>
+      <button type="submit" class="btn btn-primary">创建高校</button>
+    </form>
 
-  <h2>维护高校信息</h2>
-  <form method="post" class="inline-form"
-        action="{{ url_for('admin.update_university', university_id=0) }}">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <select name="_pick" onchange="if (this.value) { this.form.action = '/admin/organizations/universities/' + this.value + '/update'; }">
-      <option value="">选择高校</option>
-      {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
-    </select>
-    <input type="text" name="name" placeholder="新名称（可选）">
-    <input type="text" name="city" placeholder="新城市（可选）">
-    <select name="status"><option value="">状态不变</option><option value="active">启用</option><option value="inactive">停用</option></select>
-    <button type="submit" class="btn btn-primary">更新高校</button>
-  </form>
+    <h2>维护高校信息</h2>
+    <form method="post" class="inline-form"
+          action="{{ url_for('admin.update_university', university_id=0) }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <select name="_pick" onchange="if (this.value) { this.form.action = '/admin/organizations/universities/' + this.value + '/update'; }">
+        <option value="">选择高校</option>
+        {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
+      </select>
+      <input type="text" name="name" placeholder="新名称（可选）">
+      <input type="text" name="city" placeholder="新城市（可选）">
+      <select name="status"><option value="">状态不变</option><option value="active">启用</option><option value="inactive">停用</option></select>
+      <button type="submit" class="btn btn-primary">更新高校</button>
+    </form>
+  {% endif %}
 
   <h2>创建校区</h2>
   <form method="post" action="{{ url_for('admin.create_campus') }}" class="inline-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <select name="university_id" required>
-      {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
-    </select>
+    {% if g.current_user.is_platform_admin %}
+      <select name="university_id" required>
+        {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}
+      </select>
+    {% else %}
+      <input type="hidden" name="university_id" value="{{ universities[0].id }}">
+      <span>{{ universities[0].name }}</span>
+    {% endif %}
     <input type="text" name="code" placeholder="校区代码" required>
     <input type="text" name="name" placeholder="校区名称" required>
     <button type="submit" class="btn btn-primary">创建校区</button>

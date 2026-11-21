@@ -1,4 +1,4 @@
-"""平台管理员路由：组织、账号、名单、审核、争议、审计。
+"""管理员路由：平台全局能力与校级管理员本校能力。
 
 路由只解析请求和输出模板；全部查询与写操作在 service 层完成
 （route → service → model/database，工程标准第 3 节）。
@@ -16,12 +16,12 @@ bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
 @bp.get("/")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def overview():
-    """平台概览：全局计数与组织结构（FR-M01）。
+    """管理概览：平台全局或校级管理员本校（FR-M01）。
 
     路由守卫只做第一道校验；service 层在 get_organization_tree(actor)
-    内再次校验平台管理员身份（工程标准第 5 节）。
+    内再次校验角色和高校边界（工程标准第 5 节）。
     """
     data = org_service.get_organization_tree(g.current_user)
     return render_template(
@@ -37,9 +37,9 @@ def overview():
 
 
 @bp.get("/organizations")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def organizations():
-    """高校、校区和站点管理（FR-U02）。"""
+    """高校、校区和站点管理（FR-U02）；校级管理员仅维护本校。"""
     universities = org_service.list_all_universities(g.current_user)
     campuses = org_service.list_campuses(g.current_user)
     stations = org_service.list_all_stations(g.current_user)
@@ -93,7 +93,7 @@ def update_university(university_id: int):
 
 
 @bp.post("/organizations/campuses")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def create_campus():
     try:
         org_service.create_campus(
@@ -111,7 +111,7 @@ def create_campus():
 
 
 @bp.post("/organizations/stations")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def create_station():
     try:
         org_service.create_station(
@@ -130,7 +130,7 @@ def create_station():
 
 
 @bp.post("/organizations/assignments")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def assign_station_manager():
     from datetime import date
 
