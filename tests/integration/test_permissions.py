@@ -150,7 +150,7 @@ class TestRolesRequired:
 
 class TestStationManagerLogin:
     def test_station_manager_login_and_role_tag(self, client, app, school):
-        """公益管理员（回收）登录：账号由平台管理员导入，无注册入口。"""
+        """公益管理员登录：账号由平台管理员导入，无注册入口。"""
         with app.app_context():
             from app.models.user import User
             from app.services.auth_service import hash_password
@@ -174,7 +174,7 @@ class TestStationManagerLogin:
             follow_redirects=True,
         )
         page = client.get("/auth/login").get_data(as_text=True)
-        assert "公益管理员（回收）登录" in page
+        assert "公益管理员登录" in page
         assert "不提供注册入口" in page
 
         resp = client.post(
@@ -210,6 +210,8 @@ class TestStudentContextEnforced:
         assert 'id="university-results"' in context_html
         assert 'placeholder="输入校名或城市关键字"' in context_html
         assert "输入“四川”" not in context_html
+        assert "实时匹配校名与城市" not in context_html
+        assert 'class="visually-hidden" id="university-search-hint"' in context_html
 
     def test_student_without_campus_cannot_login(self, client):
         """未选校区时直接 POST 登录被重定向回学校校区选择。"""

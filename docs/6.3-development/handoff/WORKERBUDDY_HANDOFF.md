@@ -152,7 +152,7 @@ Route 只解析请求和输出模板；Service 负责权限、状态、事务和
 | `/charity`、`/charity/<id>` | 本校在校学生以上 | 查看项目与进度 |
 | `/charity/<id>/donate` | 在校学生 | 提交本校实物捐赠 |
 | `/charity/receipts/<id>` | 本校在校学生以上 | 查看已公示回执 |
-| `/station`、`/station/recycling`、`/station/donations` | 公益管理员（回收） | 处理授权站点工作 |
+| `/station`、`/station/recycling`、`/station/donations` | 公益管理员 | 处理授权站点工作 |
 | `/admin`、`/admin/organizations`、`/admin/student-imports`、`/admin/users` | 平台管理员 | 管理全局组织、账号和名单 |
 | `/admin/moderation`、`/admin/disputes`、`/admin/audit` | 平台管理员 | 审核、争议和审计 |
 

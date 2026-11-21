@@ -1811,9 +1811,9 @@
     };
 
     const roleBadge = (role) => {
-      if (role === "station") return '<span class="role-tag role-station">公益管理员（回收）</span>';
+      if (role === "station") return '<span class="role-tag role-station">公益管理员</span>';
       if (role === "admin") return '<span class="role-tag role-admin">平台管理员</span>';
-      if (role === "university_admin") return '<span class="role-tag role-university">校级管理员（预留）</span>';
+      if (role === "university_admin") return '<span class="role-tag role-university">校级管理员</span>';
       return '<span class="role-tag role-student">学生</span>';
     };
 
@@ -2384,7 +2384,7 @@
         note: "学号或手机号登录，也可以使用模拟验证码。",
       },
       station: {
-        name: "公益管理员（回收）",
+        name: "公益管理员",
         heading: "公益管理员登录",
         field: "管理员账号",
         note: "使用平台管理员导入的站点账号登录。",
@@ -2396,7 +2396,7 @@
         note: "平台管理员账号由系统预设，当前首版预置 1 个，后续可继续创建。",
       },
       university_admin: {
-        name: "校级管理员（预留）",
+        name: "校级管理员",
         heading: "校级管理员登录",
         field: "管理员账号",
         note: "账号由平台管理员统一导入，校级管理功能暂未开放。",
@@ -2437,9 +2437,9 @@
             <label for="identity-select">登录身份</label>
             <select class="identity-select" id="identity-select">
               <option value="student">在校学生</option>
-              <option value="station">公益管理员（回收）</option>
+              <option value="station">公益管理员</option>
               <option value="admin">平台管理员</option>
-              <option value="university_admin">校级管理员（预留）</option>
+              <option value="university_admin">校级管理员</option>
             </select>
             <p class="identity-help" id="identity-help">选择学校和校区后，使用学号或手机号登录。</p>
             <button class="btn btn-primary" type="submit">继续登录</button>

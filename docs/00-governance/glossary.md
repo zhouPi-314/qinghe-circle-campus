@@ -7,13 +7,13 @@
 | 高校/学校 | `University` | 数据隔离边界；用户只能操作本校业务 |
 | 校区 | `Campus` | 学校内部地点；同校不同校区允许流转 |
 | 在校学生 | `Student` / `student` | 可发布、借用、购买、领取、捐赠和评价的师生账号 |
-| 公益管理员（回收） | `StationManager` / `station_manager` | 负责物品接收、回收确认、公益物资核验和回执 |
+| 公益管理员 | `StationManager` / `station_manager` | 负责物品接收、回收确认、公益物资核验和回执 |
 | 平台管理员 | `PlatformAdmin` | 管理高校数据、学生名单、角色、审核和异常 |
-| 校级管理员（预留） | `UniversityAdmin` / `university_admin` | 账号由平台管理员导入的本校管理身份；首版不开放管理功能 |
+| 校级管理员 | `UniversityAdmin` / `university_admin` | 账号由平台管理员导入的本校管理身份；首版不开放管理功能 |
 | 回收/公益站点 | `Station` | 设在校区内、承担回收验收或公益物资核验的线下服务点 |
 | 学生名单记录 | `StudentRegistryRecord` | 管理员导入的校内学生核验记录，包含学号、学院和校区等字段 |
 | 名单导入批次 | `StudentImportBatch` | 一次 CSV 名单导入的操作者、摘要、成功行和失败行记录 |
-| 公益管理员站点授权 | `StationManagerAssignment` | 将公益管理员（回收）账号限定到具体站点和有效期限的关系 |
+| 公益管理员站点授权 | `StationManagerAssignment` | 将公益管理员账号限定到具体站点和有效期限的关系 |
 | 登录身份 | `LoginRole` | 登录前选择的在校学生、公益管理员、平台管理员或校级管理员入口 |
 | 登录账号 | `LoginName` | 非学生管理员登录使用的平台内账号名；学生使用学号和手机号 |
 

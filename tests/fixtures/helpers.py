@@ -182,7 +182,7 @@ def create_station_manager_user(
     password: str = "station1",
     nickname: str = "站点管理员",
 ) -> User:
-    """公益管理员（回收）账号（测试用；真实账号走 auth_service 导入）。"""
+    """公益管理员账号（测试用；真实账号走 auth_service 导入）。"""
     user = User(
         university_id=university.id,
         login_name=login_name,

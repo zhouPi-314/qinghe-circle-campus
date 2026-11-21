@@ -15,6 +15,8 @@
 | `6.3-development/audit/` | 设计符合性、安全、测试证据和质量门禁记录 | Codex |
 | `6.3-development/test-evidence/` | 测试输出、截图和结果摘要 | WorkerBuddy 提供，Codex核验 |
 | `6.3-development/knowledge-notes/` | 阶段技术解释和知识点总结 | Codex/WorkerBuddy |
+| `6.3-development/registration-captcha-plan.md` | 注册验证码可行性、替代方案、分工和进度 | Codex |
+| `6.3-development/admin-access-and-recovery.md` | 公网平台管理员账号获取与恢复的受控流程 | Codex |
 
 ## 唯一规则入口
 

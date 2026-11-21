@@ -175,7 +175,7 @@ def create_station(
 def assign_station_manager(
     actor, *, station_id: int, user_id: int, started_on
 ) -> StationManagerAssignment:
-    """平台管理员把公益管理员（回收）授权到站点（BR-007、FR-M03）。
+    """平台管理员把公益管理员授权到站点（BR-007、FR-M03）。
 
     同一账号同一站点只能有一条有效授权（数据库唯一索引兜底）。
     """
@@ -189,7 +189,7 @@ def assign_station_manager(
     if user.university_id != station.university_id:
         raise ConflictError("不能把站点授权给其他学校的账号（BR-002）。")
     if user.role != "station_manager":
-        raise ConflictError("只能授权公益管理员（回收）角色账号。")
+        raise ConflictError("只能授权公益管理员角色账号。")
     existing = db.session.scalar(
         select(StationManagerAssignment).where(
             StationManagerAssignment.station_id == station_id,
@@ -222,7 +222,7 @@ def assign_station_manager(
 
 
 def manager_scope(actor) -> list[Station]:
-    """公益管理员（回收）被授权的站点（BR-007、FR-M03）。"""
+    """公益管理员被授权的站点（BR-007、FR-M03）。"""
     if actor.role != "station_manager":
         return []
     stmt = (

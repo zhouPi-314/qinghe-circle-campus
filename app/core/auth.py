@@ -27,9 +27,9 @@ VALID_IDENTITY_ROLES = ("student", "station_manager", "platform_admin", "univers
 
 ROLE_LABELS = {
     "student": "学生",
-    "station_manager": "公益管理员（回收）",
+    "station_manager": "公益管理员",
     "platform_admin": "平台管理员",
-    "university_admin": "校级管理员（预留）",
+    "university_admin": "校级管理员",
 }
 
 

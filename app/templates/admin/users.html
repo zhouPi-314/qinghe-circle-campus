@@ -8,8 +8,8 @@
   <form method="post" action="{{ url_for('admin.import_managed_account') }}" class="inline-form">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <select name="role" required>
-      <option value="station_manager">公益管理员（回收）</option>
-      <option value="university_admin">校级管理员（预留）</option>
+      <option value="station_manager">公益管理员</option>
+      <option value="university_admin">校级管理员</option>
     </select>
     <select name="university_id" required>
       {% for uni in universities %}<option value="{{ uni.id }}">{{ uni.name }}</option>{% endfor %}

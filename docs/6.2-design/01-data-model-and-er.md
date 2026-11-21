@@ -123,7 +123,7 @@ erDiagram
 | 12 | `circulation_requests` | 四类流转统一申请 | `item_id`、`requester_user_id`、`owner_user_id`、`mode`、`status`、`request_note` | 模式必须与物品模式一致；活动申请对物品唯一 |
 | 13 | `borrow_details` | 借用专属字段 | `request_id`、`start_date`、`due_date`、`return_note`、`returned_at` | 与申请一对一；结束日期不早于开始日期 |
 | 14 | `sale_details` | 出售与模拟支付字段 | `request_id`、`agreed_price_cents`、`payment_status`、`paid_at` | 只记录模拟状态，不产生真实资金流水 |
-| 15 | `recycle_details` | 回收站点与验收字段 | `request_id`、`station_id`、`preferred_start_at`、`preferred_end_at`、`inspection_status`、`inspection_note` | 与申请一对一；公益管理员（回收）只能处理本站记录 |
+| 15 | `recycle_details` | 回收站点与验收字段 | `request_id`、`station_id`、`preferred_start_at`、`preferred_end_at`、`inspection_status`、`inspection_note` | 与申请一对一；公益管理员只能处理本站记录 |
 | 16 | `handover_records` | 一次性交接凭证 | `request_id`、`code_hash`、`code_version`、`generated_by_user_id`、`expires_at`、`consumed_at`、`status` | 每笔申请最多一条当前交接记录；旧码重生成后失效 |
 | 17 | `status_history` | 关键状态历史 | `university_id`、`entity_type`、`entity_id`、`from_status`、`to_status`、`actor_user_id`、`reason` | 只追加，不更新或删除历史 |
 | 18 | `notifications` | 站内通知 | `recipient_user_id`、`category`、`title`、`body`、`related_entity_type`、`related_entity_id`、`read_at` | 只在本校范围内可见 |

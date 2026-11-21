@@ -3,7 +3,7 @@
 公开接口（交接书第 7 节）：
 - create_project() / update_project_need()   项目与物资目标
 - submit_donation()                          学生提交本校实物捐赠
-- review_donation()                          公益管理员（回收）核验（行锁防超募）
+- review_donation()                          公益管理员核验（行锁防超募）
 - publish_receipt()                          创建并公示脱敏回执
 
 辅助接口：list_projects / get_project / project_progress / station_donation_queue /
@@ -61,7 +61,7 @@ def create_project(
 ) -> CharityProject:
     """创建公益项目（FR-C01）。
 
-    公益管理员（回收）：项目属于本人所在高校，需持有站点授权；
+    公益管理员：项目属于本人所在高校，需持有站点授权；
     平台管理员：可支持创建（university_id 指定归属高校）。
     """
     _ensure_project_creator(actor)
@@ -641,20 +641,20 @@ def get_published_receipt(actor, receipt_id: int) -> CharityReceipt:
 
 def _ensure_project_creator(actor) -> None:
     if actor.role not in ("station_manager", "platform_admin"):
-        raise PermissionDeniedError("只有公益管理员（回收）或平台管理员可以创建公益项目。")
+        raise PermissionDeniedError("只有公益管理员或平台管理员可以创建公益项目。")
 
 
 def _get_managed_project(
     actor, project_id: int, *, allow_completed: bool = False
 ) -> CharityProject:
-    """核验与回执操作的项目归属校验：本校 + 公益管理员/管理员。"""
+    """核验与回执操作的项目归属校验：本校 + 公益管理员/平台管理员。"""
     project = db.session.get(CharityProject, project_id)
     if project is None or project.university_id != actor.university_id:
         raise NotFoundError("没有找到该公益项目。")
     if actor.is_platform_admin:
         return project
     if actor.role != "station_manager":
-        raise PermissionDeniedError("只有公益管理员（回收）可以执行该操作。")
+        raise PermissionDeniedError("只有公益管理员可以执行该操作。")
     if not manager_scope(actor):
         raise PermissionDeniedError("公益管理员需持有站点授权。")
     if not allow_completed and project.status != "active":

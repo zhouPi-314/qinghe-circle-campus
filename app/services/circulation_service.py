@@ -926,7 +926,7 @@ def station_recycle_queue(actor) -> list[CirculationRequest]:
 
 
 def _ensure_station_authorization(actor, request: CirculationRequest) -> None:
-    """FR-M03：公益管理员（回收）只能处理授权站点的申请。"""
+    """FR-M03：公益管理员只能处理授权站点的申请。"""
     from app.models.university import StationManagerAssignment
 
     details = db.session.get(RecycleDetails, request.id)

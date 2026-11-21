@@ -510,13 +510,13 @@ def import_managed_accounts(
     """导入管理员账号（公益管理员/校级管理员；BR-007、FR-A04）。
 
     - 平台管理员账号不在此创建（首版只预置 1 个，D-022）；
-    - 校级管理员为预留身份，可导入账号但不开放管理功能；
+    - 校级管理员可导入账号，但管理功能暂未开放；
     - 公益管理员仍需平台管理员另行授权站点。
     """
     if not actor.is_platform_admin:
         raise PermissionDeniedError("只有平台管理员可以导入管理员账号。")
     if role not in ("station_manager", "university_admin"):
-        raise InputError("只能导入公益管理员或校级管理员（预留）账号。")
+        raise InputError("只能导入公益管理员或校级管理员账号。")
     login_name = (login_name or "").strip()
     nickname = (nickname or "").strip() or login_name
     if not login_name:

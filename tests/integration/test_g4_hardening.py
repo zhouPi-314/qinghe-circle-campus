@@ -518,7 +518,7 @@ def _login_student(client, world) -> None:
 
 
 def _login_manager(client, world) -> None:
-    """公益管理员（回收）HTTP 登录。"""
+    """公益管理员 HTTP 登录。"""
     from tests.integration.test_register_and_login import get_csrf_token
 
     page = client.get("/auth/identity").get_data(as_text=True)

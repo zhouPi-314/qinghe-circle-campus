@@ -75,7 +75,7 @@ def school(app):
 class TestIdentityFlow:
     def test_identity_page_lists_roles(self, client):
         html = client.get("/auth/identity").get_data(as_text=True)
-        for label in ("在校学生", "公益管理员（回收）", "平台管理员", "校级管理员（预留）"):
+        for label in ("在校学生", "公益管理员", "平台管理员", "校级管理员"):
             assert label in html
 
     def test_invalid_role_rejected(self, client):
@@ -444,4 +444,4 @@ class TestReservedUniversityAdmin:
         )
         page = client.get("/auth/login").get_data(as_text=True)
         resp = submit_login(client, page, "uniadmin01", "uniadmin1")
-        assert "校级管理员（预留）" in resp.get_data(as_text=True)
+        assert "校级管理员" in resp.get_data(as_text=True)

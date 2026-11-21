@@ -20,9 +20,9 @@ bp = Blueprint("auth", __name__, url_prefix="/auth")
 
 _IDENTITY_ROLES = {
     "student": "在校学生",
-    "station_manager": "公益管理员（回收）",
+    "station_manager": "公益管理员",
     "platform_admin": "平台管理员",
-    "university_admin": "校级管理员（预留）",
+    "university_admin": "校级管理员",
 }
 
 _IDENTITY_COPY = {
@@ -53,7 +53,7 @@ _IDENTITY_COPY = {
         "footnote": "账号由平台管理员统一配置，不提供注册入口。",
     },
     "university_admin": {
-        "intro": "校级管理员为预留身份，当前可登录但管理功能暂未开放。",
+        "intro": "当前可登录，校级管理功能暂未开放。",
         "account_label": "登录账号",
         "account_placeholder": "请输入登录账号",
         "context_label": "账号说明",
