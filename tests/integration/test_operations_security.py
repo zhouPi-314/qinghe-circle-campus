@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from threading import Barrier, Thread
 
 import pytest
 from sqlalchemy import select
@@ -84,6 +85,47 @@ def test_ninth_registration_request_from_ip_creates_block_and_attack_event(
         assert block.ends_at > datetime.now(UTC)
         assert event is not None
         assert event.severity == "high"
+
+
+def test_active_block_unique_and_advisory_lock_serializes_same_ip(
+    app, monkeypatch, security_world
+):
+    subject_hash = auth_service._registration_hash("request-ip", "203.0.113.88")
+    for _ in range(8):
+        _request_mismatch(app, monkeypatch, security_world, ip="203.0.113.88")
+
+    barrier = Barrier(2)
+    outcomes = []
+
+    def attempt():
+        with app.app_context():
+            barrier.wait()
+            try:
+                operations_service.ensure_ip_allowed(
+                    subject_hash,
+                    university_id=security_world["university_id"],
+                    route="/auth/register/sms-code",
+                )
+            except TooManyRequestsError:
+                outcomes.append("blocked")
+            else:
+                outcomes.append("allowed")
+
+    threads = [Thread(target=attempt), Thread(target=attempt)]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    assert outcomes == ["blocked", "blocked"]
+    with app.app_context():
+        active = db.session.scalars(
+            select(SecurityBlock).where(
+                SecurityBlock.subject_hash == subject_hash,
+                SecurityBlock.status == "active",
+            )
+        ).all()
+        assert len(active) == 1
 
 
 def test_expired_block_no_longer_blocks_registration(app, monkeypatch, security_world):

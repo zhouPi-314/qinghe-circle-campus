@@ -39,6 +39,10 @@ def ensure_ip_allowed(
 ) -> None:
     """Block the ninth registration request from one IP hash in ten minutes."""
     now = now or datetime.now(UTC)
+    lock_key = int(subject_hash[:16], 16)
+    if lock_key >= 2**63:
+        lock_key -= 2**64
+    db.session.execute(select(func.pg_advisory_xact_lock(lock_key)))
     block = db.session.scalar(
         select(SecurityBlock)
         .where(

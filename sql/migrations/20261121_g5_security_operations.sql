@@ -50,6 +50,10 @@ CREATE TABLE IF NOT EXISTS security_blocks (
     CHECK (btrim(reason) <> '')
 );
 
+CREATE UNIQUE INDEX IF NOT EXISTS uq_active_security_block_subject
+    ON security_blocks (subject_type, subject_hash)
+    WHERE status = 'active';
+
 CREATE UNIQUE INDEX IF NOT EXISTS uq_active_security_block
     ON security_blocks (subject_type, subject_hash)
     WHERE status = 'active';
