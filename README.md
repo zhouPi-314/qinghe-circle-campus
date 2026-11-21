@@ -1,10 +1,8 @@
-# 青禾流转 
-Qinghe Circle Campus
+# 青禾流转 Qinghe Circle Campus
 
 面向高校的校园物品共享、二手流转、免费赠送、绿色回收与公益实物捐赠平台。项目使用 Flask 服务端渲染，支持多高校逻辑隔离、学生名单核验、四类流转状态机、一次性交接码、争议处理、公益回执和 R2 图片存储。
 
 - 已部署的在线官方网站：<https://qinghe-circle-campus.vercel.app>
-- GitHub：<https://github.com/zhouPi-314/qinghe-circle-campus>
 - Python：3.13
 - 数据库：PostgreSQL 18
 - 许可：代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权
