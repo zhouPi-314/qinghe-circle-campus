@@ -5,6 +5,7 @@
 .venv/
 .work-cloud-check-venv/
 .workbuddy-ai/
+.worktrees/
 .npm-cache/
 .qa/
 __pycache__/
