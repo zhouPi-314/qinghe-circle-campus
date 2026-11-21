@@ -23,6 +23,7 @@ from app.models.governance import (  # noqa: F401
     StatusHistory,
 )
 from app.models.item import Item, ItemCategory, ItemImage  # noqa: F401
+from app.models.security import ApplicationEvent, SecurityBlock, SecurityEvent  # noqa: F401
 from app.models.university import (  # noqa: F401
     Campus,
     LoginVerificationCode,

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}运维与安全 - 青禾流转{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>运维与安全</h1>
+  <p class="page-lead">运行状况、恶意攻击、临时封禁、应用报错与脱敏日志。</p>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-num">{{ '正常' if snapshot.database == 'ok' else '异常' }}</span><span class="stat-label">数据库</span></div>
+    <div class="stat"><span class="stat-num">{{ snapshot.sms_sent }}</span><span class="stat-label">24h 短信成功</span></div>
+    <div class="stat"><span class="stat-num">{{ snapshot.sms_failed }}</span><span class="stat-label">24h 短信失败</span></div>
+    <div class="stat"><span class="stat-num">{{ snapshot.active_blocks }}</span><span class="stat-label">生效封禁</span></div>
+    <div class="stat"><span class="stat-num">{{ snapshot.open_events }}</span><span class="stat-label">未关闭事件</span></div>
+    <div class="stat"><span class="stat-num">{{ snapshot.recent_errors }}</span><span class="stat-label">24h 报错</span></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>恶意攻击分类</h2>
+  {% if events %}
+    <div class="table-scroll"><table class="org-table">
+      <thead><tr><th>分类</th><th>级别</th><th>来源摘要</th><th>次数</th><th>状态</th><th>最近时间</th></tr></thead>
+      <tbody>{% for event in events %}
+        <tr><td>{{ event.category }}</td><td>{{ event.severity }}</td><td>{{ event.subject_type }}:{{ event.subject_hash[:10] }}</td><td>{{ event.event_count }}</td><td>{{ event.status }}</td><td>{{ event.last_seen_at | local_dt }}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}<p class="page-lead">暂无安全事件。</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>临时封禁</h2>
+  {% if blocks %}
+    <div class="table-scroll"><table class="org-table">
+      <thead><tr><th>来源</th><th>原因</th><th>状态</th><th>开始</th><th>结束</th><th>处置</th></tr></thead>
+      <tbody>{% for block in blocks %}
+        <tr><td>{{ block.subject_type }}:{{ block.subject_hash[:10] }}</td><td>{{ block.reason }}</td><td>{{ block.status }}</td><td>{{ block.starts_at | local_dt }}</td><td>{{ block.ends_at | local_dt }}</td>
+          <td>{% if block.status == 'active' %}
+            <form method="post" action="{{ url_for('admin.dispose_security_block', block_id=block.id) }}" class="inline-form">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <input type="text" name="reason" placeholder="处置原因" required>
+              <button type="submit" name="action" value="revoke" class="btn btn-ghost btn-compact">解除</button>
+              <button type="submit" name="action" value="false_positive" class="btn btn-ghost btn-compact">标记误报</button>
+            </form>
+          {% else %}—{% endif %}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}<p class="page-lead">暂无封禁记录。</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>应用报错与日志</h2>
+  {% if app_events %}
+    <div class="table-scroll"><table class="org-table">
+      <thead><tr><th>时间</th><th>级别</th><th>事件</th><th>请求</th><th>路由</th><th>摘要</th></tr></thead>
+      <tbody>{% for event in app_events %}
+        <tr><td>{{ event.created_at | local_dt }}</td><td>{{ event.level }}</td><td>{{ event.event_code }}</td><td>{{ event.request_id or '—' }}</td><td>{{ event.method or '' }} {{ event.route or '—' }}</td><td>{{ event.summary }}</td></tr>
+      {% endfor %}</tbody>
+    </table></div>
+  {% else %}<p class="page-lead">暂无应用事件。</p>{% endif %}
+</section>
+{% endblock %}

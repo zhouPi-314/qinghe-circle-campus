@@ -10,7 +10,13 @@ from flask import Blueprint, flash, g, redirect, render_template, request, url_f
 
 from app.core.errors import InputError
 from app.core.permissions import roles_required
-from app.services import auth_service, handover_service, item_service, org_service
+from app.services import (
+    auth_service,
+    handover_service,
+    item_service,
+    operations_service,
+    org_service,
+)
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -284,6 +290,36 @@ def audit():
 
     rows = notification_service.list_audit_logs(g.current_user, limit=100)
     return render_template("admin/audit.html", logs=rows)
+
+
+@bp.get("/operations")
+@roles_required("platform_admin")
+def operations():
+    """Runtime, attack, block and sanitized error review for platform admins."""
+    return render_template(
+        "admin/operations.html",
+        snapshot=operations_service.operations_snapshot(g.current_user),
+        events=operations_service.list_security_events(g.current_user),
+        blocks=operations_service.list_security_blocks(g.current_user),
+        app_events=operations_service.list_application_events(g.current_user),
+    )
+
+
+@bp.post("/operations/blocks/<int:block_id>/disposition")
+@roles_required("platform_admin")
+def dispose_security_block(block_id: int):
+    try:
+        operations_service.set_block_disposition(
+            g.current_user,
+            block_id,
+            action=request.form.get("action", ""),
+            reason=request.form.get("reason", ""),
+        )
+    except InputError as err:
+        _flash_input_error(err)
+    else:
+        flash("安全封禁状态已更新。", "success")
+    return redirect(url_for("admin.operations"))
 
 
 def _flash_input_error(err: InputError) -> None:

@@ -138,6 +138,14 @@ def request_registration_code(
     student_no_digest = _registration_hash("student-no", student_no)
     phone_digest = phone_hash(normalized_phone)
     ip_digest = _registration_hash("request-ip", request_ip or "unknown")
+    from app.services.operations_service import ensure_ip_allowed
+
+    ensure_ip_allowed(
+        ip_digest,
+        university_id=university_id,
+        route="/auth/register/sms-code",
+        now=now,
+    )
 
     record = db.session.scalars(
         select(StudentRegistryRecord)

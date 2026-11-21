@@ -67,6 +67,13 @@ class ConflictError(AppError):
     title = "当前状态无法执行该操作"
 
 
+class TooManyRequestsError(AppError):
+    """Abuse protection: the caller must wait before retrying."""
+
+    status_code = 429
+    title = "请求过于频繁"
+
+
 def register_error_handlers(app: Flask) -> None:
     """注册全局错误处理；错误页必须说明原因和下一步。"""
 
@@ -103,6 +110,23 @@ def register_error_handlers(app: Flask) -> None:
         # 只有明确请求 JSON 的客户端才返回 JSON 错误；浏览器一律得到中文错误页
         return request.accept_mimetypes.best == "application/json"
 
+    def _record_unexpected(request_id: str, error: Exception) -> None:
+        try:
+            from app.services.operations_service import record_application_event
+
+            record_application_event(
+                level="error",
+                event_code="unexpected_error",
+                request_id=request_id,
+                route=request.path,
+                method=request.method,
+                status_code=500,
+                summary="系统遇到未处理异常",
+                detail={"type": type(error).__name__},
+            )
+        except Exception:
+            logger.exception("应用事件写入失败 request_id=%s", request_id)
+
     @app.errorhandler(AppError)
     def handle_app_error(err: AppError):
         if isinstance(err, LoginRequiredError):
@@ -134,6 +158,7 @@ def register_error_handlers(app: Flask) -> None:
     def handle_500(err):
         request_id = uuid.uuid4().hex[:12]
         logger.exception("未处理异常 request_id=%s path=%s", request_id, request.path)
+        _record_unexpected(request_id, err)
         return _render_error(
             500,
             "服务暂时不可用",
@@ -153,6 +178,7 @@ def register_error_handlers(app: Flask) -> None:
             return _render_error(status, title, reason, next_step)
         request_id = uuid.uuid4().hex[:12]
         logger.exception("未处理异常 request_id=%s path=%s", request_id, request.path)
+        _record_unexpected(request_id, err)
         return _render_error(
             500,
             "服务暂时不可用",
