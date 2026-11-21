@@ -15,6 +15,7 @@ from sqlalchemy import select
 
 from app import db
 from app.core.errors import NotFoundError, PermissionDeniedError
+from app.core.permissions import ensure_actor_university, is_university_manager
 from app.models.governance import AuditLog, Notification
 
 
@@ -116,10 +117,14 @@ def record_audit(
 
 
 def list_audit_logs(actor, *, limit: int = 100) -> list[AuditLog]:
-    """平台管理员查询审计日志；service 层复验角色。"""
-    if actor is None or actor.role != "platform_admin":
-        raise PermissionDeniedError("审计日志仅对平台管理员开放。")
-    stmt = select(AuditLog).order_by(AuditLog.created_at.desc()).limit(limit)
+    """管理员查询审计日志；校级管理员只查看本校。"""
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法查看审计日志。")
+    stmt = select(AuditLog)
+    if actor.is_university_admin:
+        ensure_actor_university(actor, actor.university_id)
+        stmt = stmt.where(AuditLog.university_id == actor.university_id)
+    stmt = stmt.order_by(AuditLog.created_at.desc()).limit(limit)
     return list(db.session.scalars(stmt).all())
 
 

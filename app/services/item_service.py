@@ -22,6 +22,7 @@ from sqlalchemy import func, or_, select
 
 from app import db
 from app.core.errors import ConflictError, InputError, NotFoundError, PermissionDeniedError
+from app.core.permissions import ensure_actor_university, is_university_manager
 from app.core.states import (
     ITEM_ACTIVE,
     ITEM_COMPLETED,
@@ -309,8 +310,9 @@ def change_item_shelf_state(actor, item_id: int, *, action: str, reason: str | N
         raise NotFoundError("没有找到该物品。")
 
     if action == "force_off_shelf":
-        if not actor.is_platform_admin:
-            raise PermissionDeniedError("只有平台管理员可以强制下架。")
+        if not is_university_manager(actor):
+            raise PermissionDeniedError("当前身份无法强制下架。")
+        ensure_actor_university(actor, item.university_id)
         if not (reason and reason.strip()):
             raise InputError("强制下架必须填写原因。", field_errors={"reason": "请填写下架原因。"})
         item.moderation_status = "hidden"
@@ -390,10 +392,14 @@ def item_status_label(item: Item) -> str:
 
 
 def list_recent_items(actor, *, limit: int = 50) -> list[Item]:
-    """平台管理员审核页：最近更新的物品（FR-M02）。"""
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以查看审核列表。")
-    stmt = select(Item).order_by(Item.updated_at.desc()).limit(limit)
+    """管理员审核页：最近更新的物品；校级管理员仅本校（FR-M02）。"""
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法查看审核列表。")
+    stmt = select(Item)
+    if actor.is_university_admin:
+        ensure_actor_university(actor, actor.university_id)
+        stmt = stmt.where(Item.university_id == actor.university_id)
+    stmt = stmt.order_by(Item.updated_at.desc()).limit(limit)
     return list(db.session.scalars(stmt).all())
 
 

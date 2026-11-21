@@ -7,16 +7,25 @@ from datetime import UTC, datetime
 import pytest
 
 from app import db
-from app.core.errors import PermissionDeniedError
+from app.core.errors import NotFoundError, PermissionDeniedError
 from app.core.permissions import CurrentUser, ensure_actor_university, to_current_user
-from app.models.governance import AuditLog
+from app.models.circulation import CirculationRequest
+from app.models.governance import AuditLog, Dispute
 from app.models.university import StationManagerAssignment, University
 from app.models.user import User
-from app.services import auth_service, org_service
+from app.services import (
+    auth_service,
+    handover_service,
+    item_service,
+    notification_service,
+    org_service,
+)
 from app.services.auth_service import hash_password
 from tests.fixtures.helpers import (
     assign_manager,
     create_campus,
+    create_category,
+    create_item,
     create_platform_admin,
     create_station,
     create_station_manager_user,
@@ -449,3 +458,202 @@ def test_school_admin_users_and_roster_pages_are_scoped(client, schools):
     )
     assert response.status_code == 200
     assert "账号状态已更新" in response.get_data(as_text=True)
+
+
+@pytest.fixture
+def governance_world(app, schools):
+    with app.app_context():
+        school_a = db.session.get(University, schools["a_id"])
+        school_b = db.session.get(University, schools["b_id"])
+        campus_a = db.session.get(University, schools["a_id"]).campuses[0]
+        campus_b = db.session.get(University, schools["b_id"]).campuses[0]
+        owner_a = db.session.get(User, schools["a_student_id"])
+        owner_b = db.session.get(User, schools["b_student_id"])
+        borrower_a = create_student_user(
+            school_a, campus_a, student_no="2025021", phone="13900005021"
+        )
+        borrower_b = create_student_user(
+            school_b, campus_b, student_no="2025022", phone="13900005022"
+        )
+        category = create_category()
+        item_a = create_item(owner_a, category.id, campus_a.id, title="甲审核物品")
+        item_b = create_item(owner_b, category.id, campus_b.id, title="乙审核物品")
+        dispute_item_a = create_item(
+            owner_a, category.id, campus_a.id, title="甲争议物品"
+        )
+        dispute_item_b = create_item(
+            owner_b, category.id, campus_b.id, title="乙争议物品"
+        )
+        now = datetime.now(UTC)
+        dispute_item_a.status = "on_hold"
+        dispute_item_b.status = "on_hold"
+        request_a = CirculationRequest(
+            university_id=schools["a_id"],
+            item_id=dispute_item_a.id,
+            requester_user_id=borrower_a.id,
+            owner_user_id=owner_a.id,
+            mode="borrow",
+            status="disputed",
+            created_at=now,
+            updated_at=now,
+        )
+        request_b = CirculationRequest(
+            university_id=schools["b_id"],
+            item_id=dispute_item_b.id,
+            requester_user_id=borrower_b.id,
+            owner_user_id=owner_b.id,
+            mode="borrow",
+            status="disputed",
+            created_at=now,
+            updated_at=now,
+        )
+        db.session.add_all([request_a, request_b])
+        db.session.flush()
+        dispute_a = Dispute(
+            university_id=schools["a_id"],
+            circulation_request_id=request_a.id,
+            opened_by_user_id=borrower_a.id,
+            reason="甲争议",
+            status="open",
+            created_at=now,
+            updated_at=now,
+        )
+        dispute_b = Dispute(
+            university_id=schools["b_id"],
+            circulation_request_id=request_b.id,
+            opened_by_user_id=borrower_b.id,
+            reason="乙争议",
+            status="open",
+            created_at=now,
+            updated_at=now,
+        )
+        db.session.add_all([dispute_a, dispute_b])
+        notification_service.record_audit(
+            actor_user_id=schools["actor"].id,
+            university_id=schools["a_id"],
+            action="test.audit.a",
+            entity_type="test",
+        )
+        notification_service.record_audit(
+            actor_user_id=schools["b_admin_id"],
+            university_id=schools["b_id"],
+            action="test.audit.b",
+            entity_type="test",
+        )
+        db.session.commit()
+        yield {
+            "item_a_id": item_a.id,
+            "item_b_id": item_b.id,
+            "dispute_a_id": dispute_a.id,
+            "dispute_b_id": dispute_b.id,
+        }
+
+
+def test_school_admin_moderation_lists_are_scoped(governance_world, schools):
+    item_ids = {item.id for item in item_service.list_recent_items(schools["actor"])}
+    assert governance_world["item_a_id"] in item_ids
+    assert governance_world["item_b_id"] not in item_ids
+
+    platform_ids = {
+        item.id for item in item_service.list_recent_items(schools["platform_actor"])
+    }
+    assert {governance_world["item_a_id"], governance_world["item_b_id"]} <= platform_ids
+
+
+def test_school_admin_can_force_off_own_item_only(governance_world, schools):
+    item = item_service.change_item_shelf_state(
+        schools["actor"],
+        governance_world["item_a_id"],
+        action="force_off_shelf",
+        reason="本校违规",
+    )
+    assert item.moderation_status == "hidden"
+
+    with pytest.raises(NotFoundError):
+        item_service.change_item_shelf_state(
+            schools["actor"],
+            governance_world["item_b_id"],
+            action="force_off_shelf",
+            reason="跨校违规",
+        )
+
+
+def test_school_admin_disputes_are_scoped(governance_world, schools):
+    own_ids = {dispute.id for dispute in handover_service.list_open_disputes(schools["actor"])}
+    assert own_ids == {governance_world["dispute_a_id"]}
+
+    platform_ids = {
+        dispute.id
+        for dispute in handover_service.list_open_disputes(schools["platform_actor"])
+    }
+    assert platform_ids == {
+        governance_world["dispute_a_id"],
+        governance_world["dispute_b_id"],
+    }
+
+
+def test_school_admin_can_resolve_own_dispute_only(governance_world, schools):
+    dispute = handover_service.resolve_dispute(
+        schools["actor"],
+        governance_world["dispute_a_id"],
+        resolution="本校处理完成",
+    )
+    assert dispute.status == "resolved"
+
+    with pytest.raises(NotFoundError):
+        handover_service.resolve_dispute(
+            schools["actor"],
+            governance_world["dispute_b_id"],
+            resolution="跨校处理",
+        )
+
+
+def test_school_admin_audit_logs_are_scoped(governance_world, schools):
+    own_actions = {
+        log.action for log in notification_service.list_audit_logs(schools["actor"])
+    }
+    assert "test.audit.a" in own_actions
+    assert "test.audit.b" not in own_actions
+
+    platform_actions = {
+        log.action
+        for log in notification_service.list_audit_logs(schools["platform_actor"])
+    }
+    assert {"test.audit.a", "test.audit.b"} <= platform_actions
+
+
+def test_school_admin_governance_pages_are_scoped(client, governance_world, schools):
+    page = client.get("/auth/identity").get_data(as_text=True)
+    client.post(
+        "/auth/identity",
+        data={"csrf_token": get_csrf_token(page), "role": "university_admin"},
+        follow_redirects=True,
+    )
+    page = client.get("/auth/login").get_data(as_text=True)
+    client.post(
+        "/auth/login",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "identifier": "school-a-admin",
+            "password": "manager1",
+        },
+        follow_redirects=True,
+    )
+
+    moderation = client.get("/admin/moderation")
+    assert moderation.status_code == 200
+    html = moderation.get_data(as_text=True)
+    assert "甲审核物品" in html
+    assert "乙审核物品" not in html
+
+    disputes = client.get("/admin/disputes")
+    assert disputes.status_code == 200
+    html = disputes.get_data(as_text=True)
+    assert "甲争议" in html
+    assert "乙争议" not in html
+
+    audit = client.get("/admin/audit")
+    assert audit.status_code == 200
+    html = audit.get_data(as_text=True)
+    assert "test.audit.a" in html
+    assert "test.audit.b" not in html

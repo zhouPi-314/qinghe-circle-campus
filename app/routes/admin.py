@@ -234,7 +234,7 @@ def upload_roster():
 
 
 @bp.get("/moderation")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def moderation():
     """内容审核（FR-M02）：下架违规物品并记录原因。"""
     rows = item_service.list_recent_items(g.current_user)
@@ -242,7 +242,7 @@ def moderation():
 
 
 @bp.post("/moderation/<int:item_id>/off-shelf")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def force_off_shelf(item_id: int):
     try:
         item_service.change_item_shelf_state(
@@ -256,7 +256,7 @@ def force_off_shelf(item_id: int):
 
 
 @bp.get("/disputes")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def disputes():
     """争议处理（FR-H05、BR-042）。"""
     rows = handover_service.list_open_disputes(g.current_user)
@@ -264,7 +264,7 @@ def disputes():
 
 
 @bp.post("/disputes/<int:dispute_id>/resolve")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def resolve_dispute(dispute_id: int):
     try:
         handover_service.resolve_dispute(
@@ -278,7 +278,7 @@ def resolve_dispute(dispute_id: int):
 
 
 @bp.get("/audit")
-@roles_required("platform_admin")
+@roles_required("platform_admin", "university_admin")
 def audit():
     """审计日志查询（FR-M04）。"""
     from app.services import notification_service

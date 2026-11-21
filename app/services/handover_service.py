@@ -26,6 +26,7 @@ from sqlalchemy import select
 
 from app import db
 from app.core.errors import ConflictError, InputError, NotFoundError, PermissionDeniedError
+from app.core.permissions import ensure_actor_university, is_university_manager
 from app.core.states import (
     DISPUTABLE_REQUEST_STATUSES,
     ITEM_IN_PROGRESS,
@@ -393,7 +394,7 @@ def open_dispute_for_request(
         recipient_ids={request.requester_user_id, request.owner_user_id} - {opened_by_user_id},
         category="dispute",
         title="流转争议已发起",
-        body=f"「{request.item.title}」存在争议，等待平台管理员处理。",
+        body=f"「{request.item.title}」存在争议，等待管理员处理。",
         related_entity_type="circulation_request",
         related_entity_id=request.id,
     )
@@ -401,12 +402,12 @@ def open_dispute_for_request(
 
 
 def resolve_dispute(actor, dispute_id: int, *, resolution: str) -> Dispute:
-    """平台管理员处理争议（FR-H05、BR-042）：记录结论并关闭业务。
+    """管理员处理争议（FR-H05、BR-042）：记录结论并关闭业务。
 
     G4 加固：锁序固定 争议行 → 申请行 → 物品行，与并发处理串行化。
     """
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以处理争议。")
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法处理争议。")
     dispute = db.session.scalars(
         select(Dispute).where(Dispute.id == dispute_id)
         .with_for_update()
@@ -414,6 +415,9 @@ def resolve_dispute(actor, dispute_id: int, *, resolution: str) -> Dispute:
     ).first()
     if dispute is None:
         raise NotFoundError("没有找到该争议记录。")
+    if actor.is_university_admin and dispute.university_id != actor.university_id:
+        raise NotFoundError("没有找到该争议记录。")
+    ensure_actor_university(actor, dispute.university_id)
     if dispute.status not in ("open", "reviewing"):
         raise ConflictError("该争议已处理完毕，不能重复处理（BR-042）。")
     if not (resolution or "").strip():
@@ -477,7 +481,7 @@ def resolve_dispute(actor, dispute_id: int, *, resolution: str) -> Dispute:
         recipient_ids={request.requester_user_id, request.owner_user_id} if request else set(),
         category="dispute",
         title="争议已处理",
-        body=f"「{request.item.title if request else '相关物品'}」的争议已由平台管理员处理完毕。",
+        body=f"「{request.item.title if request else '相关物品'}」的争议已由管理员处理完毕。",
         related_entity_type="circulation_request",
         related_entity_id=request.id if request else None,
     )
@@ -496,14 +500,17 @@ def dispute_messages_for(dispute_id: int) -> list[DisputeMessage]:
 
 
 def list_open_disputes(actor) -> list[Dispute]:
-    """平台管理员查看待处理争议（FR-H05）。"""
-    if not actor.is_platform_admin:
-        raise PermissionDeniedError("只有平台管理员可以查看争议列表。")
+    """管理员查看待处理争议；校级管理员仅本校（FR-H05）。"""
+    if not is_university_manager(actor):
+        raise PermissionDeniedError("当前身份无法查看争议列表。")
     stmt = (
         select(Dispute)
         .where(Dispute.status.in_(("open", "reviewing")))
         .order_by(Dispute.created_at)
     )
+    if actor.is_university_admin:
+        ensure_actor_university(actor, actor.university_id)
+        stmt = stmt.where(Dispute.university_id == actor.university_id)
     return list(db.session.scalars(stmt).all())
 
 
