@@ -106,7 +106,9 @@ class AliyunPnvsSmsSender:
         )
         try:
             response = self._client.check_sms_verify_code(request)
-        except Exception:
+        except Exception as error:
+            if getattr(error, "code", None) == "isv.ValidateFail":
+                return False
             raise SmsProviderError("短信核验服务暂时不可用，请稍后重试。") from None
 
         body = response.body

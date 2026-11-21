@@ -153,6 +153,24 @@ def test_aliyun_pnvs_verification_passes_only_on_pass(monkeypatch, tmp_path):
     assert sender.verify_register_code("13880001234", "000000", "request-1") is False
 
 
+def test_aliyun_validate_fail_is_a_wrong_code_not_outage(monkeypatch, tmp_path):
+    config = _config(monkeypatch, tmp_path, "aliyun_pnvs")
+    monkeypatch.setenv("ALIBABA_CLOUD_ACCESS_KEY_ID", "test-id")
+    monkeypatch.setenv("ALIBABA_CLOUD_ACCESS_KEY_SECRET", "test-secret")
+    monkeypatch.setenv("ALIYUN_PNVS_SIGN_NAME", "test-sign")
+    monkeypatch.setenv("ALIYUN_PNVS_TEMPLATE_CODE", "100001")
+    config = Config(project_root=tmp_path)
+
+    class InvalidCodeClient:
+        def check_sms_verify_code(self, _request):
+            error = RuntimeError("provider detail")
+            error.code = "isv.ValidateFail"
+            raise error
+
+    sender = sms.AliyunPnvsSmsSender(config, client=InvalidCodeClient())
+    assert sender.verify_register_code("13880001234", "000000", "request-1") is False
+
+
 def test_provider_failure_does_not_expose_phone_or_secret():
     class FailingClient:
         def send_sms_verify_code(self, _request):
