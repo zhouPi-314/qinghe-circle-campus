@@ -28,6 +28,7 @@ from flask import (
 from app.core import auth as session_auth
 from app.core.captcha import issue_captcha
 from app.core.errors import InputError
+from app.core.security_monitor import trusted_client_ip
 from app.core.sms import SmsProviderError
 from app.services import auth_service
 
@@ -410,7 +411,7 @@ def register_sms_code():
             student_no=request.form.get("student_no", ""),
             phone=request.form.get("phone", ""),
             captcha_answer=request.form.get("captcha", ""),
-            request_ip=request.remote_addr,
+            request_ip=trusted_client_ip(),
         )
     except InputError as err:
         if _wants_json():

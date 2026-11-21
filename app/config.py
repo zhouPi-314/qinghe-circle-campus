@@ -25,6 +25,8 @@ ALLOWED_ENV_VARS = (
     "ALIYUN_PNVS_SIGN_NAME",
     "ALIYUN_PNVS_TEMPLATE_CODE",
     "ALIYUN_PNVS_REGION_ID",
+    "TRUST_CLOUDFLARE_IP_HEADER",
+    "CLOUDFLARE_ORIGIN_SECRET",
 )
 
 _REQUIRED = ("SECRET_KEY", "DATABASE_URL")
@@ -95,6 +97,11 @@ class Config:
             os.environ.get("ALIYUN_PNVS_REGION_ID") or "cn-hangzhou"
         )
         self.vercel_env = os.environ.get("VERCEL_ENV")
+        self.trust_cloudflare_ip_header = (
+            os.environ.get("TRUST_CLOUDFLARE_IP_HEADER", "").strip().lower()
+            in ("1", "true", "yes")
+        )
+        self.cloudflare_origin_secret = os.environ.get("CLOUDFLARE_ORIGIN_SECRET")
 
         self.testing = False
 
@@ -135,6 +142,10 @@ class Config:
                 raise RuntimeError(
                     "阿里云短信认证配置缺失：" + "、".join(missing)
                 )
+        if self.trust_cloudflare_ip_header and not self.cloudflare_origin_secret:
+            raise RuntimeError(
+                "启用 Cloudflare IP Header 时必须配置 CLOUDFLARE_ORIGIN_SECRET。"
+            )
 
 
 def flask_config_from(config: Config, *, testing: bool = False) -> dict:

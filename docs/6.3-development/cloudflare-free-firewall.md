@@ -42,10 +42,13 @@ WAF 不扫描上传文件内部的恶意代码。当前只允许 JPEG/PNG/WebP �
 ### 4.1 可信客户端 IP
 
 - 新增 `TRUST_CLOUDFLARE_IP_HEADER` 配置，默认 `false`。
+- 新增 `CLOUDFLARE_ORIGIN_SECRET`，由 Cloudflare Request Header Transform 规则注入 `X-Qinghe-Origin-Secret`。
 - 自定义域名经 Cloudflare 代理后设为 `true`。
-- 开启时读取 `CF-Connecting-IP`；关闭时使用 Vercel 提供的请求地址。
+- 只有共享源站密钥常量时间校验通过后，才读取 `CF-Connecting-IP`；否则使用 Vercel 提供的请求地址。
 - 只保存 IP 的 HMAC，不保存完整 IP。
 - 禁止直接信任公网客户端自行提交的 `CF-Connecting-IP`。
+
+当前实现位于 `app/core/security_monitor.py:trusted_client_ip()`；只有环境变量显式为 true、源站密钥匹配且 Header 是合法 IP 时才采用，否则回退 `request.remote_addr`。这防止直接访问 vercel.app 时伪造 `CF-Connecting-IP`。
 
 ### 4.2 应用层注册防火墙
 
