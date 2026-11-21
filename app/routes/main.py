@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flask import Blueprint, g, jsonify, render_template
+from flask import Blueprint, current_app, g, jsonify, render_template
 from sqlalchemy import text
 
 from app import db
@@ -33,3 +33,9 @@ def health():
     checks["database"] = db_status
     overall = "ok" if db_status == "ok" else "degraded"
     return jsonify({"status": overall, "checks": checks}), status_code
+
+
+@bp.get("/favicon.ico")
+def favicon():
+    """部分浏览器会直接请求根目录图标，复用项目内的 SVG 标记。"""
+    return current_app.send_static_file("favicon.svg")

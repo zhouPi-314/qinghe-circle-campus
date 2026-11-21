@@ -192,12 +192,14 @@ class TestStationManagerLogin:
 
 
 class TestStudentContextEnforced:
-    def test_student_without_campus_redirected(self, client):
-        """学生未选校区时不能进入登录页（BR-044、FR-A08）。"""
+    def test_student_without_campus_sees_context_prompt(self, client):
+        """学生未选校区时登录页原位提示先选择学校校区（BR-044、FR-A08）。"""
         choose_student_identity(client)
         resp = client.get("/auth/login", follow_redirects=False)
-        assert resp.status_code == 302
-        assert "/auth/student-context" in resp.headers["Location"]
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        assert "先选择学校与校区" in html
+        assert "/auth/student-context" in html
 
     def test_student_without_campus_cannot_login(self, client):
         """未选校区时直接 POST 登录被重定向回学校校区选择。"""
@@ -286,11 +288,12 @@ class TestNextTargetChain:
         location = resp.headers["Location"]
         assert "/auth/login" in location and "next=" in location
 
-        # 2) 登录页（未选身份）-> 身份选择页，next 不丢失
-        resp = client.get(location, follow_redirects=False)
-        assert resp.status_code == 302
-        assert "/auth/identity" in resp.headers["Location"]
-        assert "next=" in resp.headers["Location"]
+        # 2) 登录页原地显示未选择身份，并保留 next
+        resp = client.get(location)
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        assert "未选择身份" in html
+        assert 'name="next" value="/me/profile"' in html
 
         # 3) 选择学生身份 -> 学校校区选择，next 仍保留
         page = client.get("/auth/identity").get_data(as_text=True)

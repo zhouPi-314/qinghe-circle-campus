@@ -25,6 +25,61 @@ _IDENTITY_ROLES = {
     "university_admin": "校级管理员（预留）",
 }
 
+_IDENTITY_COPY = {
+    "student": {
+        "intro": "登录后查看本校物品、申请与公益项目。",
+        "account_label": "学号或手机号",
+        "account_placeholder": "请输入学号或手机号",
+        "context_label": "学生登录范围",
+        "context_text": "首次登录需先选择学校与校区。",
+        "footnote": "还没有账号？",
+        "footnote_link_label": "前往学生注册",
+        "footnote_endpoint": "auth.register",
+    },
+    "station_manager": {
+        "intro": "登录后处理回收验收、公益捐赠核验与回执登记。",
+        "account_label": "登录账号",
+        "account_placeholder": "请输入登录账号",
+        "context_label": "账号说明",
+        "context_text": "公益管理员账号由平台管理员导入，不提供注册入口。",
+        "footnote": "账号由平台管理员统一配置，不提供注册入口。",
+    },
+    "platform_admin": {
+        "intro": "登录后继续处理校园物品的发布、申请与交接。",
+        "account_label": "登录账号",
+        "account_placeholder": "请输入登录账号",
+        "context_label": "账号说明",
+        "context_text": "管理员账号由平台统一配置，不提供注册入口。",
+        "footnote": "账号由平台管理员统一配置，不提供注册入口。",
+    },
+    "university_admin": {
+        "intro": "校级管理员为预留身份，当前可登录但管理功能暂未开放。",
+        "account_label": "登录账号",
+        "account_placeholder": "请输入登录账号",
+        "context_label": "账号说明",
+        "context_text": "校级管理员账号由平台管理员导入，不提供注册入口。",
+        "footnote": "账号由平台管理员统一配置，不提供注册入口。",
+    },
+}
+
+
+def _identity_config(campus_display: str | None = None) -> dict[str, dict[str, str | None]]:
+    """登录页身份切换的展示文案；不包含账号或权限判断。"""
+    config: dict[str, dict[str, str | None]] = {}
+    for role, label in _IDENTITY_ROLES.items():
+        copy = dict(_IDENTITY_COPY[role])
+        footnote_endpoint = copy.pop("footnote_endpoint", None)
+        if role == "student" and campus_display:
+            copy["context_text"] = campus_display
+        config[role] = {
+            "label": label,
+            **copy,
+            "context_action_url": url_for("auth.student_context") if role == "student" else None,
+            "context_action_label": "重新选择学校与校区" if campus_display else "先选择学校与校区",
+            "footnote_url": url_for(footnote_endpoint) if footnote_endpoint else None,
+        }
+    return config
+
 
 def _safe_target(raw: str | None) -> str | None:
     """校验 next 目标：仅接受站内相对路径（拒绝外链与协议相对地址）。"""
@@ -58,10 +113,17 @@ def identity():
         if role == "student":
             return _redirect_with_next("auth.student_context", target)
         return _redirect_with_next("auth.login", target)
+    role = session_auth.get_identity_role()
+    campus_display = _student_context_display()
     return render_template(
-        "auth/identity.html",
+        "auth/login.html",
+        role=role,
+        role_display=_IDENTITY_ROLES.get(role, "未选择身份"),
         roles=_IDENTITY_ROLES,
-        selected=session_auth.get_identity_role(),
+        identity_config=_identity_config(campus_display),
+        field_errors={},
+        identifier_value="",
+        campus_display=campus_display,
         next_target=target,
     )
 
@@ -113,16 +175,39 @@ def login():
     """
     target = _target_from_request()
     role = session_auth.get_identity_role()
-    if role is None:
-        return _redirect_with_next("auth.identity", target)
-    if role == "student" and session.get(session_auth.SESSION_UNIVERSITY_ID) is None:
-        # 学生必须先选择学校与校区（BR-044、FR-A08）
-        return _redirect_with_next("auth.student_context", target)
 
     field_errors: dict[str, str] = {}
     identifier_value = ""
 
     if request.method == "POST":
+        submitted_role = request.form.get("role", "").strip()
+        if submitted_role:
+            if submitted_role not in _IDENTITY_ROLES:
+                raise InputError("请选择有效的登录身份。")
+            role = submitted_role
+            session_auth.set_identity_role(role)
+        if role is None:
+            from flask import flash
+
+            flash("未选择身份，请先在右上角选择登录身份。", "error")
+            return (
+                render_template(
+                    "auth/login.html",
+                    role=None,
+                    role_display="未选择身份",
+                    roles=_IDENTITY_ROLES,
+                    identity_config=_identity_config(),
+                    field_errors={},
+                    identifier_value="",
+                    campus_display=None,
+                    next_target=target,
+                ),
+                400,
+            )
+        if role == "student" and session.get(session_auth.SESSION_UNIVERSITY_ID) is None:
+            # 学生必须先选择学校与校区（BR-044、FR-A08）
+            return _redirect_with_next("auth.student_context", target)
+
         identifier_value = request.form.get("identifier", "")
         password = request.form.get("password", "")
         student_university_id = (
@@ -149,7 +234,9 @@ def login():
     return render_template(
         "auth/login.html",
         role=role,
-        role_display=_IDENTITY_ROLES[role],
+        role_display=_IDENTITY_ROLES.get(role, "未选择身份"),
+        roles=_IDENTITY_ROLES,
+        identity_config=_identity_config(campus_display),
         field_errors=field_errors,
         identifier_value=identifier_value,
         campus_display=campus_display,
@@ -226,7 +313,7 @@ def register():
 @bp.post("/logout")
 def logout():
     session_auth.logout_user()
-    return redirect(url_for("auth.identity"))
+    return redirect(url_for("auth.login"))
 
 
 def _student_context_display() -> str | None:

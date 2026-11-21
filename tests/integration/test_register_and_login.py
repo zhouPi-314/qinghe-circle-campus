@@ -99,11 +99,26 @@ class TestIdentityFlow:
         )
         html = resp.get_data(as_text=True)
         assert 'class="login-shell"' in html
-        assert '<label for="identifier">登录账号</label>' in html
+        assert 'id="account-label"' in html
+        assert "登录账号" in html
         assert '<label for="password">密码</label>' in html
         assert 'id="password-toggle"' in html
         assert 'aria-controls="password"' in html
         assert 'name="remember_account"' in html
+        assert 'class="identity-switcher"' in html
+        assert 'id="identity-picker"' in html
+        assert 'name="role" value="platform_admin"' in html
+        assert "不需要再次确认" in html
+        assert "data-theme-toggle" in html
+
+    def test_login_page_prompts_when_identity_is_not_selected(self, client):
+        resp = client.get("/auth/login?next=/me/profile")
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        assert "未选择身份" in html
+        assert "请先在右上角选择登录身份" in html
+        assert 'name="next" value="/me/profile"' in html
+        assert 'id="login-form"' in html
 
 
 class TestRegister:
@@ -327,10 +342,12 @@ class TestLogin:
 
     def test_student_must_choose_campus_first(self, client):
         choose_student_identity(client)
-        # 未选学校时访问登录页必须被拦截并回到学校校区选择（BR-044、FR-A08）
+        # 未选学校时登录页原位提示先完成学校校区选择（BR-044、FR-A08）
         resp = client.get("/auth/login", follow_redirects=False)
-        assert resp.status_code == 302
-        assert "/auth/student-context" in resp.headers["Location"]
+        assert resp.status_code == 200
+        html = resp.get_data(as_text=True)
+        assert "先选择学校与校区" in html
+        assert "/auth/student-context" in html
 
 
 class TestAdminLogin:

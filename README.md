@@ -12,7 +12,7 @@ A Campus Circular Sharing Platform
 [![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00)](https://www.sqlalchemy.org/)
-[![Tests](https://img.shields.io/badge/tests-191%20passed-2EA44F)](docs/6.3-development/evidence/m6-public-release-test-output.txt)
+[![Tests](https://img.shields.io/badge/tests-194%20passed-2EA44F)](docs/6.3-development/evidence/ui-consistency-redesign.md)
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghe-circle-campus.vercel.app)
 

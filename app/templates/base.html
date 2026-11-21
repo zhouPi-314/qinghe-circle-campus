@@ -4,37 +4,85 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}青禾流转{% endblock %}</title>
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem("qinghe.theme");
+        const system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = saved === "dark" || saved === "light" ? saved : system;
+      } catch (_error) {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <header class="site-header">
     <a class="brand" href="{{ url_for('main.index') }}">
-      <span class="brand-name">青禾流转</span>
-      <span class="brand-sub">校园物品共享流转与绿色回收平台</span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 48 48">
+          <path d="M12 29c1-10 8-17 18-18-1 10-8 17-18 18Z"></path>
+          <path d="M13 34c7-7 13-11 22-14"></path>
+          <path d="M17 35c5 1 10 0 15-3"></path>
+        </svg>
+      </span>
+      <span class="brand-copy">
+        <span class="brand-name">青禾流转</span>
+        <span class="brand-sub">Qinghe Circle Campus</span>
+      </span>
     </a>
     <nav class="site-nav">
       {% if g.current_user %}
-        <a class="nav-link" href="{{ url_for('items.discover') }}">物品发现</a>
-        <a class="nav-link" href="{{ url_for('circulation.my_requests') }}">我的申请</a>
-        <a class="nav-link" href="{{ url_for('circulation.notifications') }}">通知</a>
-        <a class="nav-link" href="{{ url_for('me.profile') }}">资料</a>
-        <a class="nav-link" href="{{ url_for('items.new_item') }}">发布物品</a>
-        {% if g.current_user.role == 'station_manager' %}
-          <a class="nav-link" href="{{ url_for('circulation.station_workbench') }}">站点工作台</a>
-          <a class="nav-link" href="{{ url_for('charity.new_project') }}">创建公益项目</a>
-        {% endif %}
-        <a class="nav-link" href="{{ url_for('charity.project_list') }}">公益项目</a>
-        {% if g.current_user.is_platform_admin %}
-          <a class="nav-link" href="{{ url_for('admin.overview') }}">平台概览</a>
-        {% endif %}
-        <span class="role-tag role-{{ g.current_user.role }}">{{ g.current_user.role_label }}</span>
-        <span class="nav-user">{{ g.current_user.nickname }}</span>
-        <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn btn-ghost">退出登录</button>
-        </form>
+        <div class="nav-links">
+          <a class="nav-link" href="{{ url_for('items.discover') }}">物品发现</a>
+          <a class="nav-link" href="{{ url_for('circulation.my_requests') }}">我的申请</a>
+          <a class="nav-link" href="{{ url_for('circulation.notifications') }}">通知</a>
+          <a class="nav-link" href="{{ url_for('me.profile') }}">资料</a>
+          <a class="nav-link" href="{{ url_for('items.new_item') }}">发布物品</a>
+          {% if g.current_user.role == 'station_manager' %}
+            <a class="nav-link" href="{{ url_for('circulation.station_workbench') }}">站点工作台</a>
+            <a class="nav-link" href="{{ url_for('charity.new_project') }}">创建公益项目</a>
+          {% endif %}
+          <a class="nav-link" href="{{ url_for('charity.project_list') }}">公益项目</a>
+          {% if g.current_user.is_platform_admin %}
+            <a class="nav-link" href="{{ url_for('admin.overview') }}">平台概览</a>
+          {% endif %}
+        </div>
+        <div class="nav-actions">
+          <span class="nav-user">
+            <span class="role-tag role-{{ g.current_user.role }}">{{ g.current_user.role_label }}</span>
+            <span>{{ g.current_user.nickname }}</span>
+          </span>
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z"></path>
+            </svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+          </button>
+          <form method="post" action="{{ url_for('auth.logout') }}" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-ghost btn-compact">退出</button>
+          </form>
+        </div>
       {% else %}
-        <a class="btn btn-ghost" href="{{ url_for('auth.identity') }}">登录 / 注册</a>
+        <div class="nav-actions">
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z"></path>
+            </svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+          </button>
+          <a class="btn btn-primary btn-compact" href="{{ url_for('auth.identity') }}">登录 / 注册</a>
+        </div>
       {% endif %}
     </nav>
   </header>
@@ -56,5 +104,6 @@
   <footer class="site-footer">
     <p>让每一件好物，都遇见下一位需要的人</p>
   </footer>
+  <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
 </body>
 </html>

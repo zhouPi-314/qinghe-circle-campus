@@ -1,15 +1,21 @@
 {
   "audited_at": "2026-11-21",
-  "scope": "Enterprise SaaS login page and direct project dependencies",
+  "scope": "Application-wide campus UI, login, theme, and direct project dependencies",
   "new_third_party_assets": [],
   "new_dependencies": [],
   "original_design_assets": [
     {
       "name": "Qinghe circulation hero and interface icons",
       "files": [
+        "app/static/favicon.svg",
+        "app/static/css/tokens.css",
+        "app/static/css/style.css",
         "app/templates/auth/login.html",
         "app/static/css/login.css",
-        "app/static/js/login.js"
+        "app/static/js/login.js",
+        "app/static/js/theme.js",
+        "app/templates/base.html",
+        "app/templates/home.html"
       ],
       "author": "zhouPi-314 / Codex",
       "license": "MIT",
@@ -19,8 +25,8 @@
   ],
   "fonts": [
     {
-      "name": "Aptos, Segoe UI Variable, Noto Sans SC, Microsoft YaHei, Bahnschrift, Cascadia Code",
-      "distribution": "No font files are bundled or downloaded by this page",
+      "name": "Noto Sans SC, Microsoft YaHei, PingFang SC, Noto Serif SC, Source Han Serif SC, STSong, Songti SC, Bahnschrift, Cascadia Code, Consolas",
+      "distribution": "No font files are bundled or downloaded by the application",
       "license_status": "Provided by the operating system/browser; individual system font licenses apply"
     }
   ],
@@ -75,7 +81,7 @@
     }
   ],
   "existing_media": {
-    "scope": "Not introduced or changed by the login redesign",
+    "scope": "Not introduced or changed by the UI consistency and theme update",
     "record": "THIRD_PARTY_NOTICES.md, docs/6.2-design/assets/credits.json, work/ui-animation-proposal-20261120/sources.json"
   },
   "limitations": "This is a dependency and asset inventory, not legal advice. System-font licenses vary by installed operating system."

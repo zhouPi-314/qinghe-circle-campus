@@ -1,17 +1,47 @@
 {% extends "base.html" %}
 {% block title %}首页 - 青禾流转{% endblock %}
 {% block content %}
+<section class="card campus-hero">
+  <div class="hero-content">
+    <p class="hero-kicker">校园循环网络</p>
+    <h1>你好，{{ user.nickname }}</h1>
+    <p class="page-lead">
+      当前身份：<span class="role-tag role-{{ user.role }}">{{ user.role_label }}</span><br>
+      让闲置在同校同学之间继续被需要，也让每一次交接都有清楚的去向。
+    </p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="{{ url_for('items.discover') }}">浏览本校物品</a>
+      <a class="btn btn-ghost" href="{{ url_for('items.new_item') }}">发布闲置</a>
+    </div>
+  </div>
+  <div class="hero-emblem" aria-hidden="true">
+    <svg viewBox="0 0 120 120">
+      <path d="M31 74c2-25 22-43 55-45-2 27-22 46-55 45Z"></path>
+      <path d="M28 95c17-18 34-31 59-43"></path>
+      <path d="M37 93c13 3 28 1 42-7"></path>
+    </svg>
+  </div>
+</section>
+
 <section class="card">
-  <h1>你好，{{ user.nickname }}</h1>
-  <p class="page-lead">
-    当前身份：<span class="role-tag role-{{ user.role }}">{{ user.role_label }}</span>
-  </p>
-  <p>可以开始使用：</p>
-  <ul>
-    <li><a href="{{ url_for('items.discover') }}">物品发现</a> — 浏览本校可共享物品</li>
-    <li><a href="{{ url_for('items.new_item') }}">发布物品</a> — 让闲置继续被需要</li>
-    <li><a href="{{ url_for('circulation.my_requests') }}">我的申请</a> — 跟进借还进度</li>
-    <li><a href="{{ url_for('circulation.notifications') }}">通知</a> — 申请、交接与争议提醒</li>
-  </ul>
+  <h2>今天从哪里开始</h2>
+  <div class="action-grid">
+    <a class="action-card" href="{{ url_for('items.discover') }}">
+      <strong>物品发现</strong>
+      <span>浏览本校可共享的教材、器材与生活用品。</span>
+    </a>
+    <a class="action-card" href="{{ url_for('circulation.my_requests') }}">
+      <strong>我的申请</strong>
+      <span>跟进申请、交接、归还与争议进度。</span>
+    </a>
+    <a class="action-card" href="{{ url_for('circulation.notifications') }}">
+      <strong>站内通知</strong>
+      <span>查看申请结果、交接提醒和状态变化。</span>
+    </a>
+    <a class="action-card" href="{{ url_for('charity.project_list') }}">
+      <strong>公益项目</strong>
+      <span>了解实物募集进度与已公示的脱敏回执。</span>
+    </a>
+  </div>
 </section>
 {% endblock %}

@@ -16,6 +16,11 @@ class TestHealth:
         assert data["status"] == "ok"
         assert data["checks"]["database"] == "ok"
 
+    def test_favicon_is_available(self, client):
+        resp = client.get("/favicon.ico")
+        assert resp.status_code == 200
+        assert resp.mimetype == "image/svg+xml"
+
 
 class TestSchemaInit:
     def test_all_27_tables_exist(self, app):

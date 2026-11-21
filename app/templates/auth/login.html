@@ -4,14 +4,27 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ role_display }}登录 - 青禾流转</title>
+  <script>
+    (() => {
+      try {
+        const saved = localStorage.getItem("qinghe.theme");
+        const system = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        document.documentElement.dataset.theme = saved === "dark" || saved === "light" ? saved : system;
+      } catch (_error) {
+        document.documentElement.dataset.theme = "light";
+      }
+    })();
+  </script>
+  <link rel="icon" href="{{ url_for('static', filename='favicon.svg') }}" type="image/svg+xml">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/tokens.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
-<body>
+<body data-initial-role="{{ role or '' }}">
   <main class="login-shell">
     <section class="brand-panel" aria-labelledby="brand-title">
       <div class="brand-ambient" aria-hidden="true"></div>
       <header class="brand-lockup">
-        <a class="brand-mark-link" href="{{ url_for('auth.identity') }}" aria-label="返回青禾流转身份选择">
+        <a class="brand-mark-link" href="{{ url_for('auth.login') }}" aria-label="返回青禾流转登录页">
           <span class="brand-mark" aria-hidden="true">
             <svg viewBox="0 0 48 48" role="img">
               <path d="M12 29c1-10 8-17 18-18-1 10-8 17-18 18Z"></path>
@@ -100,29 +113,76 @@
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 5 6v5c0 4.6 2.9 8.1 7 10 4.1-1.9 7-5.4 7-10V6l-7-3Z"></path><path d="m9 12 2 2 4-4"></path></svg>
           安全访问
         </span>
-        <a href="{{ url_for('auth.identity') }}">切换登录身份</a>
+        <div class="topbar-actions">
+          <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换主题">
+            <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M20 15.2A8.5 8.5 0 0 1 8.8 4a8.5 8.5 0 1 0 11.2 11.2Z"></path>
+            </svg>
+            <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path>
+            </svg>
+          </button>
+          <details class="identity-switcher" data-role-picker>
+            <summary>
+              切换身份
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5"></path></svg>
+            </summary>
+            <div class="identity-popover">
+              <h2 id="identity-panel-title">选择登录身份</h2>
+              <p>选中身份后，下方登录界面会立即更新，不需要再次确认。</p>
+              <form id="identity-picker" method="post" action="{{ url_for('auth.identity') }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="next" value="{{ next_target or '' }}">
+                <fieldset class="identity-options">
+                  <legend>登录身份</legend>
+                  {% for value, label in roles.items() %}
+                    <label class="identity-option">
+                      <input type="radio" name="role" value="{{ value }}"
+                             {% if role == value %}checked{% endif %} required>
+                      <span class="identity-option-copy">
+                        <strong>{{ label }}</strong>
+                        <small>{{ identity_config[value].intro }}</small>
+                      </span>
+                      <span class="identity-check" aria-hidden="true"></span>
+                    </label>
+                  {% endfor %}
+                </fieldset>
+                <noscript><button type="submit">使用此身份继续</button></noscript>
+              </form>
+            </div>
+          </details>
+        </div>
       </header>
 
       <div class="login-card">
-        <div class="role-chip">{{ role_display }}</div>
+        <div class="role-chip" id="role-chip" aria-live="polite">{{ role_display }}</div>
         <h2 id="login-title">欢迎回来</h2>
-        <p class="login-intro">登录后继续处理校园物品的发布、申请与交接。</p>
+        <p class="login-intro" id="login-intro">
+          {{ identity_config[role].intro if role else '请先在右上角选择登录身份。' }}
+        </p>
 
-        {% if campus_display %}
-          <div class="context-card">
-            <span class="context-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5"></path><path d="M5 10v9h14v-9"></path><path d="M9 19v-5h6v5"></path></svg>
-            </span>
-            <span><small>当前学校与校区</small><strong>{{ campus_display }}</strong></span>
-          </div>
-        {% else %}
-          <div class="context-card">
-            <span class="context-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H11v15H6.5A2.5 2.5 0 0 0 4 21.5v-15Z"></path><path d="M20 6.5A2.5 2.5 0 0 0 17.5 4H13v15h4.5a2.5 2.5 0 0 1 2.5 2.5v-15Z"></path></svg>
-            </span>
-            <span><small>账号说明</small><strong>管理员账号由平台统一配置，不提供注册入口</strong></span>
-          </div>
-        {% endif %}
+        <p id="role-required-notice" class="login-alert role-required-notice" role="status" {% if role %}hidden{% endif %}>
+          未选择身份，请先在右上角选择登录身份。
+        </p>
+
+        <div class="context-card" id="context-card">
+          <span class="context-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 10.5 12 4l9 6.5"></path><path d="M5 10v9h14v-9"></path><path d="M9 19v-5h6v5"></path></svg>
+          </span>
+          <span>
+            <small id="context-label">
+              {{ identity_config[role].context_label if role else '身份状态' }}
+            </small>
+            <strong id="context-value">
+              {{ identity_config[role].context_text if role else '尚未选择登录身份' }}
+            </strong>
+            <a id="context-action" href="{{ identity_config[role].context_action_url if role else url_for('auth.student_context') }}"
+               {% if not role or not identity_config[role].context_action_url %}hidden{% endif %}>
+              {{ identity_config[role].context_action_label if role else '先选择学校与校区' }}
+            </a>
+          </span>
+        </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
@@ -134,19 +194,22 @@
           {% endif %}
         {% endwith %}
 
-        <form id="login-form" class="login-form" method="post" action="{{ url_for('auth.login') }}" data-role="{{ role }}">
+        <form id="login-form" class="login-form" method="post" action="{{ url_for('auth.login') }}" data-role="{{ role or '' }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="next" value="{{ next_target or '' }}">
+          <input type="hidden" name="role" id="selected-role" value="{{ role or '' }}">
 
           <div class="form-field {% if field_errors.identifier %}has-error{% endif %}">
-            <label for="identifier">{{ '学号或手机号' if role == 'student' else '登录账号' }}</label>
+            <label for="identifier" id="account-label">
+              {{ identity_config[role].account_label if role else '登录账号' }}
+            </label>
             <div class="input-shell">
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 20c.7-3.4 3.2-5.2 7-5.2s6.3 1.8 7 5.2"></path></svg>
               </span>
               <input id="identifier" name="identifier" type="text" value="{{ identifier_value }}"
-                     autocomplete="username" required
-                     placeholder="{{ '请输入学号或手机号' if role == 'student' else '请输入登录账号' }}"
+                     autocomplete="username" required {% if not role %}disabled{% endif %}
+                     placeholder="{{ identity_config[role].account_placeholder if role else '选择身份后可输入账号' }}"
                      aria-describedby="{{ 'err-identifier' if field_errors.identifier else '' }}">
             </div>
             {% if field_errors.identifier %}<p class="field-error" id="err-identifier">{{ field_errors.identifier }}</p>{% endif %}
@@ -158,11 +221,11 @@
               <span class="input-icon" aria-hidden="true">
                 <svg viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
               </span>
-              <input id="password" name="password" type="password" autocomplete="current-password" required
+              <input id="password" name="password" type="password" autocomplete="current-password" required {% if not role %}disabled{% endif %}
                      placeholder="请输入密码"
                      aria-describedby="{{ 'err-password' if field_errors.password else '' }}">
               <button id="password-toggle" class="password-toggle" type="button"
-                      aria-label="显示密码" aria-controls="password" aria-pressed="false">
+                      aria-label="显示密码" aria-controls="password" aria-pressed="false" {% if not role %}disabled{% endif %}>
                 <svg class="eye-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M2.5 12s3.4-5 9.5-5 9.5 5 9.5 5-3.4 5-9.5 5-9.5-5-9.5-5Z"></path><circle cx="12" cy="12" r="2.5"></circle></svg>
                 <svg class="eye-closed" viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 16 16"></path><path d="M9.5 6.3A10 10 0 0 1 12 7c6.1 0 9.5 5 9.5 5a14 14 0 0 1-2.1 2.4"></path><path d="M6.1 8.1C3.9 9.6 2.5 12 2.5 12s3.4 5 9.5 5c1.3 0 2.5-.2 3.6-.6"></path></svg>
               </button>
@@ -172,24 +235,26 @@
 
           <div class="form-meta">
             <label class="remember-control">
-              <input id="remember-account" name="remember_account" type="checkbox" value="1">
+              <input id="remember-account" name="remember_account" type="checkbox" value="1" {% if not role %}disabled{% endif %}>
               <span>记住账号</span>
             </label>
             <span>忘记密码请联系平台管理员</span>
           </div>
 
-          <button class="submit-button" type="submit">
+          <button class="submit-button" type="submit" {% if not role %}disabled{% endif %}>
             <span>进入青禾流转</span>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="m14 7 5 5-5 5"></path></svg>
           </button>
         </form>
 
-        <p class="login-footnote">
-          {% if role == 'student' %}
-            还没有账号？<a href="{{ url_for('auth.register') }}">前往学生注册</a>
-          {% else %}
-            账号由平台管理员统一配置，不提供注册入口。
-          {% endif %}
+        <p class="login-footnote" id="login-footnote">
+          <span id="footnote-text">
+            {{ identity_config[role].footnote if role else '选择身份后可继续登录。' }}
+          </span>
+          <a id="footnote-link" href="{{ identity_config[role].footnote_url if role and identity_config[role].footnote_url else '#' }}"
+             {% if not role or not identity_config[role].footnote_url %}hidden{% endif %}>
+            {{ identity_config[role].footnote_link_label if role and identity_config[role].footnote_url else '' }}
+          </a>
         </p>
       </div>
 
@@ -199,6 +264,8 @@
       </footer>
     </section>
   </main>
+  <script type="application/json" id="identity-config">{{ identity_config | tojson }}</script>
+  <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
   <script src="{{ url_for('static', filename='js/login.js') }}" defer></script>
 </body>
 </html>

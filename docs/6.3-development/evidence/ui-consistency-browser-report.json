@@ -1,0 +1,490 @@
+{
+  "checked_at": "2026-11-21T10:45:20.357Z",
+  "passed": true,
+  "checks": [
+    {
+      "name": "public entry opens login without identity",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "unselected identity prompt is visible",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "identity picker stays closed until requested",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "login desktop has no vertical scrollbar",
+      "passed": true,
+      "details": {
+        "viewport": 933,
+        "documentHeight": 933,
+        "shellHeight": 933,
+        "overflowY": 0,
+        "horizontalOverflow": false,
+        "documentOverflowY": "hidden"
+      }
+    },
+    {
+      "name": "login desktop no horizontal overflow",
+      "passed": true,
+      "details": {
+        "viewport": 933,
+        "documentHeight": 933,
+        "shellHeight": 933,
+        "overflowY": 0,
+        "horizontalOverflow": false,
+        "documentOverflowY": "hidden"
+      }
+    },
+    {
+      "name": "login uses reference blue",
+      "passed": true,
+      "details": {
+        "primary": "#0b63f6",
+        "front": "color(srgb 0.184314 0.482353 1 / 0.88)",
+        "back": "color(srgb 0.340314 0.717882 1)",
+        "frontChannels": [
+          0.184314,
+          0.482353,
+          1
+        ],
+        "backChannels": [
+          0.340314,
+          0.717882,
+          1
+        ]
+      }
+    },
+    {
+      "name": "login lower rings are blue",
+      "passed": true,
+      "details": {
+        "primary": "#0b63f6",
+        "front": "color(srgb 0.184314 0.482353 1 / 0.88)",
+        "back": "color(srgb 0.340314 0.717882 1)",
+        "frontChannels": [
+          0.184314,
+          0.482353,
+          1
+        ],
+        "backChannels": [
+          0.340314,
+          0.717882,
+          1
+        ]
+      }
+    },
+    {
+      "name": "identity panel opens",
+      "passed": true,
+      "details": {
+        "open": true,
+        "left": 1403,
+        "right": 1793,
+        "top": 74,
+        "bottom": 469,
+        "viewportWidth": 1867,
+        "viewportHeight": 933
+      }
+    },
+    {
+      "name": "identity panel stays inside viewport",
+      "passed": true,
+      "details": {
+        "open": true,
+        "left": 1403,
+        "right": 1793,
+        "top": 74,
+        "bottom": 469,
+        "viewportWidth": 1867,
+        "viewportHeight": 933
+      }
+    },
+    {
+      "name": "identity selection stays on login page",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "identity switches form to station manager",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "identity chip updates in place",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "identity prompt clears after selection",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "dark theme applied on login",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "dark theme persists after reload",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "login compact desktop has no vertical scrollbar",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "documentHeight": 768,
+        "overflowY": 0,
+        "documentOverflowY": "hidden"
+      }
+    },
+    {
+      "name": "admin login reaches workspace",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "workspace theme returns light",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "home no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "admin page renders",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "admin no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "/items renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "物品发现",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/items has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "物品发现",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/me/profile renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "个人资料",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/me/profile has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "个人资料",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/me/requests renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "我的申请",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/me/requests has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "我的申请",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/me/notifications renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "站内通知",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/me/notifications has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "站内通知",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/charity renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "公益项目",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/charity has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "公益项目",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/organizations renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "组织管理",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/organizations has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "组织管理",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/users renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "账号管理",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/users has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "账号管理",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/student-imports renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "学生名单导入",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/student-imports has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "学生名单导入",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/moderation renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "内容审核",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/moderation has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "内容审核",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/disputes renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "争议处理",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/disputes has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "争议处理",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/audit renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "审计日志",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/admin/audit has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "审计日志",
+        "overflow": false
+      }
+    },
+    {
+      "name": "student item form uses shared shell",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student item form no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student item detail renders",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "student item detail no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "/station renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "站点工作台",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/station has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "站点工作台",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/station/recycling renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "回收验收",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/station/recycling has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "回收验收",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/station/donations renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "公益捐赠核验",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/station/donations has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "公益捐赠核验",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/station/receipts/new renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "公益回执登记",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/station/receipts/new has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "公益回执登记",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/charity/projects/new renders shared shell",
+      "passed": true,
+      "details": {
+        "heading": "创建公益项目",
+        "overflow": false
+      }
+    },
+    {
+      "name": "/charity/projects/new has no horizontal overflow",
+      "passed": true,
+      "details": {
+        "heading": "创建公益项目",
+        "overflow": false
+      }
+    },
+    {
+      "name": "tablet no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "mobile no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "mobile login no horizontal overflow",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "mobile unselected identity prompt visible",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "mobile controls meet 44px target",
+      "passed": true,
+      "details": []
+    },
+    {
+      "name": "form fields have labels",
+      "passed": true,
+      "details": null
+    },
+    {
+      "name": "no console errors",
+      "passed": true,
+      "details": []
+    }
+  ],
+  "console": {
+    "errors": [],
+    "warnings": []
+  },
+  "credentials_recorded": false
+}
