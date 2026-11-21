@@ -1,14 +1,33 @@
-# 青禾流转 Qinghe Circle Campus
+<div align="center">
+
+# 青禾流转
+
+### Qinghe Circle Campus
+
+**让闲置继续流动，让资源遇见下一位需要的人。**
+
+A Campus Circular Sharing Platform
+
+[![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00)](https://www.sqlalchemy.org/)
+[![Tests](https://img.shields.io/badge/tests-191%20passed-2EA44F)](docs/6.3-development/evidence/m6-public-release-test-output.txt)
+[![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
+[![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghe-circle-campus.vercel.app)
+
+[**在线体验**](https://qinghe-circle-campus.vercel.app) ·
+[**项目文档**](docs/README.md) ·
+[**版本更新**](https://github.com/zhouPi-314/qinghe-circle-campus/releases) ·
+[**参与贡献**](CONTRIBUTING.md)
+
+</div>
 
 面向高校的校园物品共享、二手流转、免费赠送、绿色回收与公益实物捐赠平台。项目使用 Flask 服务端渲染，支持多高校逻辑隔离、学生名单核验、四类流转状态机、一次性交接码、争议处理、公益回执和 R2 图片存储。
 
-- 已部署的在线官方网站：<https://qinghe-circle-campus.vercel.app>
-- Python：3.13
-- 数据库：PostgreSQL 18
-- 许可：代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权
-
 > 本项目最初作为课程作业完成，现以开源方式分享，欢迎使用、提出问题和参与改进。它是教学与工程示例，不承诺生产级 SLA，也不接收真实公益资金。
 
+> **当前版本状态：** `v1.0.0` 已公开发布并部署。代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权。
 
 ## 功能范围
 
