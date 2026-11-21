@@ -5,13 +5,14 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 import pytest
+from sqlalchemy import select
 
 from app import db
 from app.core.errors import NotFoundError, PermissionDeniedError
 from app.core.permissions import CurrentUser, ensure_actor_university, to_current_user
 from app.models.circulation import CirculationRequest
 from app.models.governance import AuditLog, Dispute
-from app.models.university import StationManagerAssignment, University
+from app.models.university import Station, StationManagerAssignment, University
 from app.models.user import User
 from app.services import (
     auth_service,
@@ -213,7 +214,6 @@ def test_school_admin_can_create_own_campus_and_station(schools):
     )
     station = org_service.create_station(
         actor,
-        university_id=schools["a_id"],
         campus_id=campus.id,
         name="甲东站点",
         station_type="mixed",
@@ -244,7 +244,6 @@ def test_school_admin_cannot_create_other_school_organization(schools):
     with pytest.raises(PermissionDeniedError):
         org_service.create_station(
             actor,
-            university_id=schools["b_id"],
             campus_id=schools["b_campus_id"],
             name="越权站点",
             station_type="mixed",
@@ -300,6 +299,86 @@ def test_school_admin_can_render_scoped_admin_pages(client, schools):
     assert "创建校区" in html
     assert "创建站点" in html
     assert "新增高校" not in html
+
+
+def _login_admin(client, role: str, identifier: str, password: str) -> None:
+    page = client.get("/auth/identity").get_data(as_text=True)
+    client.post(
+        "/auth/identity",
+        data={"csrf_token": get_csrf_token(page), "role": role},
+        follow_redirects=True,
+    )
+    page = client.get("/auth/login").get_data(as_text=True)
+    client.post(
+        "/auth/login",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "identifier": identifier,
+            "password": password,
+        },
+        follow_redirects=True,
+    )
+
+
+def test_school_admin_creates_station_from_http_form(client, schools):
+    _login_admin(client, "university_admin", "school-a-admin", "manager1")
+    page = client.get("/admin/organizations").get_data(as_text=True)
+    response = client.post(
+        "/admin/organizations/stations",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "campus_id": str(schools["a_campus_id"]),
+            "name": "HTTP 校级站点",
+            "station_type": "mixed",
+            "address": "甲校东门",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    station = db.session.scalar(select(Station).where(Station.name == "HTTP 校级站点"))
+    assert station is not None
+    assert station.university_id == schools["a_id"]
+
+
+def test_platform_admin_creates_station_from_http_form(client, schools):
+    _login_admin(client, "platform_admin", "platform-a", "admin12345")
+    page = client.get("/admin/organizations").get_data(as_text=True)
+    response = client.post(
+        "/admin/organizations/stations",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "campus_id": str(schools["b_campus_id"]),
+            "name": "HTTP 平台站点",
+            "station_type": "charity",
+            "address": "乙校南门",
+        },
+        follow_redirects=True,
+    )
+
+    assert response.status_code == 200
+    station = db.session.scalar(select(Station).where(Station.name == "HTTP 平台站点"))
+    assert station is not None
+    assert station.university_id == schools["b_id"]
+
+
+def test_school_admin_cannot_create_station_from_other_school_http(client, schools):
+    _login_admin(client, "university_admin", "school-a-admin", "manager1")
+    page = client.get("/admin/organizations").get_data(as_text=True)
+    response = client.post(
+        "/admin/organizations/stations",
+        data={
+            "csrf_token": get_csrf_token(page),
+            "campus_id": str(schools["b_campus_id"]),
+            "name": "跨校 HTTP 站点",
+            "station_type": "mixed",
+            "address": "乙校北门",
+        },
+        follow_redirects=False,
+    )
+
+    assert response.status_code == 403
+    assert db.session.scalar(select(Station).where(Station.name == "跨校 HTTP 站点")) is None
 
 
 def test_school_admin_user_and_university_lists_are_scoped(schools):

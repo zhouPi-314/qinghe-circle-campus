@@ -141,7 +141,6 @@ def create_campus(
 def create_station(
     actor,
     *,
-    university_id: int,
     campus_id: int,
     name: str,
     station_type: str,
@@ -149,16 +148,16 @@ def create_station(
     service_hours: str | None = None,
 ) -> Station:
     """平台管理员或本校校级管理员创建回收/公益站点（FR-U02）。"""
-    ensure_actor_university(actor, university_id)
+    campus = db.session.get(Campus, campus_id)
+    if campus is None or campus.status != "active":
+        raise InputError("所选校区无效。")
+    university_id = ensure_actor_university(actor, campus.university_id)
     name = (name or "").strip()
     address = (address or "").strip()
     if not name or not address:
         raise InputError("站点名称与地址不能为空。")
     if station_type not in ("recycle", "charity", "mixed"):
         raise InputError("站点类型无效。")
-    campus = db.session.get(Campus, campus_id)
-    if campus is None or campus.university_id != university_id or campus.status != "active":
-        raise InputError("所选校区无效。")
     now = datetime.now(UTC)
     station = Station(
         university_id=university_id,

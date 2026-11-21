@@ -116,7 +116,6 @@ def create_station():
     try:
         org_service.create_station(
             g.current_user,
-            university_id=request.form.get("university_id", type=int) or 0,
             campus_id=request.form.get("campus_id", type=int) or 0,
             name=request.form.get("name", ""),
             station_type=request.form.get("station_type", "mixed"),
