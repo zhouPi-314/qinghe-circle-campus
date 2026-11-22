@@ -6,6 +6,7 @@
 
 - 项目名称：青禾流转（Qinghe Circle Campus）
 - 当前状态：G4 已批准发布（D-042）。G5-A/B/C 已完成合并、依赖审计、31 表 Production 迁移、Vercel 部署和公网 smoke；主入口已迁移到 `https://qinghecircle.dpdns.org`，Cloudflare Free WAF、源站密钥入口守卫和免费收件转发已上线（D-058/D-059）；298 项回归通过，WorkerBuddy 保持停止
+- 课程演示使用已单独预置的校级管理员账号；登录名和密码只保存在部署维护者的桌面受控文件，不进入 Git、Issue、日志或课程文档。
 - G1 通过前不得进入 G2 业务编码；各门禁停止点见 `docs/00-governance/collaboration-and-quality-gates.md`
 
 ## 强制阅读顺序

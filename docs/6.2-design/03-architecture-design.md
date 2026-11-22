@@ -209,10 +209,12 @@ flowchart LR
 | 数据库 | 本地 PostgreSQL 18 | Neon PostgreSQL |
 | 图片 | 本地 fake storage 或临时目录 | Cloudflare R2 |
 | 短信认证 | Mock Provider | 阿里云 PNVS 短信认证 |
-| 边缘防护 | Flask 应用层频控 | Vercel + 应用层安全事件和临时封禁；Cloudflare WAF 暂缓 |
+| 边缘防护 | Flask 应用层频控 | `qinghecircle.dpdns.org` 经 Cloudflare Free WAF、Bot Fight Mode 和注册速率限制；`qinghecircle.de5.net` 保留兼容 |
 | 页面 | Jinja2 | 同一套 Jinja2 模板 |
 
 环境变量、密钥和 R2 凭据只从环境读取，不写入代码或文档。
+
+公网 Production 只允许白名单 Host 携带 Cloudflare 注入的 `X-Qinghe-Origin-Secret` 进入 Flask。直接访问默认 `vercel.app` Production Host 返回 404；最新 deployment URL 由 Vercel Deployment Protection 保护。Cloudflare 只负责边缘防护，应用层验证码、IP HMAC 频控、临时封禁和角色权限仍保留。
 
 ## 9. 架构验收
 
@@ -232,3 +234,4 @@ flowchart LR
 | 1.0 | 2026-11-19 | 建立分层架构、模块职责、service 接口和关键数据流 |
 | 1.1 | 2026-11-19 | 补齐管理账号和校园组织 service 接口，移除校级管理员首版职责冲突 |
 | 1.2 | 2026-11-22 | 同步 G5 校级管理员、阿里云短信、运维安全与 Cloudflare WAF 暂缓状态 |
+| 1.3 | 2026-11-22 | 同步 DigitalPlat 免费域名、Cloudflare Free WAF、双域名请求头转换和默认 Vercel 入口封锁 |

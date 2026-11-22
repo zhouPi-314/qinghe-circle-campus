@@ -1,5 +1,7 @@
 # G5 Production 发布与公网验证
 
+> Historical snapshot: the primary public entry is now `https://qinghecircle.dpdns.org`, and Cloudflare Free WAF is active. See `digitalplat-cloudflare-production-verification-20261122.md` for the current deployment state.
+
 | 项目 | 内容 |
 |---|---|
 | 日期 | 2026-11-22 |

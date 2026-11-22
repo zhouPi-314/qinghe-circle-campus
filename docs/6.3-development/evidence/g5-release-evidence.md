@@ -1,5 +1,7 @@
 # G5 发布候选证据
 
+> Historical release-candidate snapshot: the current deployment has 298 passing tests, a DigitalPlat custom domain, Cloudflare Free WAF, and an application-level default Vercel host block. See `digitalplat-cloudflare-production-verification-20261122.md`.
+
 | 项目 | 内容 |
 |---|---|
 | 日期 | 2026-11-22 |

@@ -12,11 +12,11 @@ A Campus Circular Sharing Platform
 [![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00)](https://www.sqlalchemy.org/)
-[![Tests](https://img.shields.io/badge/tests-286%20passed-2EA44F)](docs/6.3-development/evidence/g5-release-evidence.md)
+[![Tests](https://img.shields.io/badge/tests-298%20passed-2EA44F)](docs/6.3-development/evidence/digitalplat-cloudflare-production-verification-20261122.md)
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
-[![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghe-circle-campus.vercel.app)
+[![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghecircle.dpdns.org)
 
-[**官方网站**](https://qinghe-circle-campus.vercel.app) ·
+[**官方网站**](https://qinghecircle.dpdns.org) ·
 [**项目文档**](docs/README.md) ·
 [**版本更新**](https://github.com/zhouPi-314/qinghe-circle-campus/releases) ·
 [**参与贡献**](CONTRIBUTING.md)
@@ -27,7 +27,7 @@ A Campus Circular Sharing Platform
 
 > 本项目以开源方式分享，欢迎使用、提出问题和参与改进。它是校园场景的工程示例，不承诺生产级 SLA，也不接收真实公益资金。
 
-> **当前版本状态：** `v1.1.0` 已合并并部署，包含校级管理员本校治理、图形验证码、阿里云短信认证和平台运维安全中心。代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权。
+> **当前版本状态：** `v1.1.0` 已合并并部署，包含校级管理员本校治理、图形验证码、阿里云短信认证和平台运维安全中心。公网主入口迁移到 `https://qinghecircle.dpdns.org`，Cloudflare Free WAF、默认 Vercel 入口封锁和免费收件转发已启用。代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权。
 
 ## 项目背景
 
@@ -86,6 +86,7 @@ A Campus Circular Sharing Platform
 
 公开站点不提供管理员密码查询。生产密码只保存慢哈希，无法从网页或数据库哈希反推明文。默认登录名通常是 `platform_admin`，但登录名不等于密码。
 
+- 课程演示使用单独预置的校级管理员账号，凭据不进入仓库、Issue、日志或截图。
 - 有 Vercel/Neon 权限时，可按 [平台管理员账号获取与恢复](docs/6.3-development/admin-access-and-recovery.md) 使用受控脚本创建一个独立恢复账号。
 - 没有基础设施权限时，请通过项目所有者或课程维护者恢复；不要在公开 Issue 或 Discussion 中请求或发送密码。
 - 当前首版没有管理员自助改密页面，密码重置属于受控运维操作。
@@ -130,6 +131,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 | `ALIYUN_PNVS_REGION_ID` | 可选 | 默认 `cn-hangzhou` |
 | `TRUST_CLOUDFLARE_IP_HEADER` | Cloudflare 代理时需要 | 默认 `false` |
 | `CLOUDFLARE_ORIGIN_SECRET` | 上项为 true 时必填 | Cloudflare 注入的源站共享密钥 |
+| `PUBLIC_ALLOWED_HOSTS` | Production 入口守卫需要 | 允许进入 Production 的 Host，逗号分隔 |
 
 上述配置真实值不得提交到 Git、Issue、PR、日志或截图中。真实学生姓名、学号、手机号、名单 CSV、短信测试号和公益受助对象信息同样禁止提交。
 
@@ -185,7 +187,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 | Cloudflare R2 | 物品与公益图片上传、读取和删除 | 否，图片增强 |
 | Vercel + Neon | 公网应用入口与托管 PostgreSQL | 否，部署增强 |
 
-邮件验证码、支付结算和公开募捐不在当前实现范围内。真实短信使用阿里云号码认证短信认证；Cloudflare 当前只用于 R2，Cloudflare WAF 暂缓，未部署到公网。
+邮件验证码、支付结算和公开募捐不在当前实现范围内。真实短信使用阿里云号码认证短信认证；Cloudflare Free 已用于 R2、自定义域名 WAF、Bot Fight Mode、注册速率限制和 `contact@qinghecircle.dpdns.org` 收件转发。
 
 ## 演示顺序
 
@@ -209,7 +211,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 4. Vercel 使用仓库根目录的 Flask 入口 `main.py`。
 5. 部署后验证 `/health`、登录、数据库读写、R2 上传与公网读取。
 6. 先执行添加式数据库迁移，再部署新应用版本；阿里云短信先使用受控测试手机 smoke。
-7. Cloudflare WAF 当前暂缓；若后续启用，需要自有域名、代理 DNS、Full (strict) 和源站共享 Header，不能直接套在 `vercel.app`。
+7. 自定义域名通过 Cloudflare Proxied DNS 和 Full (strict) 接入；Cloudflare 请求头转换规则注入源站共享密钥，应用只接受白名单 Host。默认 `vercel.app` Production 入口返回应用 404。
 
 更完整的基础设施说明见 `docs/0-pre-development/07-Vercel-Neon-R2接入指南.md`。
 
@@ -250,6 +252,8 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 - 首版无真实支付、邮件验证码、实名认证和公开募捐。
 - 图形验证码是课程级自托管方案，不等同于商业 OCR 抗性验证码。
 - 无管理员自助改密页面，密码重置需要受控运维操作。
+- 课程演示管理员已独立预设，凭据只保存在部署维护者的桌面受控文件中。
+- Cloudflare Free 自带的速率限制只有一条规则、10 秒窗口；长窗口频控仍由应用层承担。
 - 并发验证以线程级测试为主，未做生产级压测。
 - 高校校区部分记录仍标记为 `temporary`，正式运营前需逐校核验。
 - 第三方人物、学校、公益机构、未成年人场景和用户提供图片保留在仓库中用于课程与场景说明，来源记录见 `docs/6.2-design/assets/credits.json` 和 `work/ui-animation-proposal-20261120/sources.json`；这些素材不随 MIT 代码授权，也不代表相关机构、人物或活动与本项目存在合作、授权或背书。
