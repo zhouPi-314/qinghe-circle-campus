@@ -37,7 +37,7 @@ Cloudflare 是边缘防护层，不是唯一安全边界。应用层的高校权
 |---|---|---|
 | Free Managed Ruleset | 所有套餐可用 | 拦截常见高危 Web 漏洞与扫描 |
 | Bot Fight Mode | Free 可用 | 挑战自动化机器人 |
-| Rate Limiting Rule | Free 提供基础规则额度 | 限制 `/auth/register/*` 请求 |
+| Rate Limiting Rule | Free 提供基础规则额度 | 限制 `/auth/register` 请求 |
 | Turnstile | 有免费额度 | 可作为图形验证码增强，非首版必需 |
 | WAF 事件日志 | Free 能力有限 | 依赖应用 `security_events` 补充审计 |
 
@@ -61,7 +61,7 @@ WAF 不扫描上传文件内部的恶意代码。当前只允许 JPEG/PNG/WebP �
 - 同一 IP 在滚动 10 分钟内第 9 次验证码请求时，阻止继续请求 15 分钟。
 - 同一 IP 24 小时内再次触发 2 次后升级为 24 小时封禁。
 - 永久封禁仅由平台管理员复核执行。
-- 自动封禁只作用于 `/auth/register/*`，避免校园共享 NAT 影响全站。
+- 自动封禁只作用于 `/auth/register`，避免校园共享 NAT 影响全站。
 - 所有临时封禁、升级、解除和误报标记写入审计。
 
 ### 4.3 平台运维页
@@ -92,7 +92,7 @@ WAF 不扫描上传文件内部的恶意代码。当前只允许 JPEG/PNG/WebP �
 Free 只有一条基础速率限制规则，当前用于保护注册入口：
 
 ```text
-匹配路径：/auth/register/*
+匹配条件：URI Path contains /auth/register
 统计维度：IP
 窗口：10 秒
 阈值：10 次
@@ -104,14 +104,20 @@ Free 只有一条基础速率限制规则，当前用于保护注册入口：
 
 ## 6. 上线验证
 
-1. `https://qinghecircle.dpdns.org/health` 返回 200，响应含 Cloudflare 标识。
-2. `https://qinghecircle.de5.net/health` 保持可用。
-3. 自定义域名通过 Cloudflare 代理，证书为 Full (strict)。
-4. 直接访问 `qinghe-circle-campus.vercel.app` 和最新 deployment URL 返回 404。
-4. 连续第 9 次短信请求被应用阻断，产生 `sms_ip_threshold`。
-5. Cloudflare 挑战/阻断不导致健康检查、登录、静态资源和正常注册失效。
-6. 平台运维页可查看安全事件、错误和封禁处置结果。
-7. 解除封禁和误报标记有审计记录。
+2026-11-22 发布后实测：
+
+| 验收项 | 结果 |
+|---|---|
+| 主域健康检查 | `https://qinghecircle.dpdns.org/health` 返回 200，`Server: cloudflare`，存在 `CF-RAY` |
+| 兼容域健康检查 | `https://qinghecircle.de5.net/health` 返回 200 |
+| 首页、登录、注册 GET | 均返回 200，未被 Bot Fight Mode 或 WAF 误伤 |
+| 扫描路径 | `https://qinghecircle.dpdns.org/.env` 返回 Cloudflare 403 |
+| 默认 Vercel 域名 | `https://qinghe-circle-campus.vercel.app/health` 返回应用 404 |
+| Deployment URL | 仍由 Vercel Deployment Protection 登录页拦截，不触达 Flask |
+| 注册速率限制 | 同 IP 连续请求第 11、12 次返回 Cloudflare 429；10 秒后恢复 200 |
+| 自动化回归 | pytest 298 项通过；`app` 与 `tests` 的 Ruff 检查通过 |
+
+应用层长窗口封禁、平台运维页和审计仍需按既有测试继续验收。
 
 ## 7. 获取与配置步骤
 

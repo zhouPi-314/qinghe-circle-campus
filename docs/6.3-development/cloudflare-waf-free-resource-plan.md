@@ -143,7 +143,7 @@ Cloudflare 官方当前说明：
 推荐只把唯一一条 Free 边缘速率限制用于高成本或高风险入口，例如：
 
 ```text
-路径：/auth/register/*
+路径：/auth/register
 计数：IP
 窗口：10 秒
 阈值：10 次
