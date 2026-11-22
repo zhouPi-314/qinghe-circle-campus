@@ -34,6 +34,29 @@ def safe_event_detail(value):
     return value
 
 
+def enforce_public_origin():
+    """Reject direct Production hosts unless the request carries the origin secret."""
+    config = current_app.config.get("APP_CONFIG")
+    allowed_hosts = getattr(config, "public_allowed_hosts", ())
+    if (
+        config is None
+        or config.vercel_env != "production"
+        or not allowed_hosts
+    ):
+        return None
+
+    host = request.host.split(":", 1)[0].rstrip(".").lower()
+    supplied_secret = (request.headers.get("X-Qinghe-Origin-Secret") or "").strip()
+    expected_secret = config.cloudflare_origin_secret or ""
+    if (
+        host in allowed_hosts
+        and expected_secret
+        and hmac.compare_digest(supplied_secret, expected_secret)
+    ):
+        return None
+    return "Not Found", 404
+
+
 def trusted_client_ip() -> str:
     """Return Cloudflare's client IP only when the deployment explicitly trusts it."""
     if not has_app_context():

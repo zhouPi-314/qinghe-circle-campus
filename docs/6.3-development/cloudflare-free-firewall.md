@@ -1,19 +1,24 @@
-# Cloudflare Free 防火墙接入评估（暂缓）
+# DigitalPlat + Cloudflare Free 防火墙接入记录
 
 | 项目 | 内容 |
 |---|---|
 | 日期 | 2026-11-22 |
-| 当前入口 | `https://qinghe-circle-campus.vercel.app` |
+| 当前入口 | `https://qinghecircle.dpdns.org` |
+| 兼容入口 | `https://qinghecircle.de5.net` |
 | 当前主机 | Vercel |
-| 结论 | 用户决定暂不接入；当前 vercel.app 无法直接使用 Cloudflare WAF |
-| 当前状态 | Cloudflare 仅用于 R2；WAF、Bot Fight Mode 和 Cloudflare Rate Limiting 未部署 |
-| 恢复条件 | 用户提供或批准购买自有域名后，再按本文流程评估 |
+| 域名来源 | DigitalPlat FreeDomain，`qinghecircle.dpdns.org`，免费注册，Active |
+| 域名期限 | 2026-11-22 至 2027-11-22；到期前 120 天可免费续费 |
+| 套餐与成本 | Cloudflare Free（$0）；未开通付费域名、WAF、邮箱或 Vercel Pro |
+| 当前状态 | Cloudflare Zone Active；Vercel 域名验证通过；Universal SSL 正常；Full (strict)；Managed Free Ruleset、Bot Fight Mode、扫描路径阻断和注册接口限流已启用；两个自定义域名的请求头转换规则均 Active |
+| 入口边界 | Cloudflare 只保护两个自定义域名；`vercel.app` 直连由应用层 Host 白名单和源站密钥封锁 |
 
 ## 1. 当前限制
 
 Cloudflare WAF 只保护添加到用户 Cloudflare 账户并开启 DNS 代理的域名。`vercel.app` 由 Vercel 控制，不属于本项目自有域名，因此不能为 `qinghe-circle-campus.vercel.app` 添加 Cloudflare WAF、Bot Fight Mode 或 Rate Limiting。
 
-同时，即使以后启用自定义域名，默认 `*.vercel.app` 地址可能仍可访问。Cloudflare 是边缘防护层，不是唯一安全边界；应用层的高校权限、验证码、IP HMAC 频控和黑名单必须继续存在。
+Cloudflare 是边缘防护层，不是唯一安全边界。应用层的高校权限、验证码、IP HMAC 频控和黑名单必须继续存在。
+
+默认 `*.vercel.app` 地址不接受 Vercel 账号内的 WAF 规则。当前项目在 Production 增加 Host 白名单与 `X-Qinghe-Origin-Secret` 双重校验：只有两个批准域名且请求头匹配时进入应用，其他 Production Host 统一返回 404。Cloudflare 为两个域名分别注入该请求头，应用侧用常量时间比较验证。
 
 ## 2. 接入前提
 
@@ -67,6 +72,11 @@ WAF 不扫描上传文件内部的恶意代码。当前只允许 JPEG/PNG/WebP �
 
 ## 5. Cloudflare 规则建议
 
+当前已部署：
+
+- Free Managed Ruleset：Cloudflare 标记为 `Always active`，规则集详情显示 42 条免费托管规则。
+- 自定义规则 `Block common scanner paths and unsafe methods`：匹配 `.env`、`.git`、`.php`、`/actuator/`、`/server-status`、`/phpmyadmin` 以及 TRACE/TRACK/CONNECT，动作 `Block`。
+
 ### Managed Rules
 
 - 启用 Free Managed Ruleset。
@@ -79,22 +89,25 @@ WAF 不扫描上传文件内部的恶意代码。当前只允许 JPEG/PNG/WebP �
 
 ### Rate Limiting
 
-Free 只有有限规则，优先保护注册：
+Free 只有一条基础速率限制规则，当前用于保护注册入口：
 
 ```text
 匹配路径：/auth/register/*
 统计维度：IP
-阈值：10 分钟 10 次（略宽于应用层第 9 次阻断）
-动作：Managed Challenge
+窗口：10 秒
+阈值：10 次
+动作：Block
+阻断持续时间：10 秒
 ```
 
-应用层仍是最终业务限制；Cloudflare 只负责尽早卸载明显洪峰。
+应用层仍是最终业务限制；Cloudflare 只负责尽早卸载明显洪峰。应用层继续执行 60 秒重发间隔和 10 分钟内第 9 次触发临时封禁等长窗口策略。
 
 ## 6. 上线验证
 
-1. `qinghe-circle-campus.vercel.app` 和应用层防护仍可用。
-2. 自定义域名通过 Cloudflare 代理，证书为 Full (strict)。
-3. 直接访问 Vercel 默认域名仍受应用层频率限制。
+1. `https://qinghecircle.dpdns.org/health` 返回 200，响应含 Cloudflare 标识。
+2. `https://qinghecircle.de5.net/health` 保持可用。
+3. 自定义域名通过 Cloudflare 代理，证书为 Full (strict)。
+4. 直接访问 `qinghe-circle-campus.vercel.app` 和最新 deployment URL 返回 404。
 4. 连续第 9 次短信请求被应用阻断，产生 `sms_ip_threshold`。
 5. Cloudflare 挑战/阻断不导致健康检查、登录、静态资源和正常注册失效。
 6. 平台运维页可查看安全事件、错误和封禁处置结果。
@@ -103,13 +116,15 @@ Free 只有有限规则，优先保护注册：
 ## 7. 获取与配置步骤
 
 1. 已有域名：登录 Cloudflare → Add a site → 选择 Free → 按提示替换 Nameserver。
-2. 没有域名：使用 Cloudflare Registrar 或合规域名注册商购买；此步骤涉及付款，需要用户确认。
+2. 免费域名：按 DigitalPlat 当前免费名额选择后缀；避开暂停注册的 `.us.kg`、`.xx.kg`，本次使用 `.dpdns.org`。
 3. 在 Vercel 添加域名并完成验证。
 4. Cloudflare DNS 按 Vercel 要求添加记录并开启代理。
 5. Cloudflare → Security → WAF 开启 Free Managed Ruleset。
 6. Cloudflare → Bots 开启 Bot Fight Mode。
 7. Cloudflare → Security → WAF Rate Limiting 创建注册路径规则。
 8. 先部署 Preview 自定义域名验证，再切换 Production。
+
+本次另配置免费 Cloudflare Email Routing：`contact@qinghecircle.dpdns.org` 转发至 Cloudflare 账号内已验证邮箱。该能力仅覆盖收件转发，不提供任意收件人的免费事务邮件发信。
 
 ## 8. 官方参考
 

@@ -42,8 +42,10 @@ def create_app(*, testing: bool = False) -> Flask:
 
     from app.core.auth import register_auth_hooks
     from app.core.errors import register_error_handlers
+    from app.core.security_monitor import enforce_public_origin
 
     register_error_handlers(app)
+    app.before_request(enforce_public_origin)
     register_auth_hooks(app)
 
     _register_template_helpers(app)

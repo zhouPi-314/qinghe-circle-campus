@@ -22,6 +22,63 @@ class TestHealth:
         assert resp.mimetype == "image/svg+xml"
 
 
+class TestPublicOriginGuard:
+    @pytest.fixture
+    def secured_app(self, app, monkeypatch):
+        config = app.config["APP_CONFIG"]
+        monkeypatch.setattr(config, "vercel_env", "production")
+        monkeypatch.setattr(
+            config, "public_allowed_hosts", ("qinghecircle.dpdns.org",)
+        )
+        monkeypatch.setattr(config, "cloudflare_origin_secret", "origin-secret")
+        return app
+
+    def test_allowed_host_and_origin_secret_reach_app(self, secured_app, client):
+        resp = client.get(
+            "/favicon.ico",
+            base_url="https://qinghecircle.dpdns.org",
+            headers={"X-Qinghe-Origin-Secret": "origin-secret"},
+        )
+        assert resp.status_code == 200
+
+    def test_production_vercel_host_is_blocked_even_with_secret(
+        self, secured_app, client
+    ):
+        resp = client.get(
+            "/favicon.ico",
+            base_url="https://qinghe-circle-campus.vercel.app",
+            headers={"X-Qinghe-Origin-Secret": "origin-secret"},
+        )
+        assert resp.status_code == 404
+
+    def test_allowed_host_without_origin_secret_is_blocked(self, secured_app, client):
+        resp = client.get(
+            "/favicon.ico",
+            base_url="https://qinghecircle.dpdns.org",
+        )
+        assert resp.status_code == 404
+
+    def test_allowed_host_with_wrong_origin_secret_is_blocked(
+        self, secured_app, client
+    ):
+        resp = client.get(
+            "/favicon.ico",
+            base_url="https://qinghecircle.dpdns.org",
+            headers={"X-Qinghe-Origin-Secret": "wrong-secret"},
+        )
+        assert resp.status_code == 404
+
+    def test_non_production_hosts_are_not_blocked(self, secured_app, client, monkeypatch):
+        monkeypatch.setattr(
+            secured_app.config["APP_CONFIG"], "vercel_env", "preview"
+        )
+        resp = client.get(
+            "/favicon.ico",
+            base_url="https://qinghe-circle-campus.vercel.app",
+        )
+        assert resp.status_code == 200
+
+
 class TestSchemaInit:
     def test_all_27_tables_exist(self, app):
         with app.app_context():

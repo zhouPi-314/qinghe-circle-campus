@@ -27,6 +27,7 @@ ALLOWED_ENV_VARS = (
     "ALIYUN_PNVS_REGION_ID",
     "TRUST_CLOUDFLARE_IP_HEADER",
     "CLOUDFLARE_ORIGIN_SECRET",
+    "PUBLIC_ALLOWED_HOSTS",
 )
 
 _REQUIRED = ("SECRET_KEY", "DATABASE_URL")
@@ -102,6 +103,11 @@ class Config:
             in ("1", "true", "yes")
         )
         self.cloudflare_origin_secret = os.environ.get("CLOUDFLARE_ORIGIN_SECRET")
+        self.public_allowed_hosts = tuple(
+            host.strip().rstrip(".").lower()
+            for host in os.environ.get("PUBLIC_ALLOWED_HOSTS", "").split(",")
+            if host.strip()
+        )
 
         self.testing = False
 
@@ -145,6 +151,14 @@ class Config:
         if self.trust_cloudflare_ip_header and not self.cloudflare_origin_secret:
             raise RuntimeError(
                 "启用 Cloudflare IP Header 时必须配置 CLOUDFLARE_ORIGIN_SECRET。"
+            )
+        if (
+            self.vercel_env == "production"
+            and self.public_allowed_hosts
+            and not self.cloudflare_origin_secret
+        ):
+            raise RuntimeError(
+                "Production 限制公共 Host 时必须配置 CLOUDFLARE_ORIGIN_SECRET。"
             )
 
 
