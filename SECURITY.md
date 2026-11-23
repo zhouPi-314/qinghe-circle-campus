@@ -2,7 +2,7 @@
 
 ## 私下报告
 
-不要在公开 Issue 中披露密码、验证码、数据库连接串、R2 密钥、Token、真实学生信息或其他可利用细节。
+在公开 Issue 中不会披露密码、验证码、数据库连接串、R2 密钥、Token、真实学生信息或其他可利用细节。
 
 优先使用 GitHub 仓库的 **Security > Report a vulnerability / Security Advisory** 私下报告。若该入口不可用，请先通过仓库所有者的 GitHub 主页请求安全联系方式，不要附带真实凭据。
 
