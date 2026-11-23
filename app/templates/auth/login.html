@@ -251,6 +251,16 @@
                        data-theme="auto"
                        data-size="flexible"
                        data-appearance="always"></div>
+                  <div class="turnstile-status" id="turnstile-status" role="status" aria-live="polite">
+                    <span class="turnstile-status__spinner" aria-hidden="true"></span>
+                    <span class="turnstile-status__copy">
+                      <strong>Cloudflare 安全验证</strong>
+                      <small id="turnstile-status-text">正在验证浏览器环境</small>
+                    </span>
+                    <svg class="turnstile-status__check" viewBox="0 0 24 24" aria-hidden="true">
+                      <path d="m6.5 12.5 3.4 3.3 7.6-7.6"></path>
+                    </svg>
+                  </div>
                 </div>
               {% else %}
                 <div class="local-verification">

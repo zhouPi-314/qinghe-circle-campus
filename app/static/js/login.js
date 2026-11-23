@@ -21,6 +21,8 @@
   const footnoteLink = document.getElementById("footnote-link");
   const securityVerification = document.getElementById("security-verification");
   const securityError = document.getElementById("security-verification-error");
+  const turnstileStatus = document.getElementById("turnstile-status");
+  const turnstileStatusText = document.getElementById("turnstile-status-text");
   const captchaImage = document.getElementById("login-captcha-image");
   const captchaRefresh = document.getElementById("captcha-refresh");
 
@@ -256,5 +258,35 @@
     }
     if (captchaRefresh) captchaRefresh.disabled = false;
   });
+
+  if (securityVerification?.dataset.mode === "turnstile") {
+    let pendingSince = Date.now();
+    const updateTurnstileStatus = () => {
+      const token = document.querySelector(
+        '.cf-turnstile [name="cf-turnstile-response"]',
+      )?.value;
+      const hasVisibleWidget = [...document.querySelectorAll('.cf-turnstile iframe')].some((frame) => {
+        const rect = frame.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
+      if (turnstileStatus) {
+        turnstileStatus.hidden = hasVisibleWidget;
+        turnstileStatus.dataset.state = token ? "verified" : "pending";
+      }
+      if (turnstileStatusText) {
+        if (token) {
+          turnstileStatusText.textContent = "验证已通过";
+          pendingSince = Date.now();
+        } else if (Date.now() - pendingSince > 12000) {
+          turnstileStatusText.textContent = "验证服务响应较慢，请刷新重试";
+        } else {
+          turnstileStatusText.textContent = "正在验证浏览器环境";
+        }
+      }
+      if (currentRole) submit.disabled = !token;
+    };
+    updateTurnstileStatus();
+    window.setInterval(updateTurnstileStatus, 500);
+  }
 
 })();

@@ -198,6 +198,7 @@ class TestIdentityFlow:
         assert 'data-size="flexible"' in page
         assert "security-verification--inline" in page
         assert 'id="login-captcha-image"' not in page
+        assert 'id="turnstile-status"' in page
         assert 'src="https://challenges.cloudflare.com/turnstile/v0/api.js"' in page
         assert 'id="login-captcha-image"' not in page
 

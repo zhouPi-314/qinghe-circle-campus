@@ -626,18 +626,78 @@ html[data-theme="dark"] .theme-icon-sun { display: block; }
 }
 
 .security-verification--turnstile .turnstile-shell {
-  justify-content: center;
+  position: relative;
+  min-height: 65px;
+  display: block;
 }
 
 .security-verification--turnstile .security-verification__hint {
   text-align: right;
 }
 
-.turnstile-shell {
+.turnstile-status {
+  position: absolute;
+  inset: 0;
   width: 100%;
   min-height: 65px;
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--login-line);
+  border-radius: 6px;
+  color: var(--c-text);
+  background: var(--c-surface);
+}
+
+.security-verification--turnstile .cf-turnstile {
+  position: relative;
+  z-index: 1;
+  min-height: 65px;
+  display: flex;
+  justify-content: center;
+}
+
+.turnstile-status__spinner {
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  border: 2px solid color-mix(in srgb, var(--login-muted) 26%, transparent);
+  border-top-color: #f6821f;
+  border-radius: 50%;
+  animation: turnstile-spin 800ms linear infinite;
+}
+
+.turnstile-status__copy { min-width: 0; }
+.turnstile-status__copy strong,
+.turnstile-status__copy small { display: block; }
+.turnstile-status__copy strong { font-size: 12px; line-height: 1.35; }
+.turnstile-status__copy small {
+  margin-top: 2px;
+  color: var(--c-text-muted);
+  font-size: 9.5px;
+}
+
+.turnstile-status__check {
+  width: 22px;
+  height: 22px;
+  display: none;
+  margin-left: auto;
+  fill: none;
+  stroke: var(--c-success);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.turnstile-status[data-state="verified"] .turnstile-status__spinner { display: none; }
+.turnstile-status[data-state="verified"] .turnstile-status__check { display: block; }
+
+.turnstile-shell {
+  position: relative;
+  width: 100%;
+  min-height: 65px;
+  display: block;
 }
 
 .security-verification__hint {
@@ -982,6 +1042,7 @@ html[data-theme="dark"] .theme-icon-sun { display: block; }
 }
 
 @keyframes slow-spin { to { transform: translate(-50%, -50%) rotate(346deg); } }
+@keyframes turnstile-spin { to { transform: rotate(360deg); } }
 
 @media (min-width: 821px) and (min-height: 700px) {
   html,
