@@ -27,6 +27,9 @@ ALLOWED_ENV_VARS = (
     "ALIYUN_PNVS_REGION_ID",
     "TRUST_CLOUDFLARE_IP_HEADER",
     "CLOUDFLARE_ORIGIN_SECRET",
+    "TURNSTILE_SITE_KEY",
+    "TURNSTILE_SECRET_KEY",
+    "LOGIN_VERIFICATION_ENABLED",
     "PUBLIC_ALLOWED_HOSTS",
 )
 
@@ -103,6 +106,17 @@ class Config:
             in ("1", "true", "yes")
         )
         self.cloudflare_origin_secret = os.environ.get("CLOUDFLARE_ORIGIN_SECRET")
+        self.turnstile_site_key = os.environ.get("TURNSTILE_SITE_KEY")
+        self.turnstile_secret_key = os.environ.get("TURNSTILE_SECRET_KEY")
+        self.turnstile_configured = bool(
+            self.turnstile_site_key and self.turnstile_secret_key
+        )
+        verification_override = os.environ.get("LOGIN_VERIFICATION_ENABLED", "").strip().lower()
+        self.login_verification_enabled = (
+            verification_override in ("1", "true", "yes")
+            if verification_override
+            else None
+        )
         self.public_allowed_hosts = tuple(
             host.strip().rstrip(".").lower()
             for host in os.environ.get("PUBLIC_ALLOWED_HOSTS", "").split(",")
@@ -152,6 +166,10 @@ class Config:
             raise RuntimeError(
                 "启用 Cloudflare IP Header 时必须配置 CLOUDFLARE_ORIGIN_SECRET。"
             )
+        if bool(self.turnstile_site_key) != bool(self.turnstile_secret_key):
+            raise RuntimeError(
+                "Cloudflare Turnstile 必须同时配置 TURNSTILE_SITE_KEY 和 TURNSTILE_SECRET_KEY。"
+            )
         if (
             self.vercel_env == "production"
             and self.public_allowed_hosts
@@ -179,6 +197,11 @@ def flask_config_from(config: Config, *, testing: bool = False) -> dict:
         "PROPAGATE_EXCEPTIONS": False,
         # 默认时区显示（数据库存 UTC，页面按 Asia/Shanghai 显示）
         "DISPLAY_TIMEZONE": "Asia/Shanghai",
+        "LOGIN_VERIFICATION_ENABLED": (
+            not testing
+            if config.login_verification_enabled is None
+            else config.login_verification_enabled
+        ),
         # JSON 健康检查
         "JSON_AS_ASCII": False,
     }

@@ -12,7 +12,7 @@ A Campus Circular Sharing Platform
 [![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00)](https://www.sqlalchemy.org/)
-[![Tests](https://img.shields.io/badge/tests-291%20passed-2EA44F)](tests/)
+[![Tests](https://img.shields.io/badge/tests-301%20passed-2EA44F)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghecircle.dpdns.org)
 
@@ -119,6 +119,8 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 | `ALIYUN_PNVS_REGION_ID` | 可选 | 默认 `cn-hangzhou` |
 | `TRUST_CLOUDFLARE_IP_HEADER` | Cloudflare 代理时需要 | 默认 `false` |
 | `CLOUDFLARE_ORIGIN_SECRET` | 上项为 true 时必填 | Cloudflare 注入的源站共享密钥 |
+| `TURNSTILE_SITE_KEY` | 可选 | 登录页 Cloudflare Turnstile 公开站点密钥 |
+| `TURNSTILE_SECRET_KEY` | 与服务端验证配套 | Turnstile 私密密钥，只放在服务端 Secret |
 | `PUBLIC_ALLOWED_HOSTS` | Production 入口守卫需要 | 允许进入 Production 的 Host，逗号分隔 |
 
 上述配置真实值不得提交到 Git、Issue、PR、日志或截图中。真实学生姓名、学号、手机号、名单 CSV、短信测试号和公益受助对象信息同样禁止提交。
@@ -197,6 +199,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 - 阿里云短信验证码不进入数据库；应用只保存挑战状态、HMAC 标识和 Provider 流水信息。
 - 同一 IP 10 分钟内第 9 次注册短信请求会触发 15 分钟临时阻断和分类安全事件。
 - 密码仅保存慢哈希，生产 Cookie 启用 `Secure`、`HttpOnly`、`SameSite=Lax`。
+- 登录页在配置 Turnstile 密钥后使用 Cloudflare 官方组件和服务端校验；未配置时使用自托管图片验证码。
 - 公开文本拒绝手机号、身份证号和邮箱；图片中的弱结构化隐私由管理员人工核验。
 - 发现安全漏洞或泄露的凭据时，请勿公开提交 Issue，按 `SECURITY.md` 私下报告。
 - 仓库不附带真实学生数据。测试中的姓名、手机号、学号和班级均为虚构示例。

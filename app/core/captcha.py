@@ -14,8 +14,10 @@ from PIL import Image, ImageDraw, ImageFont
 CAPTCHA_TTL_SECONDS = 120
 CAPTCHA_WIDTH = 240
 CAPTCHA_HEIGHT = 80
-CAPTCHA_HASH_KEY = "auth.captcha_hash"
-CAPTCHA_EXPIRES_KEY = "auth.captcha_expires_at"
+CAPTCHA_HASH_KEY_PREFIX = "auth.captcha_hash"
+CAPTCHA_EXPIRES_KEY_PREFIX = "auth.captcha_expires_at"
+CAPTCHA_HASH_KEY = f"{CAPTCHA_HASH_KEY_PREFIX}.registration"
+CAPTCHA_EXPIRES_KEY = f"{CAPTCHA_EXPIRES_KEY_PREFIX}.registration"
 
 _ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 
@@ -67,18 +69,26 @@ def _render_image(code: str) -> bytes:
     return output.getvalue()
 
 
-def issue_captcha(session) -> bytes:
+def _hash_key(purpose: str) -> str:
+    return f"{CAPTCHA_HASH_KEY_PREFIX}.{purpose}"
+
+
+def _expires_key(purpose: str) -> str:
+    return f"{CAPTCHA_EXPIRES_KEY_PREFIX}.{purpose}"
+
+
+def issue_captcha(session, *, purpose: str = "registration") -> bytes:
     """Create a PNG challenge and store only its digest and expiry."""
     code = _random_captcha_code()
-    session[CAPTCHA_HASH_KEY] = _digest(code)
-    session[CAPTCHA_EXPIRES_KEY] = _now_ts() + CAPTCHA_TTL_SECONDS
+    session[_hash_key(purpose)] = _digest(code)
+    session[_expires_key(purpose)] = _now_ts() + CAPTCHA_TTL_SECONDS
     return _render_image(code)
 
 
-def verify_captcha(session, answer: str) -> bool:
+def verify_captcha(session, answer: str, *, purpose: str = "registration") -> bool:
     """Verify and consume the current challenge, regardless of success."""
-    expected = session.pop(CAPTCHA_HASH_KEY, None)
-    expires_at = session.pop(CAPTCHA_EXPIRES_KEY, None)
+    expected = session.pop(_hash_key(purpose), None)
+    expires_at = session.pop(_expires_key(purpose), None)
     if not expected or not expires_at or _now_ts() > float(expires_at):
         return False
     submitted = (answer or "").strip()

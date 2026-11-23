@@ -153,6 +153,54 @@ class TestIdentityFlow:
         assert 'id="registration-guard-notice"' in html
         assert "data-theme-toggle" in html
 
+    def test_login_security_verification_card_uses_local_fallback(self, app, client, monkeypatch):
+        monkeypatch.setitem(app.config, "LOGIN_VERIFICATION_ENABLED", True)
+        page = client.get("/auth/identity").get_data(as_text=True)
+        resp = client.post(
+            "/auth/identity",
+            data={"csrf_token": get_csrf_token(page), "role": "platform_admin"},
+            follow_redirects=True,
+        )
+        html = resp.get_data(as_text=True)
+        assert 'id="security-verification"' in html
+        assert "security-verification--inline" in html
+        assert "安全验证，用于拦截恶意程序类访问。" in html
+        assert 'id="login-captcha-image"' in html
+        assert 'name="verification_answer"' in html
+        assert "challenges.cloudflare.com" not in html
+
+    def test_login_requires_security_verification(self, app, client, monkeypatch):
+        monkeypatch.setitem(app.config, "LOGIN_VERIFICATION_ENABLED", True)
+        page = client.get("/auth/login").get_data(as_text=True)
+        resp = client.post(
+            "/auth/login",
+            data={
+                "csrf_token": get_csrf_token(page),
+                "role": "platform_admin",
+                "identifier": "admin",
+                "password": "admin12345",
+                "verification_answer": "WRONG",
+            },
+        )
+        assert resp.status_code == 400
+        assert "安全验证未通过" in resp.get_data(as_text=True)
+
+    def test_turnstile_replaces_local_captcha_when_configured(self, app, client, monkeypatch):
+        monkeypatch.setitem(app.config, "LOGIN_VERIFICATION_ENABLED", True)
+        app_config = app.config["APP_CONFIG"]
+        monkeypatch.setattr(app_config, "turnstile_site_key", "site-key-for-test")
+        monkeypatch.setattr(app_config, "turnstile_secret_key", "secret-key-for-test")
+        monkeypatch.setattr(app_config, "turnstile_configured", True)
+
+        page = client.get("/auth/login").get_data(as_text=True)
+        assert 'class="cf-turnstile"' in page
+        assert 'data-sitekey="site-key-for-test"' in page
+        assert 'data-size="flexible"' in page
+        assert 'id="turnstile-form-response"' in page
+        assert "security-verification--inline" not in page
+        assert 'src="https://challenges.cloudflare.com/turnstile/v0/api.js"' in page
+        assert 'id="login-captcha-image"' not in page
+
     def test_login_page_prompts_when_identity_is_not_selected(self, client):
         resp = client.get("/auth/login?next=/me/profile")
         assert resp.status_code == 200

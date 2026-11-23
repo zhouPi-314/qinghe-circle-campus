@@ -34,6 +34,14 @@ Cloudflare WAF 是规则匹配型防护，不是“所有访客自动弹验证�
 
 如果确实要在普通首页强制显示托管挑战，需要另建 WAF 自定义规则，例如匹配 `http.request.uri.path eq "/"` 后执行 **Managed Challenge**。应至少排除 `/health`，并先确认 API、静态资源、登录回跳和移动端体验不受影响。该做法会降低可访问性，不应仅为了“看到验证码”而全站启用。
 
+Cloudflare 的 Managed Challenge 页面由 Cloudflare 托管，不能嵌入应用登录页。若需要在登录页右侧显示验证组件，应使用 Turnstile：
+
+1. 在 Cloudflare Dashboard 创建 Turnstile Widget，允许 `qinghecircle.dpdns.org` 和兼容域名。
+2. 将公开 Site Key 与私密 Secret Key 分别写入本地 `.env.local` 和 Vercel Production Secrets。
+3. 两项同时存在时，登录页自动显示官方组件；应用向 Siteverify 校验 token，失败则拒绝登录。
+4. 两项均未配置时，应用使用自身图片验证码，不影响本地开发和紧急回退。
+5. 只配置其中一项会快速失败，避免误以为安全验证已经启用。
+
 ## 3. 接入前提
 
 1. 一个用户可管理的域名。
@@ -52,7 +60,7 @@ Cloudflare WAF 是规则匹配型防护，不是“所有访客自动弹验证�
 | Free Managed Ruleset | 所有套餐可用 | 拦截常见高危 Web 漏洞与扫描 |
 | Bot Fight Mode | Free 可用 | 挑战自动化机器人 |
 | Rate Limiting Rule | Free 提供基础规则额度 | 限制 `/auth/register` 请求 |
-| Turnstile | 有免费额度 | 可作为图形验证码增强，非首版必需 |
+| Turnstile | 有免费额度 | 登录页右侧安全验证；未配置时回退为自托管图片验证码 |
 | WAF 事件日志 | Free 能力有限 | 依赖应用 `security_events` 补充审计 |
 
 WAF 不扫描上传文件内部的恶意代码。当前只允许 JPEG/PNG/WebP 和文件签名校验；若未来允许 Office、PDF、压缩包或可执行附件，需另接恶意文件扫描服务。

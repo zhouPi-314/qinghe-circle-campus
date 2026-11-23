@@ -19,6 +19,11 @@
   const accountLabel = document.getElementById("account-label");
   const footnoteText = document.getElementById("footnote-text");
   const footnoteLink = document.getElementById("footnote-link");
+  const securityVerification = document.getElementById("security-verification");
+  const securityError = document.getElementById("security-verification-error");
+  const turnstileFormResponse = document.getElementById("turnstile-form-response");
+  const captchaImage = document.getElementById("login-captcha-image");
+  const captchaRefresh = document.getElementById("captcha-refresh");
 
   if (
     !form ||
@@ -208,7 +213,22 @@
     password.focus({ preventScroll: true });
   });
 
-  form.addEventListener("submit", () => {
+  form.addEventListener("submit", (event) => {
+    if (securityVerification?.dataset.mode === "turnstile") {
+      const turnstileToken = document.querySelector(
+        '.cf-turnstile [name="cf-turnstile-response"]',
+      )?.value;
+      if (turnstileFormResponse) turnstileFormResponse.value = turnstileToken || "";
+      if (!turnstileToken) {
+        if (securityError) {
+          securityError.textContent = "请先完成安全验证。";
+          securityError.hidden = false;
+        }
+        event.preventDefault();
+        return;
+      }
+      if (securityError) securityError.hidden = true;
+    }
     try {
       if (remember.checked) localStorage.setItem(storageKey(currentRole), identifier.value.trim());
       else localStorage.removeItem(storageKey(currentRole));
@@ -218,4 +238,33 @@
     submit.setAttribute("aria-busy", "true");
     submit.querySelector("span").textContent = "正在登录…";
   });
+
+  captchaRefresh?.addEventListener("click", () => {
+    if (!captchaImage) return;
+    const baseUrl = captchaImage.dataset.captchaSrc;
+    if (!baseUrl) return;
+    captchaRefresh.disabled = true;
+    captchaImage.src = `${baseUrl}?refresh=${Date.now()}`;
+  });
+
+  captchaImage?.addEventListener("load", () => {
+    if (captchaRefresh) captchaRefresh.disabled = false;
+  });
+
+  captchaImage?.addEventListener("error", () => {
+    if (securityError) {
+      securityError.textContent = "验证码加载失败，请换一张后重试。";
+      securityError.hidden = false;
+    }
+    if (captchaRefresh) captchaRefresh.disabled = false;
+  });
+
+  if (securityVerification?.dataset.mode === "turnstile" && turnstileFormResponse) {
+    window.setInterval(() => {
+      const token = document.querySelector(
+        '.cf-turnstile [name="cf-turnstile-response"]',
+      )?.value;
+      turnstileFormResponse.value = token || "";
+    }, 600);
+  }
 })();

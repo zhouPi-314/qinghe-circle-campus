@@ -26,10 +26,11 @@ from flask import (
 )
 
 from app.core import auth as session_auth
-from app.core.captcha import issue_captcha
+from app.core.captcha import issue_captcha, verify_captcha
 from app.core.errors import InputError
 from app.core.security_monitor import trusted_client_ip
 from app.core.sms import SmsProviderError
+from app.core.turnstile import TurnstileError, verify_turnstile
 from app.services import auth_service
 
 bp = Blueprint("auth", __name__, url_prefix="/auth")
@@ -138,6 +139,66 @@ def _registration_challenge_context() -> dict:
     }
 
 
+def _login_verification_context() -> dict[str, object]:
+    """Expose only public verification settings to the login template."""
+    enabled = bool(current_app.config.get("LOGIN_VERIFICATION_ENABLED", True))
+    config = current_app.config.get("APP_CONFIG")
+    site_key = config.turnstile_site_key if config and config.turnstile_configured else None
+    return {
+        "login_verification_enabled": enabled,
+        "login_verification_mode": "turnstile" if site_key else "captcha",
+        "turnstile_site_key": site_key,
+    }
+
+
+def _render_login(
+    *,
+    role: str | None,
+    target: str | None,
+    field_errors: dict[str, str],
+    identifier_value: str,
+    status: int = 200,
+):
+    campus_display = _student_context_display()
+    response = render_template(
+        "auth/login.html",
+        role=role,
+        role_display=_IDENTITY_ROLES.get(role, "未选择身份"),
+        roles=_IDENTITY_ROLES,
+        identity_config=_identity_config(campus_display),
+        field_errors=field_errors,
+        identifier_value=identifier_value,
+        campus_display=campus_display,
+        next_target=target,
+        **_login_verification_context(),
+    )
+    return (response, status) if status != 200 else response
+
+
+def _verify_login_challenge() -> str | None:
+    """Return a user-facing verification error, or None when verification passes."""
+    if not current_app.config.get("LOGIN_VERIFICATION_ENABLED", True):
+        return None
+    config = current_app.config.get("APP_CONFIG")
+    if config and config.turnstile_configured:
+        try:
+            verify_turnstile(
+                config,
+                request.form.get("cf-turnstile-response", ""),
+                remote_ip=trusted_client_ip(),
+            )
+        except TurnstileError as err:
+            return str(err)
+        return None
+    if not verify_captcha(
+        session,
+        request.form.get("verification_answer", ""),
+        purpose="login",
+    ):
+        return "安全验证未通过，请重新输入验证码。"
+    return None
+
+
 @bp.route("/identity", methods=["GET", "POST"])
 def identity():
     """选择登录身份（BR-044）：学生进入学校校区选择，其余进入各自登录界面。"""
@@ -150,18 +211,11 @@ def identity():
         if role == "student":
             return _redirect_with_next("auth.student_context", target)
         return _redirect_with_next("auth.login", target)
-    role = session_auth.get_identity_role()
-    campus_display = _student_context_display()
-    return render_template(
-        "auth/login.html",
-        role=role,
-        role_display=_IDENTITY_ROLES.get(role, "未选择身份"),
-        roles=_IDENTITY_ROLES,
-        identity_config=_identity_config(campus_display),
+    return _render_login(
+        role=session_auth.get_identity_role(),
+        target=target,
         field_errors={},
         identifier_value="",
-        campus_display=campus_display,
-        next_target=target,
     )
 
 
@@ -237,23 +291,27 @@ def login():
             from flask import flash
 
             flash("未选择身份，请先在右上角选择登录身份。", "error")
-            return (
-                render_template(
-                    "auth/login.html",
-                    role=None,
-                    role_display="未选择身份",
-                    roles=_IDENTITY_ROLES,
-                    identity_config=_identity_config(),
-                    field_errors={},
-                    identifier_value="",
-                    campus_display=None,
-                    next_target=target,
-                ),
-                400,
+            return _render_login(
+                role=None,
+                target=target,
+                field_errors={},
+                identifier_value="",
+                status=400,
             )
         if role == "student" and session.get(session_auth.SESSION_UNIVERSITY_ID) is None:
             # 学生必须先选择学校与校区（BR-044、FR-A08）
             return _redirect_with_next("auth.student_context", target)
+
+        verification_error = _verify_login_challenge()
+        if verification_error:
+            field_errors["verification"] = verification_error
+            return _render_login(
+                role=role,
+                target=target,
+                field_errors=field_errors,
+                identifier_value=request.form.get("identifier", ""),
+                status=400,
+            )
 
         identifier_value = request.form.get("identifier", "")
         password = request.form.get("password", "")
@@ -277,18 +335,24 @@ def login():
 
                 flash(err.message, "error")
 
-    campus_display = _student_context_display()
-    return render_template(
-        "auth/login.html",
+    return _render_login(
         role=role,
-        role_display=_IDENTITY_ROLES.get(role, "未选择身份"),
-        roles=_IDENTITY_ROLES,
-        identity_config=_identity_config(campus_display),
+        target=target,
         field_errors=field_errors,
         identifier_value=identifier_value,
-        campus_display=campus_display,
-        next_target=target,
     )
+
+
+@bp.get("/login/captcha.png")
+def login_captcha():
+    """Issue the local fallback challenge used when Turnstile is not configured."""
+    config = current_app.config.get("APP_CONFIG")
+    if config and config.turnstile_configured:
+        return "", 404
+    image = issue_captcha(session, purpose="login")
+    response = current_app.response_class(image, mimetype="image/png")
+    response.headers["Cache-Control"] = "no-store"
+    return response
 
 
 @bp.route("/register", methods=["GET", "POST"])

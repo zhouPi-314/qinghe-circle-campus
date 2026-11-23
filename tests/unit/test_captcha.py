@@ -59,3 +59,18 @@ def test_expired_captcha_is_rejected(monkeypatch):
         captcha.issue_captcha(state)
         monkeypatch.setattr(captcha, "_now_ts", lambda: 100.0 + captcha.CAPTCHA_TTL_SECONDS + 1)
         assert captcha.verify_captcha(state, "A7B9") is False
+
+
+def test_captcha_purposes_are_isolated(monkeypatch):
+    monkeypatch.setattr(captcha, "_random_captcha_code", lambda: "A7B9")
+
+    with _app().test_request_context():
+        state: dict = {}
+        captcha.issue_captcha(state, purpose="registration")
+        registration_hash = state[captcha.CAPTCHA_HASH_KEY]
+
+        captcha.issue_captcha(state, purpose="login")
+
+        assert state[captcha.CAPTCHA_HASH_KEY] == registration_hash
+        assert captcha.verify_captcha(state, "A7B9", purpose="login") is True
+        assert captcha.verify_captcha(state, "A7B9", purpose="registration") is True
