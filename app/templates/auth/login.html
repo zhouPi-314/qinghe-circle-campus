@@ -203,7 +203,6 @@
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <input type="hidden" name="next" value="{{ next_target or '' }}">
           <input type="hidden" name="role" id="selected-role" value="{{ role or '' }}">
-          <input type="hidden" name="cf-turnstile-response" id="turnstile-form-response" value="">
 
           <div class="form-field {% if field_errors.identifier %}has-error{% endif %}">
             <label for="identifier" id="account-label">
@@ -239,34 +238,47 @@
             {% if field_errors.password %}<p class="field-error" id="err-password">{{ field_errors.password }}</p>{% endif %}
           </div>
 
-          {% if login_verification_enabled and login_verification_mode == "captcha" %}
-            <section class="security-verification security-verification--inline"
-                     id="security-verification" data-mode="captcha" aria-label="安全验证">
-              <div class="local-verification">
-                <div class="captcha-visual">
-                  <img id="login-captcha-image"
-                       src="{{ url_for('auth.login_captcha') }}"
-                       data-captcha-src="{{ url_for('auth.login_captcha') }}"
-                       width="240" height="80"
-                       alt="登录验证码图片，包含四个字符">
-                  <button id="captcha-refresh" class="captcha-refresh" type="button"
-                          aria-label="换一张验证码" title="换一张验证码">
-                    <svg viewBox="0 0 24 24" aria-hidden="true">
-                      <path d="M20 7v5h-5"></path>
-                      <path d="M4 17v-5h5"></path>
-                      <path d="M6.1 8.4A7 7 0 0 1 18 6l2 2"></path>
-                      <path d="M17.9 15.6A7 7 0 0 1 6 18l-2-2"></path>
-                    </svg>
-                  </button>
+          {% if login_verification_enabled %}
+            <section class="security-verification security-verification--inline security-verification--{{ login_verification_mode }}"
+                     id="security-verification" data-mode="{{ login_verification_mode }}"
+                     aria-label="安全验证">
+              {% if login_verification_mode == "turnstile" %}
+                <div class="turnstile-shell">
+                  <div class="cf-turnstile"
+                       data-sitekey="{{ turnstile_site_key }}"
+                       data-action="login"
+                       data-language="zh-CN"
+                       data-theme="auto"
+                       data-size="flexible"
+                       data-appearance="always"></div>
                 </div>
-                <div class="captcha-answer">
-                  <label for="verification-answer">安全验证码</label>
-                  <input id="verification-answer" name="verification_answer" type="text"
-                         inputmode="text" autocomplete="off" autocapitalize="characters"
-                         spellcheck="false" maxlength="4" placeholder="4 位字符" required>
+              {% else %}
+                <div class="local-verification">
+                  <div class="captcha-visual">
+                    <img id="login-captcha-image"
+                         src="{{ url_for('auth.login_captcha') }}"
+                         data-captcha-src="{{ url_for('auth.login_captcha') }}"
+                         width="240" height="80"
+                         alt="登录验证码图片，包含四个字符">
+                    <button id="captcha-refresh" class="captcha-refresh" type="button"
+                            aria-label="换一张验证码" title="换一张验证码">
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M20 7v5h-5"></path>
+                        <path d="M4 17v-5h5"></path>
+                        <path d="M6.1 8.4A7 7 0 0 1 18 6l2 2"></path>
+                        <path d="M17.9 15.6A7 7 0 0 1 6 18l-2-2"></path>
+                      </svg>
+                    </button>
+                  </div>
+                  <div class="captcha-answer">
+                    <label for="verification-answer">安全验证码</label>
+                    <input id="verification-answer" name="verification_answer" type="text"
+                           inputmode="text" autocomplete="off" autocapitalize="characters"
+                           spellcheck="false" maxlength="4" placeholder="4 位字符" required>
+                  </div>
                 </div>
-              </div>
-              <p class="security-verification__hint">安全验证，用于拦截恶意程序类访问。</p>
+              {% endif %}
+              <p class="security-verification__hint">安全验证 · 防止自动化程序滥用</p>
               <p class="security-verification__error" id="security-verification-error" role="alert"
                  {% if not field_errors.verification %}hidden{% endif %}>
                 {{ field_errors.verification }}
@@ -298,26 +310,6 @@
           </a>
         </p>
       </div>
-
-      {% if login_verification_enabled and login_verification_mode == "turnstile" %}
-        <section class="security-verification" id="security-verification"
-                 data-mode="turnstile" aria-label="Cloudflare 安全验证">
-          <div class="turnstile-shell">
-            <div class="cf-turnstile"
-                 data-sitekey="{{ turnstile_site_key }}"
-                 data-action="login"
-                 data-language="zh-CN"
-                 data-theme="auto"
-                 data-size="flexible"
-                 data-appearance="always"></div>
-          </div>
-          <p class="security-verification__hint">验证由 Cloudflare Turnstile 提供，结果只用于本次登录。</p>
-          <p class="security-verification__error" id="security-verification-error" role="alert"
-             {% if not field_errors.verification %}hidden{% endif %}>
-            {{ field_errors.verification }}
-          </p>
-        </section>
-      {% endif %}
 
       <footer class="panel-footer">
         <span>青禾流转 · 校园循环共享平台</span>

@@ -164,7 +164,7 @@ class TestIdentityFlow:
         html = resp.get_data(as_text=True)
         assert 'id="security-verification"' in html
         assert "security-verification--inline" in html
-        assert "安全验证，用于拦截恶意程序类访问。" in html
+        assert "安全验证 · 防止自动化程序滥用" in html
         assert 'id="login-captcha-image"' in html
         assert 'name="verification_answer"' in html
         assert "challenges.cloudflare.com" not in html
@@ -196,8 +196,8 @@ class TestIdentityFlow:
         assert 'class="cf-turnstile"' in page
         assert 'data-sitekey="site-key-for-test"' in page
         assert 'data-size="flexible"' in page
-        assert 'id="turnstile-form-response"' in page
-        assert "security-verification--inline" not in page
+        assert "security-verification--inline" in page
+        assert 'id="login-captcha-image"' not in page
         assert 'src="https://challenges.cloudflare.com/turnstile/v0/api.js"' in page
         assert 'id="login-captcha-image"' not in page
 

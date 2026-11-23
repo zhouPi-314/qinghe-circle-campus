@@ -172,6 +172,14 @@ class Config:
             )
         if (
             self.vercel_env == "production"
+            and self.login_verification_enabled is not False
+            and not self.turnstile_configured
+        ):
+            raise RuntimeError(
+                "Production 登录安全验证必须配置 Cloudflare Turnstile，禁止回退到图片验证码。"
+            )
+        if (
+            self.vercel_env == "production"
             and self.public_allowed_hosts
             and not self.cloudflare_origin_secret
         ):

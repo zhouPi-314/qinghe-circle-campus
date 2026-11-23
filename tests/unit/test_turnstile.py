@@ -87,3 +87,18 @@ def test_partial_turnstile_configuration_fails_fast(monkeypatch, tmp_path):
 
     with pytest.raises(RuntimeError, match="必须同时配置"):
         Config(project_root=tmp_path).validate()
+
+
+def test_production_requires_turnstile(monkeypatch, tmp_path):
+    monkeypatch.setenv("SECRET_KEY", "x" * 32)
+    monkeypatch.setenv(
+        "DATABASE_URL",
+        "postgresql+psycopg://user:password@localhost/example",
+    )
+    monkeypatch.setenv("VERCEL_ENV", "production")
+    monkeypatch.delenv("TURNSTILE_SITE_KEY", raising=False)
+    monkeypatch.delenv("TURNSTILE_SECRET_KEY", raising=False)
+    monkeypatch.delenv("LOGIN_VERIFICATION_ENABLED", raising=False)
+
+    with pytest.raises(RuntimeError, match="Production 登录安全验证"):
+        Config(project_root=tmp_path).validate()

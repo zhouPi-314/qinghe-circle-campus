@@ -21,7 +21,6 @@
   const footnoteLink = document.getElementById("footnote-link");
   const securityVerification = document.getElementById("security-verification");
   const securityError = document.getElementById("security-verification-error");
-  const turnstileFormResponse = document.getElementById("turnstile-form-response");
   const captchaImage = document.getElementById("login-captcha-image");
   const captchaRefresh = document.getElementById("captcha-refresh");
 
@@ -218,7 +217,6 @@
       const turnstileToken = document.querySelector(
         '.cf-turnstile [name="cf-turnstile-response"]',
       )?.value;
-      if (turnstileFormResponse) turnstileFormResponse.value = turnstileToken || "";
       if (!turnstileToken) {
         if (securityError) {
           securityError.textContent = "请先完成安全验证。";
@@ -259,12 +257,4 @@
     if (captchaRefresh) captchaRefresh.disabled = false;
   });
 
-  if (securityVerification?.dataset.mode === "turnstile" && turnstileFormResponse) {
-    window.setInterval(() => {
-      const token = document.querySelector(
-        '.cf-turnstile [name="cf-turnstile-response"]',
-      )?.value;
-      turnstileFormResponse.value = token || "";
-    }, 600);
-  }
 })();
