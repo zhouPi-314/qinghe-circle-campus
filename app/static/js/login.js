@@ -275,8 +275,11 @@
       }
       if (turnstileStatusText) {
         if (token) {
+          window.qingheTurnstileIssue = "";
           turnstileStatusText.textContent = "验证已通过";
           pendingSince = Date.now();
+        } else if (window.qingheTurnstileIssue) {
+          turnstileStatusText.textContent = window.qingheTurnstileIssue;
         } else if (Date.now() - pendingSince > 12000) {
           turnstileStatusText.textContent = "验证服务响应较慢，请刷新重试";
         } else {
