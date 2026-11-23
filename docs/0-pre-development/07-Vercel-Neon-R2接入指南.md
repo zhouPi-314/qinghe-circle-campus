@@ -15,7 +15,7 @@
 - Neon 提供 PostgreSQL 数据库。
 - Cloudflare R2 通过 S3-compatible API 提供图片和头像存储。
 - 本地 PostgreSQL 18 和 Neon PostgreSQL 使用同一种数据库技术，减少 SQL 方言差异。
-- 课程数据量远低于 Neon 免费层的 1 GB。
+- 开发数据量远低于 Neon 免费层的 1 GB。
 - 图片总量低于 R2 免费层 10 GB 时，通常不会产生存储费用。
 
 但 R2 不是 Vercel 的内部存储绑定。Vercel 应用必须使用 S3 凭据访问 R2，因此确实需要：
@@ -192,7 +192,7 @@ postgresql+psycopg://...
 
 ### 6.3 开启公共读取
 
-课程展示建议：
+项目展示建议：
 
 1. 打开刚创建的 bucket。
 2. 进入 **Settings / 设置**。
@@ -204,7 +204,7 @@ postgresql+psycopg://...
 说明：
 
 - `r2.dev` 是开发/非生产用公共地址。
-- 课程展示足够。
+- 项目展示足够。
 - 正式公开运营应使用 Cloudflare 自定义域名，并配置缓存、WAF 和访问策略。
 
 ### 6.4 创建 S3 API Token
@@ -286,7 +286,7 @@ https://<ACCOUNT_ID>.r2.cloudflarestorage.com
 - Vercel Hobby：在免费额度内为 0。
 - Neon Free：在免费额度内为 0，不需要信用卡。
 - Cloudflare R2：有每月免费额度，但开通 R2 和 API Token 可能需要支付方式或订阅激活。
-- 如果课程期间只上传少量图片，R2 用量通常远低于 10 GB 免费存储额度。
+- 如果开发期间只上传少量图片，R2 用量通常远低于 10 GB 免费存储额度。
 
 ## 10. 不推荐现在就做的操作
 

@@ -21,7 +21,7 @@
         "app/templates/auth/student_context.html",
         "app/templates/auth/register.html"
       ],
-      "author": "zhouPi-314 / Codex",
+      "author": "zhouPi-314 / 项目维护者",
       "license": "MIT",
       "source": "Original inline SVG, CSS and JavaScript created for this project",
       "redistribution": "Covered by the repository MIT License"

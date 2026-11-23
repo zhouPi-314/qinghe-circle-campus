@@ -12,7 +12,7 @@ A Campus Circular Sharing Platform
 [![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.x-D71F00)](https://www.sqlalchemy.org/)
-[![Tests](https://img.shields.io/badge/tests-298%20passed-2EA44F)](docs/6.3-development/evidence/digitalplat-cloudflare-production-verification-20261122.md)
+[![Tests](https://img.shields.io/badge/tests-291%20passed-2EA44F)](tests/)
 [![License](https://img.shields.io/badge/license-MIT-3DA639)](LICENSE)
 [![Vercel](https://img.shields.io/badge/Vercel-deployed-000000?logo=vercel&logoColor=white)](https://qinghecircle.dpdns.org)
 
@@ -25,7 +25,9 @@ A Campus Circular Sharing Platform
 
 面向高校的校园物品共享、二手流转、免费赠送、绿色回收与公益实物捐赠平台。项目使用 Flask 服务端渲染，支持多高校逻辑隔离、学生名单核验、四类流转状态机、一次性交接码、争议处理、公益回执和 R2 图片存储。
 
-> 本项目以开源方式分享，欢迎使用、提出问题和参与改进。它是校园场景的工程示例，不承诺生产级 SLA，也不接收真实公益资金。代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权。
+> 本项目以开源方式分享，欢迎使用、提出问题和参与改进。它是校园场景的工程示例，不承诺生产级 SLA，也不接收真实公益资金。
+
+> **当前版本状态：** `v1.1.0` 已合并并部署，包含校级管理员本校治理、图形验证码、阿里云短信认证和平台运维安全中心。公网主入口迁移到 `https://qinghecircle.dpdns.org`，Cloudflare Free WAF、默认 Vercel 入口封锁和免费收件转发已启用。代码与原创文档采用 MIT；第三方媒体保留原权利人许可，不随 MIT 重新授权。
 
 ## 项目背景
 
@@ -38,7 +40,7 @@ A Campus Circular Sharing Platform
 
 青禾流转把分散的流转行为组织为一条可搜索、可确认、可追踪的流程。系统采用多高校逻辑隔离，个人只能参与所属学校的业务；管理员按平台、学校和站点范围分工；公益首版只处理实物需求、捐赠核验和脱敏回执，不接收真实资金。
 
-## 功能结构与演示权重
+## 功能结构
 
 | 模块 | 能力 |
 |---|---|
@@ -73,6 +75,8 @@ A Campus Circular Sharing Platform
 
 公开站点不提供管理员密码查询。生产密码只保存慢哈希，无法从网页或数据库哈希反推明文。默认登录名通常是 `platform_admin`，但登录名不等于密码。
 
+- 有 Vercel/Neon 权限时，可按 [平台管理员账号获取与恢复](docs/6.3-development/admin-access-and-recovery.md) 使用受控脚本创建一个独立恢复账号。
+- 没有基础设施权限时，请通过项目所有者恢复；不要在公开 Issue 或 Discussion 中请求或发送密码。
 - 当前首版没有管理员自助改密页面，密码重置属于受控运维操作。
 
 ## 如需本地复刻部署
@@ -199,7 +203,7 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 
 ## 使用、复刻与署名
 
-你可以直接访问本项目已公网配置好的官网进行使用，也可以基于它继续开发或参与本项目开发完善。复刻、发布修改版或用于课程展示时，请：
+你可以直接访问本项目已公网配置好的官网进行使用，也可以基于它继续开发或参与本项目开发完善。复刻或发布修改版时，请：
 
 1. 保留 `LICENSE` 中的版权与许可声明。
 2. 在项目 README、About 或衍生产品说明中注明“基于 Qinghe Circle Campus / 青禾流转，作者 zhouPi-314”。
@@ -222,14 +226,13 @@ macOS/Linux 将虚拟环境命令替换为 `source .venv/bin/activate`。
 ## 已知限制
 
 - 首版无真实支付、邮件验证码、实名认证和公开募捐。
-- 图形验证码是课程级自托管方案，不等同于商业 OCR 抗性验证码。
+- 图形验证码是项目自托管方案，不等同于商业 OCR 抗性验证码。
 - 无管理员自助改密页面，密码重置需要受控运维操作。
-- 课程演示管理员已独立预设，凭据只保存在部署维护者的桌面受控文件中。
 - Cloudflare Free 自带的速率限制只有一条规则、10 秒窗口；长窗口频控仍由应用层承担。
 - 并发验证以线程级测试为主，未做生产级压测。
 - 高校校区部分记录仍标记为 `temporary`，正式运营前需逐校核验。
-- 第三方人物、学校、公益机构、未成年人场景和用户提供图片保留在仓库中用于课程与场景说明，来源记录见 `docs/6.2-design/assets/credits.json` 和 `work/ui-animation-proposal-20261120/sources.json`；这些素材不随 MIT 代码授权，也不代表相关机构、人物或活动与本项目存在合作、授权或背书。
+- 第三方人物、学校、公益机构、未成年人场景和用户提供图片保留在仓库中用于场景说明，来源记录见 `docs/6.2-design/assets/credits.json` 和 `work/ui-animation-proposal-20261120/sources.json`；这些素材不随 MIT 代码授权，也不代表相关机构、人物或活动与本项目存在合作、授权或背书。
 
 ## License
 
-Copyright (c) 2026 zhouPi-314. Original source code and original project documentation are licensed under the MIT License. Third-party media, trademarks and institutional marks retain their own rights and are included only as attributed course-demo and scene-illustration material.
+Copyright (c) 2026 zhouPi-314. Original source code and original project documentation are licensed under the MIT License. Third-party media, trademarks and institutional marks retain their own rights and are included only as attributed scene-illustration material.

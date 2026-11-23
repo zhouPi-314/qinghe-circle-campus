@@ -1,61 +1,48 @@
-# 青禾流转项目协作规则
+# 青禾流转项目开发规则
 
-本文件是当前仓库的统一下游入口。Codex、WorkerBuddy 和人工维护者都必须先遵守本文件，再阅读它指向的规范。
+本文件是仓库的统一开发入口。修改代码、数据库、部署或公开文档前，先阅读本文件及它指向的规范。
 
-## 当前阶段
+## 当前状态
 
-- 项目名称：青禾流转（Qinghe Circle Campus）
-- 当前状态：G4 已批准发布（D-042）。G5-A/B/C 已完成合并、依赖审计、31 表 Production 迁移、Vercel 部署和公网 smoke；主入口已迁移到 `https://qinghecircle.dpdns.org`，Cloudflare Free WAF、源站密钥入口守卫和免费收件转发已上线（D-058/D-059）；298 项回归通过，WorkerBuddy 保持停止
-- G1 通过前不得进入 G2 业务编码；各门禁停止点见 `docs/00-governance/collaboration-and-quality-gates.md`
+- 项目：青禾流转（Qinghe Circle Campus）
+- 主入口：`https://qinghecircle.dpdns.org`
+- 技术栈：Flask、Jinja2、PostgreSQL、SQLAlchemy、Vercel、Neon、Cloudflare
+- 当前版本已部署；发布前必须完成自动化回归、公网 smoke、密钥检查和文档同步。
 
-## 强制阅读顺序
-
-开始 6.1 前阅读：
+## 阅读顺序
 
 1. `docs/0-pre-development/01-问题定义.md`
 2. `docs/0-pre-development/02-可行性研究报告.md`
 3. `docs/0-pre-development/03-项目开发计划.md`
 4. `docs/0-pre-development/04-已确认范围与约束.md`
-
-开始 6.3 编码前，WorkerBuddy 还必须完整阅读：
-
-1. `docs/00-governance/engineering-standards.md`
-2. `docs/00-governance/collaboration-and-quality-gates.md`
-3. `docs/00-governance/glossary.md`
-4. 全部已冻结的 6.1、6.2 文档
-5. `docs/6.3-development/handoff/WORKERBUDDY_HANDOFF.md`
+5. `docs/00-governance/engineering-standards.md`
+6. `docs/00-governance/collaboration-and-quality-gates.md`
+7. `docs/00-governance/glossary.md`
 
 ## 唯一标准
 
-- 技术标准只以 `docs/00-governance/engineering-standards.md` 为准。
-- 业务术语只以 `docs/00-governance/glossary.md` 为准。
-- 阶段职责与暂停点只以 `docs/00-governance/collaboration-and-quality-gates.md` 为准。
+- 技术标准以 `docs/00-governance/engineering-standards.md` 为准。
+- 业务术语以 `docs/00-governance/glossary.md` 为准。
+- 阶段和质量门禁以 `docs/00-governance/collaboration-and-quality-gates.md` 为准。
 - 范围、接口、数据库或业务规则变更必须记录在 `docs/00-governance/decision-log.md`。
-- WorkerBuddy 不建立第二套规范，不另建平行目录，不以自己的偏好覆盖仓库规范。
+- 开发文档只维护一套，不创建重复规范或平行实现。
 
-## 写入权
+## 开发原则
 
-- 6.1、6.2：Codex 编写，用户批准。
-- 6.3：同一时间只允许一个 Agent 修改业务代码。
-- WorkerBuddy 开发期间：WorkerBuddy 是编码写入者。
-- Codex 验收期间：WorkerBuddy 停止编辑，Codex 可进行受控修复。
-- 用户是范围变更和最终发布的批准者。
+- 保持 `route -> service -> model/database` 的依赖方向。
+- 业务规则、权限和事务放在 service 层；路由只负责协议转换。
+- 新模块通过明确的 service 接口扩展，避免跨模块直接依赖内部实现。
+- 一项变更应同时包含实现、测试、文档和必要的数据库迁移。
+- 未经测试证据支持，不宣称功能完成或发布安全。
 
-## 强制暂停
+## 发布检查
 
-WorkerBuddy 到达以下门禁时必须停止继续开发并等待审阅：
-
-1. **G0 交接确认**：编码开始前。
-2. **G1 基础骨架**：应用可启动、数据库可初始化、基础权限生效后。
-3. **G2 第一条业务闭环**：第一条完整流转链及其测试完成后。
-4. **G3 全功能完成**：四类物品流转和公益首版完成后。
-5. **G4 发布候选**：Codex 验收、修复和最终回归完成后。
-6. **G5-A 校级管理员**：本校范围、账号、名单、审核、争议和审计通过后。
-7. **G5-B 注册短信**：图形验证码、阿里云短信和注册闭环通过后。
-8. **G5-C 运维治理**：安全事件、临时封禁、运行状况和错误日志通过后。
-9. **G5-R 发布候选**：迁移演练、Preview smoke、文档和 Word 同步完成后。
-
-门禁的具体完成条件和停止指令见 `collaboration-and-quality-gates.md` 和 WorkerBuddy 交接文档。
+1. 需求、设计和决策记录已同步。
+2. 数据库迁移已在可回滚的演练环境执行。
+3. 自动化测试和静态检查通过。
+4. Preview 与 Production smoke 通过。
+5. 未提交密码、验证码、连接串、Access Key、API Token 或真实个人信息。
+6. 公开文档不包含凭据、内部工作记录和不应公开的运营信息。
 
 ## 安全底线
 

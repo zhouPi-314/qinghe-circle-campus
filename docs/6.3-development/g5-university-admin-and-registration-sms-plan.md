@@ -16,7 +16,7 @@ User approved the scope on 2026-11-21 in D-054. Aliyun SMS Authentication (PNVS)
 
 ## Global Constraints
 
-- 同一时间只有 WorkerBuddy 修改 `app/`、`tests/unit/`、`tests/integration/` 和 `sql/schema.sql`；Codex 只维护方案、验收测试和受控修复。
+- 同一时间只有 项目维护者 修改 `app/`、`tests/unit/`、`tests/integration/` 和 `sql/schema.sql`；项目维护者 只维护方案、验收测试和受控修复。
 - 冻结业务顺序：先完成并验收 G5-A 校级管理员，再开始 G5-B 短信；G5-B 未通过不得发布 Production。
 - `university_admin` 只能使用自己的 `university_id`；任何表单高校 ID 都必须与 actor 对比。
 - 跨校越权、停用账号、无授权站点、错误验证码、过期验证码、重发过快、短信服务异常都必须在 service 层拒绝。
@@ -241,7 +241,7 @@ git add app/services/item_service.py app/services/handover_service.py app/servic
 git commit -m "feat: add scoped university moderation and governance"
 ```
 
-Stop: G5-A 门禁，提交测试证据，等待 Codex 验收。
+Stop: G5-A 门禁，提交测试证据，等待项目维护者 验收。
 
 ### Task 5: 注册验证数据模型与迁移
 
@@ -425,7 +425,7 @@ git add app/routes/auth.py app/templates/auth/register.html app/static/js/regist
 git commit -m "feat: add registration captcha and sms UI"
 ```
 
-Stop: G5-B 门禁，提交测试证据，等待 Codex 验收。
+Stop: G5-B 门禁，提交测试证据，等待项目维护者 验收。
 
 ### Task 9: 平台运维、攻击分类与日志
 
@@ -571,14 +571,14 @@ Send nine allowed registration-code attempts from one test IP with valid captcha
 
 Record actual test count, migration result, Aliyun smoke result and remaining limitations. Regenerate 6.1/6.2 Word files and run structure checks.
 
-- [ ] **Step 7: Codex acceptance**
+- [ ] **Step 7: 项目维护者 acceptance**
 
-Codex verifies own-school isolation, account escalation prevention, captcha replay, SMS provider failure, migration and secrets. WorkerBuddy stops during review.
+验收独立检查 own-school isolation, account escalation prevention, captcha replay, SMS provider failure, migration and secrets. 项目维护者 stops during review.
 
 - [ ] **Step 8: Commit and stop**
 
 ```powershell
-git add README.md .env.example docs 提交物
+git add README.md .env.example docs
 git commit -m "docs: complete g5 release evidence"
 ```
 
@@ -590,15 +590,15 @@ Stop: G5-R release candidate，等待用户批准切换 Production。
 
 | 门禁 | 完成条件 | 停止指令 |
 |---|---|---|
-| G5-0 方案冻结 | 本文和设计提案获批；阿里云账号准备清单明确 | WorkerBuddy 不写代码 |
-| G5-A 校级管理员 | 本校概览、组织、账号名单、审核争议审计通过 | 停止，Codex 验收 |
-| G5-B 注册短信 | 图形码、模拟/真实 Provider、注册闭环与异常测试通过 | 停止，Codex 验收 |
-| G5-C 运维治理 | 攻击分类、临时封禁、运行状况、错误日志与 Cloudflare 部署说明通过 | 停止，Codex 验收 |
+| G5-0 方案冻结 | 本文和设计提案获批；阿里云账号准备清单明确 | 项目维护者 不写代码 |
+| G5-A 校级管理员 | 本校概览、组织、账号名单、审核争议审计通过 | 停止，项目维护者 验收 |
+| G5-B 注册短信 | 图形码、模拟/真实 Provider、注册闭环与异常测试通过 | 停止，项目维护者 验收 |
+| G5-C 运维治理 | 攻击分类、临时封禁、运行状况、错误日志与 Cloudflare 部署说明通过 | 停止，项目维护者 验收 |
 | G5-R 发布候选 | 全量回归、迁移演练、Preview 阿里云 smoke、文档和 Word 同步 | 停止，用户批准 Production |
 
 ### 写入权
 
-| 阶段 | Codex | WorkerBuddy | 用户 |
+| 阶段 | 项目维护者 | 项目维护者 | 用户 |
 |---|---|---|---|
 | G5-0 | 设计、计划、范围检查 | 阅读并提交问题 | 批准范围和权限 |
 | G5-A/B | 验收测试、审查、受控修复 | 业务代码、页面、测试、增量文档 | 配置阿里云、确认测试手机号 |
@@ -606,7 +606,7 @@ Stop: G5-R release candidate，等待用户批准切换 Production。
 
 ### 分支与提交
 
-- 分支：`workerbuddy/g5-university-admin-sms`
+- 分支：`feature/g5-university-admin-sms`
 - 每个 Task 一个可回滚 commit。
 - G5-A 和 G5-B 分别停止，不允许一口气实现后统一验收。
 - 迁移脚本、应用代码和文档使用同一发布候选 commit。

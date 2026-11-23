@@ -203,7 +203,7 @@ flowchart LR
 
 ## 8. 部署架构
 
-| 层 | 课程本地 | 公网演示 |
+| 层 | 本地开发 | 公网运行 |
 |---|---|---|
 | Web | Flask 开发服务器 | Vercel Python Function |
 | 数据库 | 本地 PostgreSQL 18 | Neon PostgreSQL |

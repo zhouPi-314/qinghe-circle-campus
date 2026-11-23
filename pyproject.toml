@@ -16,7 +16,7 @@ dependencies = [
 [tool.ruff]
 line-length = 100
 target-version = "py313"
-exclude = [".venv", ".workbuddy-ai", "work", "docs"]
+exclude = [".venv", ".work-ai", "work", "docs"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP"]

@@ -4,25 +4,25 @@
 |---|---|
 | 项目 | 青禾流转（Qinghe Circle Campus） |
 | 门禁 | G1：基础骨架（第三次提交） |
-| 提交者 | WorkerBuddy |
+| 提交者 | 项目维护者 |
 | 提交日期 | 2026-11-20 |
-| **代码 commit** | **`[private-history]`**（分支 `workerbuddy/6.3-implementation`） |
+| **代码 commit** | **`[private-history]`**（分支 `feature/6.3-implementation`） |
 | **证据 commit** | 本文件与测试证据所在 commit（见 `git log -- docs/6.3-development/evidence/`） |
 | 上一版报告 | v2（代码 commit `[private-history]`），第二次审核退回，结论记录于 D-034 |
 | 需求版本 | SRS-001 1.1（已批准冻结） |
 | 设计版本 | 6.2 设计集 1.9（已批准冻结） |
-| 等待 | Codex review / 用户确认 |
+| 等待 | 独立复核 / 用户确认 |
 
 ## 0. 第二次退回项修复对照表
 
-| # | Codex 退回项 | 修复方式 | 验证 |
+| # | 项目维护者 退回项 | 修复方式 | 验证 |
 |---|---|---|---|
 | 阻断 | 管理员权限未在 service 层复验：`get_organization_tree()` 不接收操作者、无角色检查 | `org_service.get_organization_tree(actor)`：actor 为空或非 `platform_admin` 一律抛 `PermissionDeniedError`；路由传入 `g.current_user` | 新增 3 项 service 测试：匿名 actor 拒绝、学生 actor 拒绝、平台管理员通过（绕过路由直接调用） |
 | 高 | 测试库不可并发（固定 `qinghe_circle_test`，重建 schema 引发锁冲突） | 每次运行使用独立测试库 `qinghe_circle_test_<pid>`，会话结束自动断开连接并 `DROP DATABASE` | conftest 重写；运行后复核 `leftover_test_dbs=0` |
 | 中 | 手机号哈希与 SECRET_KEY 绑定，缺轮换迁移方案 | 密钥版本化派生（`PHONE_HASH_KEY_VERSION=1`）并在代码注释、D-033、本报告明确迁移路径：重导名单 CSV 重建 registry 哈希 → 按 `registered_user_id` 同步回 users → 学号登录恢复；纳入 G4 发布检查单，未迁移前禁止轮换 SECRET_KEY | D-033、app/core/auth.py `phone_hmac_key()` |
 | 阻断 | 登录后无法返回原目标页（identity/student-context 丢 next） | `next` 贯穿整链：login→identity→student-context→login→落点；仅允许站内相对路径（拒绝 `//`、反斜杠、外链） | 新增端到端测试 `test_full_chain_returns_to_original_target`：6 步链路最终落点 `/me/profile` 200；另测 `//evil.com` 被丢弃 |
 | 高 | 开发库被污染（142/162/2/1） | `tools/init_database.py --reset` 重建开发库；实测 `universities=141 campuses=161 platform_admins=1 students=0`；固定旧测试库 `qinghe_circle_test` 已删除 | psql 实测输出见第 3 节 |
-| 高 | 交接书自相矛盾（版本 1.0、交接 commit 未生成、G0 未通过、业务代码未开始） | 交接书升版 1.2：文档版本号、交接 commit（`[private-history]` + 实施分支）、第 1 节交接结论、第 3 节业务代码状态全部与实际仓库对齐 | WORKERBUDDY_HANDOFF.md |
+| 高 | 交接书自相矛盾（版本 1.0、交接 commit 未生成、G0 未通过、业务代码未开始） | 交接书升版 1.2：文档版本号、交接 commit（`[private-history]` + 实施分支）、第 1 节交接结论、第 3 节业务代码状态全部与实际仓库对齐 | 实施记录 |
 | — | 首轮测试 deadlock（并发 pytest 进程） | 属测试环境并发问题，按上一条按运行隔离修复；本轮证据为单进程串行运行 | g1-test-output.txt 文件头注明"串行单进程运行" |
 
 上一轮未发现回归的项（SameSite、FLASK_DEBUG、psycopg 驱动、405 中文页、表名动态化、commit 固化、D-031）本轮保持并通过复核。
@@ -83,9 +83,9 @@ Ruff：.venv/Scripts/python -m ruff check app tests -> All checks passed!
 
 ## 6. 已知事项
 
-- **手机号哈希密钥**：与 SECRET_KEY 绑定（D-033 已记录迁移路径与 G4 发布检查单要求）。当前课程环境不轮换 SECRET_KEY，无实际影响。
+- **手机号哈希密钥**：与 SECRET_KEY 绑定（D-033 已记录迁移路径与 G4 发布检查单要求）。当前开发环境不轮换 SECRET_KEY，无实际影响。
 - 无其他已知问题。
 
 ## 7. 下一步
 
-等待 Codex/用户对 G1（第三次提交）的审阅结论。通过后按交接书第 4 节顺序进入 G2，在 G2 再次停止提交证据。
+等待 用户对 G1（第三次提交）的审阅结论。通过后按交接书第 4 节顺序进入 G2，在 G2 再次停止提交证据。

@@ -3,7 +3,7 @@
 | 项目 | 内容 |
 |---|---|
 | 阶段 | G3 全功能完成（第二次提交，首轮审核退回项已全部修复） |
-| 代码 commit | **`[private-history]`**（分支 `workerbuddy/6.3-implementation`）；首轮 G3 代码 commit `[private-history]` |
+| 代码 commit | **`[private-history]`**（分支 `feature/6.3-implementation`）；首轮 G3 代码 commit `[private-history]` |
 | 前置门禁 | G0（D-031）、G1（D-035）、G2（D-037，用户批准） |
 | 报告日期 | 2026-11-20 |
 | Python 版本 | **3.13.14**（见 `g3-python-version.txt`，v1 报告误写 3.13.12，已更正） |
@@ -77,7 +77,7 @@
 
 ## 5. 设计偏差清单
 
-1. **D-036 已由 Codex 确认**（业务方向成立）：回收拒绝/验收不符合 → off_shelf，状态机转换 reserved→off_shelf、in_progress→off_shelf 维持实现；
+1. **D-036 已由 项目维护者 确认**（业务方向成立）：回收拒绝/验收不符合 → off_shelf，状态机转换 reserved→off_shelf、in_progress→off_shelf 维持实现；
 2. 交接码通知文案采用通用表述（"与对方完成取件交接"），未按模式区分措辞；
 3. 其余无偏差。
 
@@ -90,11 +90,11 @@
 
 ## 7. 未执行项说明（沿首轮审核备注）
 
-公网部署 smoke test 未执行：当前无生产地址，部署门禁在 G4 由 Codex 执行公网验收时覆盖。
+公网部署 smoke test 未执行：当前无生产地址，部署门禁在 G4 由 项目维护者 执行公网验收时覆盖。
 
 ## 8. 停止声明
 
-按 `collaboration-and-quality-gates.md` 第 4 节，WorkerBuddy 修复完毕后停止，等待 Codex 重新审核。
+按 `collaboration-and-quality-gates.md` 第 4 节，项目维护者 修复完毕后停止，等待项目维护者 重新审核。
 
 ```text
 GATE READY: G3（重提交）
@@ -103,5 +103,5 @@ Scope completed: 首轮 12 项退回项（4 Standards + 8 Spec）全部修复；
 Evidence: docs/6.3-development/evidence/g3-gate-report.md（v2）、g3-test-output.txt、g3-python-version.txt、g3-dependencies.txt、g3-ruff.txt
 Deviations: 交接码通知文案通用化（低风险）；无其他
 Blocking questions: 无
-Waiting for: Codex review / user decision
+Waiting for: 独立复核 / user decision
 ```

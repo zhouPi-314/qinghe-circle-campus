@@ -4,8 +4,11 @@
 .vercel/
 .venv/
 .work-cloud-check-venv/
-.workbuddy-ai/
+.work-ai/
 .worktrees/
+.private-docs/
+.private-tools/
+提交物/
 .npm-cache/
 .qa/
 __pycache__/
@@ -17,3 +20,11 @@ instance/
 *.log
 Thumbs.db
 .DS_Store
+tools/export_6_1_word.py
+tools/export_6_2_sql_word.py
+tools/export_6_2_word.py
+tools/check_docx_structure.py
+docs/6.3-development/handoff/
+docs/6.2-design/evidence/docx-structure.json
+docs/6.3-development/evidence/*docx*
+docs/6.3-development/evidence/submission-docx-verification-*.md

@@ -29,6 +29,7 @@
 - Free Managed Ruleset、扫描路径阻断和 Bot Fight Mode 已启用。
 - 注册速率限制条件为 `URI Path contains /auth/register`，10 秒内 10 次，Block 10 秒。
 - 两个 Zone 各自通过 Request Header Transform Rule 注入同一源站密钥；密钥不进入仓库。
+- 普通首页不强制显示 Managed Challenge；WAF 命中扫描特征时直接返回 403，Bot Fight Mode 和注册限速按各自规则处理。
 
 ## 免费收件转发
 
@@ -36,13 +37,6 @@
 - Cloudflare Email Routing 路由状态 Active。
 - MX、SPF 和 DKIM 查询通过。
 - 该能力只负责收件转发，不是任意收件人的免费事务邮件发送服务。
-
-## 课程演示管理员
-
-- 生产环境已通过现有平台管理员会话创建独立校级管理员账号。
-- 权限范围为四川大学本校管理。
-- 登录名和初始密码不进入 Git、Issue、截图或本文档。
-- 凭据只保存在当前 Windows 用户的桌面受控文件中。
 
 ## 已知边界
 
