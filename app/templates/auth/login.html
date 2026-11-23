@@ -250,7 +250,14 @@
                        data-language="zh-CN"
                        data-theme="auto"
                        data-size="flexible"
-                       data-appearance="always"></div>
+                       data-appearance="always"
+                       data-retry="auto"
+                       data-retry-interval="3000"
+                       data-refresh-expired="auto"
+                       data-refresh-timeout="auto"
+                       data-error-callback="qingheTurnstileError"
+                       data-expired-callback="qingheTurnstileExpired"
+                       data-timeout-callback="qingheTurnstileTimeout"></div>
                   <div class="turnstile-status" id="turnstile-status" role="status" aria-live="polite">
                     <span class="turnstile-status__spinner" aria-hidden="true"></span>
                     <span class="turnstile-status__copy">
@@ -329,6 +336,18 @@
   </main>
   <script type="application/json" id="identity-config">{{ identity_config | tojson }}</script>
   {% if login_verification_enabled and login_verification_mode == "turnstile" %}
+    <script>
+      (() => {
+        const setStatus = (text) => {
+          window.qingheTurnstileIssue = text;
+          const node = document.getElementById("turnstile-status-text");
+          if (node) node.textContent = text;
+        };
+        window.qingheTurnstileError = () => setStatus("验证未完成，正在自动重试");
+        window.qingheTurnstileExpired = () => setStatus("验证已过期，正在重新验证");
+        window.qingheTurnstileTimeout = () => setStatus("验证超时，正在重新验证");
+      })();
+    </script>
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
   {% endif %}
   <script src="{{ url_for('static', filename='js/theme.js') }}" defer></script>
