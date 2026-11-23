@@ -196,6 +196,8 @@ class TestIdentityFlow:
         assert 'class="cf-turnstile"' in page
         assert 'data-sitekey="site-key-for-test"' in page
         assert 'data-size="flexible"' in page
+        assert 'data-retry-interval="3000"' in page
+        assert 'data-error-callback="qingheTurnstileError"' in page
         assert "security-verification--inline" in page
         assert 'id="login-captcha-image"' not in page
         assert 'id="turnstile-status"' in page
